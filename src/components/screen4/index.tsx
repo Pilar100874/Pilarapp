@@ -32,8 +32,8 @@ export const Screen4 = () => {
         anchorY="middle"
         position-z={0.5}
       >
-        From humble beginnings to global stardom,{'\n'}
-        Khaby's journey is a testament to the power of authenticity
+        Breaking barriers through silence{'\n'}
+        Inspiring millions with simplicity
         <meshBasicMaterial ref={materialRef} transparent side={DoubleSide} />
       </Text>
     </Scroll>
