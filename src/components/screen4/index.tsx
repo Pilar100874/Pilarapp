@@ -1,14 +1,23 @@
-import { Text, Scroll } from '@react-three/drei';
+import { Text, Scroll, useScroll } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
-import { Mesh } from 'three';
+import { DoubleSide, MathUtils, Mesh, MeshBasicMaterial } from 'three';
 
 export const Screen4 = () => {
   const textRef = useRef<Mesh>(null);
+  const materialRef = useRef<MeshBasicMaterial>(null);
+  const scroll = useScroll();
 
   useFrame((state) => {
-    if (!textRef.current) return;
+    if (!textRef.current || !materialRef.current) return;
+
+    // Floating animation
     textRef.current.position.y = -20 + Math.sin(state.clock.elapsedTime * 0.5) * 0.2;
+    
+    // Rotation and opacity animation based on scroll
+    const rotY = scroll.offset * 5 - Math.PI / 8;
+    textRef.current.rotation.y = rotY;
+    materialRef.current.opacity = MathUtils.clamp(Math.pow(rotY + 1, 20), -Infinity, 1);
   });
 
   return (
@@ -24,7 +33,7 @@ export const Screen4 = () => {
         position-z={0.5}
       >
         Mais de 30 mil metros de galpão{'\n'}para melhor atende-lo
-        <meshBasicMaterial color="white" />
+        <meshBasicMaterial ref={materialRef} transparent side={DoubleSide} />
       </Text>
     </Scroll>
   );
