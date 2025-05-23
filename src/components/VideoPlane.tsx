@@ -16,8 +16,11 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
   const scroll = useScroll();
   const windowSize = useAspect(1920, 1080);
 
-  const videoTexture = useVideoTexture(texturePath, {
+  const videoTexture = useVideoTexture("https://player.vimeo.com/external/367920624.hd.mp4?s=e4e6e6f9f6e2b1f7f3a54a0b3d7c4f7f7f7f7f7&profile_id=174", {
     autoplay: true,
+    loop: true,
+    muted: true,
+    crossOrigin: "anonymous",
   });
 
   const ref = useRef<Mesh>(null);
