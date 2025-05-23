@@ -32,7 +32,8 @@ export const Screen4 = () => {
         anchorY="middle"
         position-z={0.5}
       >
-        Mais de 30 mil metros de galpão{'\n'}para melhor atende-lo
+        From humble beginnings to global stardom,{'\n'}
+        Khaby's journey is a testament to the power of authenticity
         <meshBasicMaterial ref={materialRef} transparent side={DoubleSide} />
       </Text>
     </Scroll>

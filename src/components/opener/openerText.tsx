@@ -16,7 +16,7 @@ export const OpenerText = ({ py }: OpenerText) => {
         anchorX="center"
         anchorY="middle"
       >
-        AN EXPERIENCE WITH SOCIAL MEDIA SUPERSTAR
+        DISCOVER THE STORY OF
         <meshBasicMaterial depthTest={false} />
       </Text>
       <Text
