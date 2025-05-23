@@ -8,7 +8,7 @@ export const OpenerText = ({ py }: OpenerText) => {
   return (
     <group position-y={py}>
       <Text
-        fontSize={0.25}
+        fontSize={0.35}
         letterSpacing={0.005}
         position-z={0.1}
         textAlign={"left"}
