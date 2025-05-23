@@ -37,9 +37,9 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
         scale={[...windowSize]}
         material-side={DoubleSide}
         material-map={videoTexture}
-        position-y={-34}
+        position-y={-36}
       />
-      <OpenerText py={-33.5} />
+      <OpenerText py={-35.5} />
     </Suspense>
   );
 };
