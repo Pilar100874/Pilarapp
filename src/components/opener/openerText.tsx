@@ -16,11 +16,11 @@ export const OpenerText = ({ py }: OpenerText) => {
         anchorX="center"
         anchorY="middle"
       >
-        PROCURANDO PAPÉIS
+        PROCURANDO PAPÉIS ??
         <meshBasicMaterial depthTest={false} />
       </Text>
       <Text
-        fontSize={1.25}
+        fontSize={1.05}
         letterSpacing={0.005}
         position-z={0.1}
         position-y={-0.75}
