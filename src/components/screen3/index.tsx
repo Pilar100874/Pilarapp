@@ -1,13 +1,15 @@
 import { Scroll } from '@react-three/drei';
-import { VideoPlane } from '@/components/VideoPlane';
-import { Screen3Text } from './Screen3Text';
+import { SCREEN3_OFFSET_START_Y } from './constants';
+import { dataPhotos } from './dataPhotos';
+import { Photo } from './photo';
 
 export const Screen3 = () => {
   return (
     <Scroll>
-      <group position-y={-13.5}>
-        <VideoPlane texturePath="opener.mp4" />
-        <Screen3Text py={0.5} />
+      <group position-y={SCREEN3_OFFSET_START_Y} rotation-y={Math.PI * -0.05}>
+        {Object.entries(dataPhotos).map(([name, src], i) => (
+          <Photo key={name} index={i} src={src} />
+        ))}
       </group>
     </Scroll>
   );
