@@ -1,1 +1,1 @@
-export const SCREEN4_OFFSET_START_Y = -13;
+export const SCREEN4_OFFSET_START_Y = -23;
