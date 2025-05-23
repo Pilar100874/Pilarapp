@@ -1,0 +1,1 @@
+export const dataScreen4 = ["VISIONARY", "INNOVATOR", "CREATOR", "INFLUENCER", "LEADER"];
