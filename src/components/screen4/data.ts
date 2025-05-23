@@ -1,0 +1,1 @@
+export const dataScreen4 = ["Qualidade", "Agilidade", "Segurança", "Confiança", "Tradição"];
