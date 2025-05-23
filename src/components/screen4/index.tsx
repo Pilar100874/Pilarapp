@@ -10,7 +10,7 @@ export const Screen4 = () => {
       {dataScreen4.map((word, i) => (
         <Word key={word} value={word} index={dataScreen4.length - i} />
       ))}
-      <group position-y={SCREEN4_OFFSET_START_Y * 0.35}>
+      <group position-y={SCREEN4_OFFSET_START_Y * 0.75}>
         <PillarModel />
       </group>
     </Scroll>
