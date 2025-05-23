@@ -16,7 +16,7 @@ export const OpenerText = ({ py }: OpenerText) => {
         anchorX="center"
         anchorY="middle"
       >
-        WELCOME TO THE WORLD OF
+        PROCURANDO PAPÉIS
         <meshBasicMaterial depthTest={false} />
       </Text>
       <Text
@@ -29,7 +29,7 @@ export const OpenerText = ({ py }: OpenerText) => {
         anchorX="center"
         anchorY="middle"
       >
-        KHABY LAME
+        VOCÊ ENCONTRA AQUI !!
         <meshBasicMaterial depthTest={false} />
       </Text>
     </group>
