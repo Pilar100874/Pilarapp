@@ -27,7 +27,7 @@ export function PillarModel(props: JSX.IntrinsicElements['group']) {
           geometry={nodes.pedestal.geometry}
           material={materials.Material_0}
           rotation={[Math.PI / 2, 0, 0]}
-          scale={2.48}
+          scale={2.08}
         />
       </group>
     </group>
