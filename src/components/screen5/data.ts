@@ -1,0 +1,1 @@
+export const dataScreen5 = ["ATENDIMENTO", "PERSONALIZADO", "ENTREGA", "RÁPIDA", "QUALIDADE"];
