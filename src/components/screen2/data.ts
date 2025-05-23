@@ -1,1 +1,1 @@
-export const dataScreen2 = ["GLOBAL ICON", "DIGITAL PIONEER", "STORYTELLER", "TRENDSETTER", "CHANGEMAKER"];
+export const dataScreen2 = ["27", "ANOS NO MERCADO", "9", "UNIDADES PELO BRASIL"];
