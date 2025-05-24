@@ -22,7 +22,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
       </Text>
 
       <group
-        position-y={-1.2}
+        position-y={-1.0}
         scale={isHovered ? 1.1 : 1}
         onClick={onStart}
         onPointerEnter={() => setIsHovered(true)}
