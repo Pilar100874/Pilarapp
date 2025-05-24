@@ -6,7 +6,7 @@ export const Screen9 = () => {
     <Scroll>
       <group position-y={SCREEN9_OFFSET_START_Y}>
         <Text
-          fontSize={0.5}
+          fontSize={0.1}
           letterSpacing={0.005}
           position-z={0.1}
           font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
@@ -17,10 +17,10 @@ export const Screen9 = () => {
           <meshBasicMaterial depthTest={false} />
         </Text>
         <Text
-          fontSize={0.5}
+          fontSize={0.1}
           letterSpacing={0.005}
           position-z={0.1}
-          position-y={-0.75}
+          position-y={-0.15}
           font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
           anchorX="center"
           anchorY="middle"
