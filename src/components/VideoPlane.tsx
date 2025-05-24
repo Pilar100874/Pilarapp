@@ -40,18 +40,10 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
         material-side={DoubleSide}
         material-map={videoTexture}
       />
-      <group position={[-6, 3, 0]}>
-        {/* Shadow plane */}
-        <mesh position={[0, 0, 0.05]} scale={[2.5, 1.25, 1]}>
-          <planeGeometry />
-          <meshBasicMaterial color="black" transparent opacity={0.3} depthTest={false} />
-        </mesh>
-        {/* Logo plane */}
-        <mesh position={[0, 0, 0.1]} scale={[2.5, 1.25, 1]}>
-          <planeGeometry />
-          <meshBasicMaterial map={logoTexture} transparent depthTest={false} />
-        </mesh>
-      </group>
+      <mesh position={[-6, 3, 0.1]} scale={[2.5, 1.25, 1]}>
+        <planeGeometry />
+        <meshBasicMaterial map={logoTexture} transparent depthTest={false} />
+      </mesh>
       <OpenerText py={0.5} />
     </Suspense>
   );
