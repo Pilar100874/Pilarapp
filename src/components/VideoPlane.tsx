@@ -3,6 +3,7 @@ import {
   useAspect,
   useScroll,
   useVideoTexture,
+  useTexture,
 } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { Suspense, useRef } from "react";
@@ -12,9 +13,11 @@ import { OpenerText } from "@/components/opener/openerText";
 type VideoPlane = {
   texturePath: string;
 };
+
 export const VideoPlane = ({ texturePath }: VideoPlane) => {
   const scroll = useScroll();
   const windowSize = useAspect(1920, 1080);
+  const logoTexture = useTexture('/pilar.png');
 
   const videoTexture = useVideoTexture(texturePath, {
     autoplay: true,
@@ -37,6 +40,12 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
         scale={[...windowSize]}
         material-side={DoubleSide}
         material-map={videoTexture}
+      />
+      <Plane
+        scale={[2, 1]}
+        position={[-4, 2, 0.1]}
+        material-transparent
+        material-map={logoTexture}
       />
       <OpenerText py={0.5} />
     </Suspense>
