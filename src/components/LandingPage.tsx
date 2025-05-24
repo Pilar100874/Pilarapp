@@ -1,7 +1,6 @@
 import { Text } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import { useState } from 'react';
-import { RoundedBox } from '@react-three/drei';
 
 export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -28,19 +27,16 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         onPointerEnter={() => setIsHovered(true)}
         onPointerLeave={() => setIsHovered(false)}
       >
-        <RoundedBox args={[2.0, 0.5, 0.1]} radius={0.3} smoothness={16}>
-          <meshBasicMaterial color="white" />
-        </RoundedBox>
         <Text
           fontSize={0.15}
           position-z={0.1}
           font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
           anchorX="center"
           anchorY="middle"
-          color="black"
+          color="white"
         >
-          {' INICIAR A EXPERIÊNCIA '}
-          <meshBasicMaterial depthTest={false} color="black" />
+          INICIAR A EXPERIÊNCIA
+          <meshBasicMaterial depthTest={false} color="white" />
         </Text>
       </group>
     </group>
