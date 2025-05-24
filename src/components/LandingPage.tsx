@@ -9,7 +9,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   return (
     <group position-y={0}>
       <Text
-        fontSize={0.8}
+        fontSize={0.6}
         letterSpacing={0.005}
         position-z={0.1}
         font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
