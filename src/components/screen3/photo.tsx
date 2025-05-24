@@ -1,6 +1,6 @@
 import { Plane, useScroll, useTexture } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { MathUtils, Mesh } from 'three';
 import { easeOutQuart } from './utils';
 
@@ -16,7 +16,6 @@ export const Photo = (props: Photo) => {
   const isOddIndex = props.index % 2 === 0;
   const startPosition = isOddIndex ? -1.5 : 1.5;
   const previousOffset = useRef(-1);
-  const [isVisible, setIsVisible] = useState(true);
 
   useFrame(() => {
     if (!ref.current || previousOffset.current === Number(scroll.offset.toFixed(8))) {
@@ -32,17 +31,9 @@ export const Photo = (props: Photo) => {
     previousOffset.current = Number(scroll.offset.toFixed(8));
   });
 
-  const handleClick = () => {
-    if (!ref.current) return;
-    setIsVisible(false);
-  };
-
-  if (!isVisible) return null;
-
   return (
     <Plane
       ref={ref}
-      onClick={handleClick}
       position-x={startPosition}
       position-y={-0.25 + Math.random() * 0.5}
       position-z={props.index * -0.35}
