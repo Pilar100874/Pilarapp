@@ -9,7 +9,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   return (
     <group position-y={0}>
       <Text
-        fontSize={1.2}
+        fontSize={0.8}
         letterSpacing={0.005}
         position-z={0.1}
         font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
@@ -28,11 +28,11 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         onPointerLeave={() => setIsHovered(false)}
       >
         <mesh>
-          <planeGeometry args={[4, 1]} />
+          <circleGeometry args={[0.8, 32]} />
           <meshBasicMaterial color={isHovered ? '#646cff' : '#444'} />
         </mesh>
         <Text
-          fontSize={0.4}
+          fontSize={0.2}
           position-z={0.1}
           font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
           anchorX="center"
