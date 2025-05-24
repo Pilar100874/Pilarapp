@@ -1,4 +1,4 @@
-import { Text } from '@react-three/drei';
+import { Text, useTexture } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import { useState } from 'react';
 import { RoundedBox } from '@react-three/drei';
@@ -6,14 +6,13 @@ import { RoundedBox } from '@react-three/drei';
 export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isHovered, setIsHovered] = useState(false);
   const { viewport } = useThree();
+  const texture = useTexture('pilar.png');
 
   return (
     <group position-y={0}>
       <mesh position-y={1}>
         <planeGeometry args={[3, 1.5]} />
-        <meshBasicMaterial transparent>
-          <videoTexture attach="map" args={['pilar.png']} />
-        </meshBasicMaterial>
+        <meshBasicMaterial map={texture} transparent />
       </mesh>
 
       <Text
