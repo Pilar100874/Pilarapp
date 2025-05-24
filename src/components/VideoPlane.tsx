@@ -17,7 +17,7 @@ type VideoPlane = {
 export const VideoPlane = ({ texturePath }: VideoPlane) => {
   const scroll = useScroll();
   const windowSize = useAspect(1920, 1080);
-  const logoTexture = useTexture('/pilar.png');
+  const logoTexture = useTexture('/spots.png');
 
   const videoTexture = useVideoTexture(texturePath, {
     autoplay: true,
