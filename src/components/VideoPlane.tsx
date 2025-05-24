@@ -3,6 +3,7 @@ import {
   useAspect,
   useScroll,
   useVideoTexture,
+  useTexture,
 } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { Suspense, useRef } from "react";
@@ -15,6 +16,7 @@ type VideoPlane = {
 export const VideoPlane = ({ texturePath }: VideoPlane) => {
   const scroll = useScroll();
   const windowSize = useAspect(1920, 1080);
+  const logoTexture = useTexture('/logo_branco.png');
 
   const videoTexture = useVideoTexture(texturePath, {
     autoplay: true,
@@ -38,6 +40,10 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
         material-side={DoubleSide}
         material-map={videoTexture}
       />
+      <mesh position={[-3, 2, 0.1]} scale={[1.5, 0.75, 1]}>
+        <planeGeometry />
+        <meshBasicMaterial map={logoTexture} transparent depthTest={false} />
+      </mesh>
       <OpenerText py={0.5} />
     </Suspense>
   );
