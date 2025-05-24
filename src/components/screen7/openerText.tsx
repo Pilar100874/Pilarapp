@@ -16,7 +16,7 @@ export const OpenerText = ({ py }: OpenerText) => {
         anchorX="center"
         anchorY="middle"
       >
-        PROCURANDO PAPÉIS ??
+        FUNDADA EM 1998 
         <meshBasicMaterial depthTest={false} />
       </Text>
       <Text
@@ -29,7 +29,7 @@ export const OpenerText = ({ py }: OpenerText) => {
         anchorX="center"
         anchorY="middle"
       >
-        VOCÊ ENCONTRA AQUI !!
+        9 UNIDADES
         <meshBasicMaterial depthTest={false} />
       </Text>
     </group>
