@@ -1,12 +1,32 @@
 import { Text, useTexture } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { RoundedBox } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
+import { MeshBasicMaterial } from 'three';
 
 export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isHovered, setIsHovered] = useState(false);
   const { viewport } = useThree();
   const logoTexture = useTexture('/logo_branco.png');
+  const textRef = useRef<any>();
+  const materialRef = useRef<MeshBasicMaterial>();
+  const [animationComplete, setAnimationComplete] = useState(false);
+
+  useFrame((state) => {
+    if (!textRef.current || !materialRef.current || animationComplete) return;
+
+    const elapsed = state.clock.getElapsedTime();
+    const opacity = Math.min(elapsed * 0.5, 1);
+    
+    if (materialRef.current) {
+      materialRef.current.opacity = opacity;
+    }
+
+    if (opacity >= 1) {
+      setAnimationComplete(true);
+    }
+  });
 
   return (
     <group position-y={0}>
@@ -16,6 +36,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
       </mesh>
 
       <Text
+        ref={textRef}
         fontSize={0.6}
         letterSpacing={0.005}
         position-z={0.1}
@@ -24,7 +45,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         anchorY="middle"
       >
         PILAR APRESENTA
-        <meshBasicMaterial depthTest={false} />
+        <meshBasicMaterial ref={materialRef} transparent depthTest={false} />
       </Text>
 
       <group
