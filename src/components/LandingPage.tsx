@@ -27,6 +27,10 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         onPointerEnter={() => setIsHovered(true)}
         onPointerLeave={() => setIsHovered(false)}
       >
+        <mesh>
+          <planeGeometry args={[2, 0.4]} />
+          <meshBasicMaterial color={isHovered ? '#646cff' : '#444'} />
+        </mesh>
         <Text
           fontSize={0.15}
           position-z={0.1}
