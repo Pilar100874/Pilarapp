@@ -17,7 +17,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         anchorX="center"
         anchorY="middle"
       >
-        PILAR APRESENTA:
+        PILAR APRESENTA
         <meshBasicMaterial depthTest={false} />
       </Text>
 
