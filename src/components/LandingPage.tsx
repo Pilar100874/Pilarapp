@@ -9,6 +9,13 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
   return (
     <group position-y={0}>
+      <mesh position-y={1}>
+        <planeGeometry args={[3, 1.5]} />
+        <meshBasicMaterial transparent>
+          <videoTexture attach="map" args={['pilar.png']} />
+        </meshBasicMaterial>
+      </mesh>
+
       <Text
         fontSize={0.6}
         letterSpacing={0.005}
