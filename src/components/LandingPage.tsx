@@ -29,7 +29,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         onPointerLeave={() => setIsHovered(false)}
       >
         <RoundedBox args={[2.4, 0.6, 0.1]} radius={0.3} smoothness={16}>
-          <meshBasicMaterial color={isHovered ? '#646cff' : '#444'} />
+          <meshBasicMaterial color="white" />
         </RoundedBox>
         <Text
           fontSize={0.15}
@@ -37,12 +37,12 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
           font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
           anchorX="center"
           anchorY="middle"
-          color="white"
+          color="black"
         >
           {' INICIAR A EXPERIÊNCIA '}
-          <meshBasicMaterial depthTest={false} color="white" />
+          <meshBasicMaterial depthTest={false} color="black" />
         </Text>
       </group>
     </group>
   );
-};
+}
