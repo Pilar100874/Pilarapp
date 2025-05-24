@@ -2,11 +2,23 @@ import { Text, useTexture } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import { useState } from 'react';
 import { RoundedBox } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
+import { useRef } from 'react';
+import { MeshBasicMaterial } from 'three';
 
 export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isHovered, setIsHovered] = useState(false);
   const { viewport } = useThree();
   const logoTexture = useTexture('/logo_branco.png');
+  const textMaterialRef = useRef<MeshBasicMaterial>(null);
+
+  useFrame(({ clock }) => {
+    if (textMaterialRef.current) {
+      const time = clock.getElapsedTime();
+      const opacity = Math.sin(time * 2) * 0.5 + 0.5;
+      textMaterialRef.current.opacity = opacity;
+    }
+  });
 
   return (
     <group position-y={0}>
@@ -24,7 +36,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         anchorY="middle"
       >
         PILAR APRESENTA
-        <meshBasicMaterial depthTest={false} />
+        <meshBasicMaterial ref={textMaterialRef} transparent depthTest={false} />
       </Text>
 
       <group
