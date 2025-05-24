@@ -28,7 +28,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         onPointerLeave={() => setIsHovered(false)}
       >
         <mesh>
-          <planeGeometry args={[2, 0.6]} />
+          <planeGeometry args={[2.4, 0.6]} />
           <meshBasicMaterial color="white" />
         </mesh>
         <Text
@@ -39,7 +39,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
           anchorY="middle"
           color="black"
         >
-          Iniciar a Experiência
+          {' Iniciar a Experiência '}
           <meshBasicMaterial depthTest={false} color="black" />
         </Text>
       </group>
