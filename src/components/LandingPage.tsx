@@ -39,10 +39,10 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
           anchorY="middle"
           color="black"
         >
-          {' Iniciar a Experiência '}
+          {' INICIAR A EXPERIÊNCIA '}
           <meshBasicMaterial depthTest={false} color="black" />
         </Text>
       </group>
     </group>
   );
-};
+}
