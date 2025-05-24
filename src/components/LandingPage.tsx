@@ -32,7 +32,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
           <meshBasicMaterial color="white" />
         </RoundedBox>
         <Text
-          fontSize={0.2}
+          fontSize={0.15}
           position-z={0.1}
           font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
           anchorX="center"
