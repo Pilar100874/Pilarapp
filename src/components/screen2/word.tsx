@@ -20,9 +20,9 @@ export const Word = ({ index, value }: Word) => {
       return;
     }
 
-    const rotY = scroll.offset * 5 - Math.abs(dataScreen2.length - index) * 0.25 - Math.PI / 8;
+    const rotY = scroll.offset * 8 - Math.abs(dataScreen2.length - index) * 0.15 - Math.PI / 8;
     ref.current.rotation.y = rotY;
-    refMaterial.current.opacity = MathUtils.clamp(Math.pow(rotY + 1, 20), -Infinity, 1);
+    refMaterial.current.opacity = MathUtils.clamp(Math.pow(rotY + 1, 10), -Infinity, 1);
   });
 
   return (
