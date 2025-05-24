@@ -28,7 +28,7 @@ export const Word = ({ index, value }: Word) => {
   return (
     <Text
       ref={ref}
-      fontSize={0.85}
+      fontSize={value === 'BOBINAS INDUSTRIAIS' ? 0.65 : 0.85}
       letterSpacing={0.005}
       position-y={SCREEN4_OFFSET_START_Y - 1 * -index * 1.1}
       textAlign={'left'}
