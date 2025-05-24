@@ -1,6 +1,7 @@
 import { Text } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import { useState } from 'react';
+import { RoundedBox } from '@react-three/drei';
 
 export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -27,10 +28,9 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         onPointerEnter={() => setIsHovered(true)}
         onPointerLeave={() => setIsHovered(false)}
       >
-        <mesh>
-          <planeGeometry args={[2.4, 0.6]} />
+        <RoundedBox args={[2.4, 0.6, 0.1]} radius={0.1} smoothness={4}>
           <meshBasicMaterial color="white" />
-        </mesh>
+        </RoundedBox>
         <Text
           fontSize={0.2}
           position-z={0.1}
