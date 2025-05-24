@@ -28,9 +28,9 @@ export const Word = ({ index, value }: Word) => {
   return (
     <Text
       ref={ref}
-      fontSize={0.85}
+      fontSize={1.05}
       letterSpacing={0.005}
-      position-y={SCREEN2_OFFSET_START_Y - 1 * -index * 1.5}
+      position-y={SCREEN2_OFFSET_START_Y - 1 * -index * 1.1}
       textAlign={'left'}
       font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
       anchorX="center"
