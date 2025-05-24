@@ -28,7 +28,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         onPointerEnter={() => setIsHovered(true)}
         onPointerLeave={() => setIsHovered(false)}
       >
-        <RoundedBox args={[2.4, 0.6, 0.1]} radius={0.1} smoothness={4}>
+        <RoundedBox args={[2.4, 0.6, 0.1]} radius={0.2} smoothness={4}>
           <meshBasicMaterial color="white" />
         </RoundedBox>
         <Text
