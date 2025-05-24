@@ -28,11 +28,11 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         onPointerEnter={() => setIsHovered(true)}
         onPointerLeave={() => setIsHovered(false)}
       >
-        <RoundedBox args={[2, 0.5, 0.1]} radius={0.3} smoothness={16}>
+        <RoundedBox args={[2.4, 0.6, 0.1]} radius={0.3} smoothness={16}>
           <meshBasicMaterial color="white" />
         </RoundedBox>
         <Text
-          fontSize={0.15}
+          fontSize={0.2}
           position-z={0.1}
           font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
           anchorX="center"
