@@ -20,7 +20,6 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
   const [videoStarted, setVideoStarted] = useState(false);
   const initialY = -15; // Start position further down
   const targetY = 0; // Final position at top
-  const [opacity, setOpacity] = useState(0);
 
   const videoTexture = useVideoTexture(texturePath, {
     autoplay: false, // Don't start playing immediately
@@ -33,16 +32,12 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
     const duration = 1.5; // Animation duration in seconds
     const progress = Math.min(elapsed / duration, 1);
     
-    // Smooth easing function for position
+    // Smooth easing function
     const easeOutCubic = (x: number): number => 1 - Math.pow(1 - x, 3);
     const easedProgress = easeOutCubic(progress);
     
     // Animate position from bottom to top
     ref.current.position.y = initialY + (targetY - initialY) * easedProgress;
-
-    // Fade in effect
-    const fadeProgress = Math.max(0, Math.min((progress - 0.3) * 2, 1)); // Start fade after 30% of animation
-    setOpacity(fadeProgress);
 
     // Start video when animation is almost complete
     if (progress >= 0.8 && !videoStarted) {
@@ -60,8 +55,6 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
           scale={windowSize}
           material-side={DoubleSide}
           material-map={videoTexture}
-          material-transparent={true}
-          material-opacity={opacity}
         />
         <OpenerText py={0.5} />
       </group>
