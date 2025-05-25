@@ -44,12 +44,8 @@ export const OpenerText = ({ py }: OpenerText) => {
   });
 
   const handleClick = () => {
-    const scrollElement = scroll.el;
-    const currentScroll = scrollElement.scrollTop;
-    const targetScroll = currentScroll + window.innerHeight;
-    
-    scrollElement.scrollTo({
-      top: targetScroll,
+    scroll.el.scrollTo({
+      top: window.innerHeight,
       behavior: 'smooth'
     });
   };
