@@ -30,9 +30,10 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
   return (
     <group position-y={0}>
-      <mesh position-y={1}>
+      {/* Logo with full opacity */}
+      <mesh position-y={1.5} scale={[1.5, 1.5, 1]}>
         <planeGeometry args={[2, 1]} />
-        <meshBasicMaterial map={logoTexture} transparent />
+        <meshBasicMaterial map={logoTexture} transparent opacity={1} />
       </mesh>
 
       <Text
