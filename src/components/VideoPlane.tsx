@@ -3,7 +3,6 @@ import {
   useAspect,
   useScroll,
   useVideoTexture,
-  useTexture,
 } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { Suspense, useRef } from "react";
@@ -18,7 +17,7 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
   const scroll = useScroll();
   const windowSize = useAspect(1920, 1080);
   const ref = useRef<Mesh>(null);
-  const initialY = -10;
+  const initialY = 0; // Changed from -10 to 0
 
   const videoTexture = useVideoTexture(texturePath, {
     autoplay: true,
@@ -28,7 +27,7 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
     if (!ref.current) return;
 
     const elapsed = state.clock.getElapsedTime();
-    const targetY = 0;
+    const targetY = 2; // Changed from 0 to 2 to position at top
     
     // Animate from bottom to top
     if (elapsed < 1) {
