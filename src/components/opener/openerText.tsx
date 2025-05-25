@@ -1,5 +1,5 @@
 import { Text, useTexture, useScroll } from "@react-three/drei";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import { MeshBasicMaterial } from "three";
 
@@ -8,7 +8,6 @@ type OpenerText = {
 };
 
 export const OpenerText = ({ py }: OpenerText) => {
-  const { viewport } = useThree();
   const logoTexture = useTexture('/logo_branco.png');
   const arrowTexture = useTexture('/seta_B.png');
   const logoRef = useRef<any>();
@@ -17,12 +16,6 @@ export const OpenerText = ({ py }: OpenerText) => {
   const arrowRef = useRef<any>();
   const [startFade, setStartFade] = useState(false);
   const scroll = useScroll();
-
-  // Calculate responsive sizes based on viewport
-  const logoScale = Math.min(1.5, viewport.width / 4);
-  const smallTextSize = Math.min(0.35, viewport.width / 15);
-  const largeTextSize = Math.min(1.05, viewport.width / 5);
-  const arrowScale = Math.min(0.5, viewport.width / 10);
 
   useFrame((state) => {
     if (!logoRef.current?.material || !text1Ref.current?.material || !text2Ref.current?.material || !arrowRef.current?.material) return;
@@ -59,7 +52,7 @@ export const OpenerText = ({ py }: OpenerText) => {
       <mesh 
         ref={logoRef}
         position-y={1.25} 
-        scale={[logoScale, logoScale, 1]}
+        scale={[1.5, 1.5, 1]}
       >
         <planeGeometry args={[2, 1]} />
         <meshBasicMaterial 
@@ -74,7 +67,7 @@ export const OpenerText = ({ py }: OpenerText) => {
 
       <Text
         ref={text1Ref}
-        fontSize={smallTextSize}
+        fontSize={0.35}
         letterSpacing={0.005}
         position-z={0.1}
         textAlign={"left"}
@@ -88,7 +81,7 @@ export const OpenerText = ({ py }: OpenerText) => {
 
       <Text
         ref={text2Ref}
-        fontSize={largeTextSize}
+        fontSize={1.05}
         letterSpacing={0.005}
         position-z={0.1}
         position-y={-0.75}
@@ -104,7 +97,7 @@ export const OpenerText = ({ py }: OpenerText) => {
       <mesh 
         ref={arrowRef}
         position-y={-3.4} 
-        scale={[arrowScale, arrowScale, 1]}
+        scale={[0.5, 0.5, 1]}
         onClick={handleArrowClick}
         onPointerOver={() => document.body.style.cursor = 'pointer'}
         onPointerOut={() => document.body.style.cursor = 'default'}

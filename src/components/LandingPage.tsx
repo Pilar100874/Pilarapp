@@ -13,12 +13,6 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const materialRef = useRef<MeshBasicMaterial>();
   const [animationComplete, setAnimationComplete] = useState(false);
 
-  // Calculate responsive sizes based on viewport
-  const logoScale = Math.min(1.5, viewport.width / 4);
-  const titleSize = Math.min(0.6, viewport.width / 10);
-  const buttonWidth = Math.min(2.2, viewport.width / 3);
-  const buttonTextSize = Math.min(0.15, viewport.width / 30);
-
   useFrame((state) => {
     if (!textRef.current || !materialRef.current || animationComplete) return;
 
@@ -36,14 +30,15 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
   return (
     <group position-y={0}>
-      <mesh position-y={1.5} scale={[logoScale, logoScale, 1]}>
+      {/* Logo with full opacity */}
+      <mesh position-y={1.5} scale={[1.5, 1.5, 1]}>
         <planeGeometry args={[2, 1]} />
         <meshBasicMaterial map={logoTexture} transparent opacity={1} />
       </mesh>
 
       <Text
         ref={textRef}
-        fontSize={titleSize}
+        fontSize={0.6}
         letterSpacing={0.005}
         position-z={0.1}
         font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
@@ -61,11 +56,11 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         onPointerEnter={() => setIsHovered(true)}
         onPointerLeave={() => setIsHovered(false)}
       >
-        <RoundedBox args={[buttonWidth, 0.5, 0.1]} radius={0.25} smoothness={32}>
+        <RoundedBox args={[2.2, 0.5, 0.1]} radius={0.25} smoothness={32}>
           <meshBasicMaterial color="white" />
         </RoundedBox>
         <Text
-          fontSize={buttonTextSize}
+          fontSize={0.15}
           position-z={0.1}
           font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
           anchorX="center"
