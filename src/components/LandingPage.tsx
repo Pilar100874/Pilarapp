@@ -1,7 +1,6 @@
 import { Text, useTexture } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import { useState, useRef } from 'react';
-import { RoundedBox } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { MeshBasicMaterial } from 'three';
 
@@ -12,6 +11,8 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const textRef = useRef<any>();
   const materialRef = useRef<MeshBasicMaterial>();
   const [animationComplete, setAnimationComplete] = useState(false);
+  const buttonRef = useRef<any>();
+  const buttonTextRef = useRef<any>();
 
   useFrame((state) => {
     if (!textRef.current || !materialRef.current || animationComplete) return;
@@ -25,6 +26,13 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
     if (opacity >= 1) {
       setAnimationComplete(true);
+    }
+
+    // Button hover animation
+    if (buttonRef.current && buttonTextRef.current) {
+      const scale = isHovered ? 1.05 : 1;
+      buttonRef.current.scale.x = scale;
+      buttonRef.current.scale.y = scale;
     }
   });
 
@@ -51,26 +59,29 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
       <group
         position-y={-1.0}
-        scale={isHovered ? 1.1 : 1}
         onClick={onStart}
         onPointerEnter={() => setIsHovered(true)}
         onPointerLeave={() => setIsHovered(false)}
       >
-        <RoundedBox args={[2.2, 0.5, 0.1]} radius={0.25} smoothness={32}>
-          <meshBasicMaterial color="white" />
-        </RoundedBox>
+        {/* Button background */}
+        <mesh ref={buttonRef}>
+          <roundedBoxGeometry args={[2.2, 0.5, 0.1]} radius={0.12} smoothness={4} />
+          <meshBasicMaterial color={isHovered ? 'black' : 'white'} />
+        </mesh>
+
+        {/* Button text */}
         <Text
+          ref={buttonTextRef}
           fontSize={0.15}
-          position-z={0.1}
+          position-z={0.06}
           font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
           anchorX="center"
           anchorY="middle"
-          color="black"
         >
-          {' INICIAR A EXPERIÊNCIA '}
-          <meshBasicMaterial depthTest={false} color="black" />
+          INICIAR EXPERIÊNCIA
+          <meshBasicMaterial color={isHovered ? 'white' : 'black'} depthTest={false} />
         </Text>
       </group>
     </group>
   );
-}
+};
