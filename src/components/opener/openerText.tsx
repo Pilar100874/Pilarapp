@@ -41,10 +41,15 @@ export const OpenerText = ({ py }: OpenerText) => {
   });
 
   const handleArrowClick = () => {
-    const element = document.querySelector('.scroll-container');
-    if (element) {
-      element.scrollTo({
-        top: window.innerHeight,
+    // Get the scroll element
+    const scrollElement = document.querySelector('.scroll-container');
+    if (scrollElement) {
+      // Calculate the position of Screen2 (approximately 100vh)
+      const screen2Position = window.innerHeight * 1;
+      
+      // Scroll to Screen2 with smooth animation
+      scrollElement.scrollTo({
+        top: screen2Position,
         behavior: 'smooth'
       });
     }
@@ -102,6 +107,8 @@ export const OpenerText = ({ py }: OpenerText) => {
         position-y={-3.9} 
         scale={[0.5, 0.5, 1]}
         onClick={handleArrowClick}
+        onPointerOver={() => document.body.style.cursor = 'pointer'}
+        onPointerOut={() => document.body.style.cursor = 'default'}
       >
         <planeGeometry args={[1, 1]} />
         <meshBasicMaterial 
