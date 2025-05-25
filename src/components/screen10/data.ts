@@ -1,1 +1,1 @@
-export const dataScreen10 = ["ALGUNS", "CLIENTES"];
+export const dataScreen10 = ["ALGUNS CLIENTES"];
