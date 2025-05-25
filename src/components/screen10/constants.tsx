@@ -1,1 +1,0 @@
-export const SCREEN10_OFFSET_START_Y = -45;
