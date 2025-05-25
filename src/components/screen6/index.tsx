@@ -6,11 +6,16 @@ import { useState } from 'react';
 
 export const Screen6 = () => {
   const photoList = Object.entries(dataPhotos);
-  const [order, setOrder] = useState(photoList.map((_, i) => i)); // order of display by index
+  const [order, setOrder] = useState(photoList.map((_, i) => i));
 
-  const sendToBack = (clickedIndex: number) => {
-    const newOrder = order.filter((i) => i !== clickedIndex);
-    newOrder.push(clickedIndex); // move to back
+  const rotatePhotos = (clickedIndex: number) => {
+    const newOrder = [...order];
+    const currentPosition = order.indexOf(clickedIndex);
+    
+    // Move clicked photo to front by rotating array
+    const itemsToRotate = newOrder.splice(currentPosition);
+    newOrder.unshift(...itemsToRotate);
+    
     setOrder(newOrder);
   };
 
@@ -19,13 +24,14 @@ export const Screen6 = () => {
       <group position-y={SCREEN6_OFFSET_START_Y} rotation-y={Math.PI * -0.05}>
         {order.map((originalIndex, displayIndex) => {
           const [name, src] = photoList[originalIndex];
-          const z = -displayIndex * 0.35;
           return (
             <Photo
               key={name}
               src={src}
-              z={z}
-              onClick={() => sendToBack(originalIndex)}
+              z={-displayIndex * 0.35}
+              index={displayIndex}
+              totalPhotos={photoList.length}
+              onClick={() => rotatePhotos(originalIndex)}
             />
           );
         })}

@@ -8,26 +8,31 @@ type Photo = {
   src: string;
   z: number;
   onClick?: () => void;
+  index: number;
+  totalPhotos: number;
 };
 
 export const Photo = (props: Photo) => {
   const photo = useTexture(props.src);
   const ref = useRef<Mesh>(null);
   const scroll = useScroll();
-  const isOdd = Math.random() > 0.5;
-  const startPosition = isOdd ? -1.5 : 1.5;
   const previousOffset = useRef(-1);
 
-  useFrame(() => {
+  useFrame((state) => {
     if (!ref.current || previousOffset.current === Number(scroll.offset.toFixed(8))) {
       return;
     }
 
-    const { x } = ref.current.position;
-    const dir = previousOffset.current > scroll.offset ? -1 : 1;
-    ref.current.position.x = isOdd
-      ? MathUtils.clamp(x + easeOutQuart(0.01 * dir), startPosition, 0)
-      : MathUtils.clamp(x - easeOutQuart(0.01 * dir), 0, startPosition);
+    // Calculate the circular position
+    const angle = (props.index / props.totalPhotos) * Math.PI * 2 + state.clock.getElapsedTime() * 0.5;
+    const radius = 3;
+
+    // Update position in a circular pattern
+    ref.current.position.x = Math.cos(angle) * radius;
+    ref.current.position.z = Math.sin(angle) * radius - 2;
+
+    // Rotate to face center
+    ref.current.rotation.y = angle + Math.PI;
 
     previousOffset.current = Number(scroll.offset.toFixed(8));
   });
@@ -35,9 +40,7 @@ export const Photo = (props: Photo) => {
   return (
     <Plane
       ref={ref}
-      position-x={startPosition}
-      position-y={-0.25 + Math.random() * 0.5}
-      position-z={props.z}
+      position-y={0}
       args={[3.25, 4.5]}
       material-map={photo}
       material-transparent
