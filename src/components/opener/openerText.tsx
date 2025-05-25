@@ -9,13 +9,15 @@ type OpenerText = {
 
 export const OpenerText = ({ py }: OpenerText) => {
   const logoTexture = useTexture('/logo_branco.png');
+  const arrowTexture = useTexture('/seta_B.png');
   const logoRef = useRef<any>();
   const text1Ref = useRef<any>();
   const text2Ref = useRef<any>();
+  const arrowRef = useRef<any>();
   const [startFade, setStartFade] = useState(false);
 
   useFrame((state) => {
-    if (!logoRef.current?.material || !text1Ref.current?.material || !text2Ref.current?.material) return;
+    if (!logoRef.current?.material || !text1Ref.current?.material || !text2Ref.current?.material || !arrowRef.current?.material) return;
 
     // Start fade after 1 second (after video animation)
     if (state.clock.getElapsedTime() > 1 && !startFade) {
@@ -29,12 +31,24 @@ export const OpenerText = ({ py }: OpenerText) => {
       logoRef.current.material.opacity = opacity;
       text1Ref.current.material.opacity = opacity;
       text2Ref.current.material.opacity = opacity;
+      arrowRef.current.material.opacity = opacity;
     } else {
       logoRef.current.material.opacity = 0;
       text1Ref.current.material.opacity = 0;
       text2Ref.current.material.opacity = 0;
+      arrowRef.current.material.opacity = 0;
     }
   });
+
+  const handleArrowClick = () => {
+    const element = document.querySelector('.scroll-container');
+    if (element) {
+      element.scrollTo({
+        top: window.innerHeight,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   return (
     <group position-y={py}>
@@ -82,6 +96,23 @@ export const OpenerText = ({ py }: OpenerText) => {
         VOCÊ ENCONTRA AQUI !!
         <meshBasicMaterial transparent opacity={0} depthTest={false} />
       </Text>
+
+      <mesh 
+        ref={arrowRef}
+        position-y={-2} 
+        scale={[0.5, 0.5, 1]}
+        onClick={handleArrowClick}
+      >
+        <planeGeometry args={[1, 1]} />
+        <meshBasicMaterial 
+          map={arrowTexture} 
+          transparent 
+          opacity={0}
+          depthTest={false}
+          depthWrite={false}
+          toneMapped={false}
+        />
+      </mesh>
     </group>
   );
 };
