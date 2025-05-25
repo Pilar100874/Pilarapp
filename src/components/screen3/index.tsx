@@ -6,26 +6,30 @@ import { useState } from 'react';
 
 export const Screen3 = () => {
   const photoList = Object.entries(dataPhotos);
-  const [order, setOrder] = useState(photoList.map((_, i) => i)); // ordem de exibição por índice
+  const [order, setOrder] = useState(photoList.map((_, i) => i));
 
-  const sendToBack = (clickedIndex: number) => {
-    const newOrder = order.filter((i) => i !== clickedIndex);
-    newOrder.push(clickedIndex); // move para o fundo
+  const handlePhotoClick = (clickedIndex: number) => {
+    const newOrder = [...order];
+    const currentPosition = order.indexOf(clickedIndex);
+    
+    // Move clicked photo to front
+    newOrder.splice(currentPosition, 1);
+    newOrder.unshift(clickedIndex);
+    
     setOrder(newOrder);
   };
 
   return (
     <Scroll>
-      <group position-y={SCREEN3_OFFSET_START_Y} rotation-y={Math.PI * -0.05}>
+      <group position-y={SCREEN3_OFFSET_START_Y}>
         {order.map((originalIndex, displayIndex) => {
           const [name, src] = photoList[originalIndex];
-          const z = -displayIndex * 0.35;
           return (
             <Photo
               key={name}
               src={src}
-              z={z}
-              onClick={() => sendToBack(originalIndex)}
+              z={-displayIndex * 0.35}
+              onClick={() => handlePhotoClick(originalIndex)}
             />
           );
         })}

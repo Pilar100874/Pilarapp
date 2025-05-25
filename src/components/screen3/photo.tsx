@@ -1,8 +1,7 @@
 import { Plane, useScroll, useTexture } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { MathUtils, Mesh } from 'three';
-import { easeOutQuart } from './utils';
 
 type Photo = {
   src: string;
@@ -14,35 +13,66 @@ export const Photo = (props: Photo) => {
   const photo = useTexture(props.src);
   const ref = useRef<Mesh>(null);
   const scroll = useScroll();
-  const isOdd = Math.random() > 0.5;
-  const startPosition = isOdd ? -1.5 : 1.5;
-  const previousOffset = useRef(-1);
+  const [targetPosition, setTargetPosition] = useState({ x: 0, y: 0 });
+  const currentPosition = useRef({ x: 0, y: 0 });
+  const startTime = useRef(Date.now());
 
   useFrame(() => {
-    if (!ref.current || previousOffset.current === Number(scroll.offset.toFixed(8))) {
-      return;
-    }
+    if (!ref.current) return;
 
-    const { x } = ref.current.position;
-    const dir = previousOffset.current > scroll.offset ? -1 : 1;
-    ref.current.position.x = isOdd
-      ? MathUtils.clamp(x + easeOutQuart(0.01 * dir), startPosition, 0)
-      : MathUtils.clamp(x - easeOutQuart(0.01 * dir), 0, startPosition);
+    const now = Date.now();
+    const elapsed = (now - startTime.current) / 1000;
+    
+    // Smooth glide animation
+    currentPosition.current.x = MathUtils.lerp(
+      currentPosition.current.x,
+      targetPosition.x,
+      0.05
+    );
+    
+    currentPosition.current.y = MathUtils.lerp(
+      currentPosition.current.y,
+      targetPosition.y + Math.sin(elapsed) * 0.1, // Subtle floating effect
+      0.05
+    );
 
-    previousOffset.current = Number(scroll.offset.toFixed(8));
+    ref.current.position.x = currentPosition.current.x;
+    ref.current.position.y = currentPosition.current.y;
+    ref.current.position.z = props.z;
+
+    // Subtle rotation based on movement
+    ref.current.rotation.y = MathUtils.lerp(
+      ref.current.rotation.y,
+      (currentPosition.current.x - targetPosition.x) * 0.2,
+      0.05
+    );
   });
+
+  useEffect(() => {
+    // Random initial position
+    const randomX = (Math.random() - 0.5) * 4;
+    const randomY = (Math.random() - 0.5) * 2;
+    
+    currentPosition.current = { x: randomX, y: randomY };
+    if (ref.current) {
+      ref.current.position.x = randomX;
+      ref.current.position.y = randomY;
+    }
+    
+    // Animate to center
+    setTargetPosition({ x: 0, y: 0 });
+  }, []);
 
   return (
     <Plane
       ref={ref}
-      position-x={startPosition}
-      position-y={-0.25 + Math.random() * 0.5}
-      position-z={props.z}
       args={[3.25, 4.5]}
       material-map={photo}
       material-transparent
       material-alphaTest={0.1}
       onClick={props.onClick}
+      onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
+      onPointerOut={() => { document.body.style.cursor = 'default'; }}
     />
   );
 };
