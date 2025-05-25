@@ -1,1 +1,1 @@
-export const SCREEN10_OFFSET_START_Y = -46;
+export const SCREEN10_OFFSET_START_Y = -38; // Moved up by 8 units from -46
