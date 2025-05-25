@@ -1,7 +1,8 @@
 import { Plane, useScroll, useTexture } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { MathUtils, Mesh } from 'three';
+import { easeOutQuart } from './utils';
 
 type Photo = {
   src: string;
@@ -11,46 +12,46 @@ type Photo = {
 export const Photo = (props: Photo) => {
   const photo = useTexture(props.src);
   const ref = useRef<Mesh>(null);
-  const startTime = useRef(Date.now());
-  const [isForward, setIsForward] = useState(true);
-  const lastPosition = useRef({ x: 0, y: 0, z: 0 });
-  const animationSpeed = 2;
-  const boomerangDistance = 3;
+  const scroll = useScroll();
+  const isOddIndex = props.index % 2 === 0;
+  const startPosition = isOddIndex ? -1.5 : 1.5;
+  const previousOffset = useRef(-1);
+  const [isBack, setIsBack] = useState(false);
 
   useFrame(() => {
-    if (!ref.current) return;
+    if (!ref.current || previousOffset.current === Number(scroll.offset.toFixed(8))) {
+      return;
+    }
 
-    const currentTime = (Date.now() - startTime.current) / 1000;
-    const oscillation = Math.sin(currentTime * animationSpeed);
-    
-    // Calculate target positions with boomerang effect
-    const targetX = oscillation * boomerangDistance * (props.index % 2 === 0 ? 1 : -1);
-    const targetY = Math.cos(currentTime * animationSpeed) * 0.5;
-    const targetZ = props.index * -0.35 + Math.abs(oscillation) * -0.5;
+    const { x } = ref.current.position;
+    const dir = previousOffset.current > scroll.offset ? -1 : 1;
+    ref.current.position.x = isOddIndex
+      ? MathUtils.clamp(x + easeOutQuart(0.01 * dir), startPosition, 0)
+      : MathUtils.clamp(x - easeOutQuart(0.01 * dir), 0, startPosition);
 
-    // Smooth interpolation
-    lastPosition.current.x = MathUtils.lerp(lastPosition.current.x, targetX, 0.1);
-    lastPosition.current.y = MathUtils.lerp(lastPosition.current.y, targetY, 0.1);
-    lastPosition.current.z = MathUtils.lerp(lastPosition.current.z, targetZ, 0.1);
-
-    // Apply positions
-    ref.current.position.x = lastPosition.current.x;
-    ref.current.position.y = lastPosition.current.y - 0.25;
-    ref.current.position.z = lastPosition.current.z;
-
-    // Rotate the image based on movement
-    ref.current.rotation.y = oscillation * 0.2;
+    previousOffset.current = Number(scroll.offset.toFixed(8));
   });
+
+  const handleClick = () => {
+    if (!ref.current) return;
+    
+    setIsBack(!isBack);
+    if (ref.current) {
+      ref.current.position.z = isBack ? props.index * -0.35 : -2;
+    }
+  };
 
   return (
     <Plane
       ref={ref}
+      onClick={handleClick}
+      position-x={startPosition}
+      position-y={-0.25 + Math.random() * 0.5}
+      position-z={props.index * -0.35}
       args={[3.25, 4.5]}
       material-map={photo}
       material-transparent
       material-alphaTest={0.1}
-      onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
-      onPointerOut={() => { document.body.style.cursor = 'default'; }}
     />
   );
 };
