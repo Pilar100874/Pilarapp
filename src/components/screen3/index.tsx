@@ -14,7 +14,7 @@ export const Screen3 = () => {
 
   return (
     <Scroll>
-      <group position-y={SCREEN3_OFFSET_START_Y}>
+      <group position-y={SCREEN3_OFFSET_START_Y} position-x={0}>
         {photoList.map(([name, src], index) => (
           <Photo
             key={name}
