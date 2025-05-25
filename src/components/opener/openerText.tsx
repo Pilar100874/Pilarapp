@@ -42,7 +42,7 @@ export const OpenerText = ({ py }: OpenerText) => {
 
   const handleArrowClick = () => {
     scroll.el.scrollTo({
-      top: scroll.el.scrollHeight * 0.07,
+      top: scroll.el.scrollHeight * 0.12,
       behavior: 'smooth'
     });
   };
