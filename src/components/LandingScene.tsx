@@ -4,6 +4,7 @@ import { LandingPage } from './LandingPage';
 import { Suspense, useEffect, useState } from 'react';
 import { TextureLoader, VideoTexture } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { dataPhotos as screen3Photos } from '@/components/screen3/dataPhotos';
 import { dataPhotos as screen6Photos } from '@/components/screen6/dataPhotos';
 import { dataPhotos as screen8Photos } from '@/components/screen8/dataPhotos';
@@ -50,9 +51,14 @@ const AssetPreloader = ({ onProgress }: { onProgress: (progress: number) => void
         };
       });
 
-      // Load 3D model
+      // Load 3D model with DRACOLoader
       const modelPromise = new Promise((resolve) => {
+        const dracoLoader = new DRACOLoader();
+        dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+        
         const loader = new GLTFLoader();
+        loader.setDRACOLoader(dracoLoader);
+        
         loader.load('pillar-ok-transformed.glb', () => {
           updateProgress();
           resolve(null);
