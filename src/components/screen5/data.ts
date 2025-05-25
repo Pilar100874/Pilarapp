@@ -1,0 +1,1 @@
+export const dataScreen2 = ["NOSSOS PRODUTOS", "PAPÉIS PARA", "TODOS OS", "SEGMENTOS"];
