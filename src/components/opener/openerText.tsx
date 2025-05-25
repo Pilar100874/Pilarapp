@@ -10,7 +10,7 @@ export const OpenerText = ({ py }: OpenerText) => {
   return (
     <group position-y={py}>
       {/* Logo */}
-      <mesh position-y={1.5} scale={[1.5, 1.5, 1]}>
+      <mesh position-y={1.25} scale={[1.5, 1.5, 1]}>
         <planeGeometry args={[2, 1]} />
         <meshBasicMaterial 
           map={logoTexture} 
