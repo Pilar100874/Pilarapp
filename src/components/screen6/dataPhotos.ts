@@ -1,9 +1,9 @@
-import p1 from '/k-01.png';
-import p2 from '/k-02.png';
-import p3 from '/k-03.png';
-import p4 from '/k-04.png';
-import p5 from '/k-05.png';
-import p6 from '/k-06.png';
+import p1 from '/assai.png';
+import p2 from '/kalunga.png';
+import p3 from '/latam.png';
+import p4 from '/leroy.png';
+import p5 from '/tintasmc.png';
+import p6 from '/telha.png';
 
 type Photos = 'Photo1' | 'Photo2' | 'Photo3' | 'Photo4' | 'Photo5' | 'Photo6';
 
