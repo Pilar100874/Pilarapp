@@ -7,7 +7,6 @@ import { MeshBasicMaterial } from 'three';
 
 export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [isButtonHovered, setIsButtonHovered] = useState(false);
   const { viewport } = useThree();
   const logoTexture = useTexture('/logo_branco.png');
   const textRef = useRef<any>();
@@ -69,32 +68,6 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
           color="black"
         >
           {' INICIAR A EXPERIÊNCIA '}
-          <meshBasicMaterial depthTest={false} color="black" />
-        </Text>
-      </group>
-
-      {/* Scroll Down Button */}
-      <group
-        position-y={-2}
-        position-z={2}
-        scale={isButtonHovered ? 1.1 : 1}
-        onClick={onStart}
-        onPointerEnter={() => setIsButtonHovered(true)}
-        onPointerLeave={() => setIsButtonHovered(false)}
-      >
-        <mesh>
-          <circleGeometry args={[0.4, 32]} />
-          <meshBasicMaterial color="white" depthTest={false} transparent opacity={0.9} />
-        </mesh>
-        <Text
-          fontSize={0.25}
-          position-z={0.1}
-          font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
-          anchorX="center"
-          anchorY="middle"
-          color="black"
-        >
-          ↓
           <meshBasicMaterial depthTest={false} color="black" />
         </Text>
       </group>
