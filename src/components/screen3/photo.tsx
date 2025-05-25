@@ -5,69 +5,55 @@ import { MathUtils, Mesh } from 'three';
 
 type Photo = {
   src: string;
-  z: number;
+  index: number;
+  isActive: boolean;
+  totalPhotos: number;
+  activeIndex: number;
   onClick?: () => void;
 };
 
 export const Photo = (props: Photo) => {
   const photo = useTexture(props.src);
   const ref = useRef<Mesh>(null);
-  const scroll = useScroll();
   const [isHovered, setIsHovered] = useState(false);
-  
-  // Snap points configuration
-  const snapPoints = [-4, -2, 0, 2, 4]; // Horizontal positions to snap to
-  const snapThreshold = 0.1; // How close we need to be to snap
-  const snapSpeed = 0.15; // How fast we snap into position
+  const scroll = useScroll();
+
+  // Configuration
+  const spacing = 4; // Space between photos
+  const centerZ = -2; // Z position of center photo
+  const sideZ = -4; // Z position of side photos
+  const rotationFactor = 0.5; // How much photos rotate
+  const perspective = 2; // Perspective effect strength
 
   useFrame(() => {
     if (!ref.current) return;
 
-    // Calculate scroll influence
-    const scrollInfluence = (scroll.offset - 0.5) * 10;
+    const relativeIndex = props.index - props.activeIndex;
+    const targetX = relativeIndex * spacing;
     
-    // Find the closest snap point
-    let closestPoint = snapPoints[0];
-    let minDistance = Math.abs(ref.current.position.x - snapPoints[0]);
-    
-    snapPoints.forEach(point => {
-      const distance = Math.abs(ref.current.position.x - point);
-      if (distance < minDistance) {
-        minDistance = distance;
-        closestPoint = point;
-      }
-    });
-
-    // Apply snapping if we're close enough to a snap point
-    if (minDistance < snapThreshold) {
-      ref.current.position.x = MathUtils.lerp(
-        ref.current.position.x,
-        closestPoint,
-        snapSpeed
-      );
-    } else {
-      // Otherwise, move based on scroll
-      ref.current.position.x = MathUtils.lerp(
-        ref.current.position.x,
-        scrollInfluence,
-        0.1
-      );
+    // Calculate z-position with perspective
+    let targetZ = centerZ;
+    if (relativeIndex !== 0) {
+      targetZ = sideZ - Math.abs(relativeIndex) * perspective;
     }
 
-    // Keep Z position constant
-    ref.current.position.z = props.z;
+    // Calculate rotation
+    const targetRotationY = -relativeIndex * rotationFactor;
 
-    // Scale effect on hover
-    const targetScale = isHovered ? 1.1 : 1;
+    // Calculate scale based on position
+    const baseScale = isHovered ? 1.1 : 1;
+    const targetScale = props.isActive ? baseScale : baseScale * 0.8;
+
+    // Smooth transitions
+    ref.current.position.x = MathUtils.lerp(ref.current.position.x, targetX, 0.1);
+    ref.current.position.z = MathUtils.lerp(ref.current.position.z, targetZ, 0.1);
+    ref.current.rotation.y = MathUtils.lerp(ref.current.rotation.y, targetRotationY, 0.1);
     ref.current.scale.x = MathUtils.lerp(ref.current.scale.x, targetScale, 0.1);
     ref.current.scale.y = MathUtils.lerp(ref.current.scale.y, targetScale, 0.1);
 
-    // Subtle rotation based on movement
-    ref.current.rotation.y = MathUtils.lerp(
-      ref.current.rotation.y,
-      (ref.current.position.x - closestPoint) * 0.1,
-      0.1
-    );
+    // Add subtle movement based on scroll
+    const scrollOffset = scroll.offset - 0.5;
+    ref.current.position.x += scrollOffset * 2;
   });
 
   return (
