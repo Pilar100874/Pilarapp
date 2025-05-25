@@ -1,18 +1,17 @@
 import { Text, useTexture } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { RoundedBox } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { MeshBasicMaterial } from 'three';
 
-export const LandingPage = ({ onStart, loadingProgress = 0 }: { onStart: () => void; loadingProgress?: number }) => {
+export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isHovered, setIsHovered] = useState(false);
   const { viewport } = useThree();
   const logoTexture = useTexture('/logo_branco.png');
   const textRef = useRef<any>();
   const materialRef = useRef<MeshBasicMaterial>();
   const [animationComplete, setAnimationComplete] = useState(false);
-  const [showButton, setShowButton] = useState(false);
 
   useFrame((state) => {
     if (!textRef.current || !materialRef.current || animationComplete) return;
@@ -28,12 +27,6 @@ export const LandingPage = ({ onStart, loadingProgress = 0 }: { onStart: () => v
       setAnimationComplete(true);
     }
   });
-
-  useEffect(() => {
-    if (loadingProgress === 100) {
-      setTimeout(() => setShowButton(true), 500);
-    }
-  }, [loadingProgress]);
 
   return (
     <group position-y={0}>
@@ -56,52 +49,28 @@ export const LandingPage = ({ onStart, loadingProgress = 0 }: { onStart: () => v
         <meshBasicMaterial ref={materialRef} transparent depthTest={false} />
       </Text>
 
-      {/* Loading Progress Bar */}
-      <group position-y={-1}>
-        <RoundedBox args={[3, 0.1, 0.1]} radius={0.05} smoothness={4}>
-          <meshBasicMaterial color="#333333" />
+      <group
+        position-y={-1.0}
+        scale={isHovered ? 1.1 : 1}
+        onClick={onStart}
+        onPointerEnter={() => setIsHovered(true)}
+        onPointerLeave={() => setIsHovered(false)}
+      >
+        <RoundedBox args={[2.2, 0.5, 0.1]} radius={0.25} smoothness={32}>
+          <meshBasicMaterial color="white" />
         </RoundedBox>
-        <group position-x={-1.5 + (loadingProgress / 100) * 1.5}>
-          <RoundedBox args={[loadingProgress / 100 * 3, 0.1, 0.1]} radius={0.05} smoothness={4} position-x={loadingProgress / 100 * 1.5}>
-            <meshBasicMaterial color="white" />
-          </RoundedBox>
-        </group>
         <Text
           fontSize={0.15}
-          position-y={0.2}
+          position-z={0.1}
           font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
           anchorX="center"
           anchorY="middle"
+          color="black"
         >
-          {`${Math.round(loadingProgress)}%`}
-          <meshBasicMaterial color="white" />
+          {' INICIAR A EXPERIÊNCIA '}
+          <meshBasicMaterial depthTest={false} color="black" />
         </Text>
       </group>
-
-      {showButton && (
-        <group
-          position-y={-2}
-          scale={isHovered ? 1.1 : 1}
-          onClick={onStart}
-          onPointerEnter={() => setIsHovered(true)}
-          onPointerLeave={() => setIsHovered(false)}
-        >
-          <RoundedBox args={[2.2, 0.5, 0.1]} radius={0.25} smoothness={32}>
-            <meshBasicMaterial color="white" />
-          </RoundedBox>
-          <Text
-            fontSize={0.15}
-            position-z={0.1}
-            font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
-            anchorX="center"
-            anchorY="middle"
-            color="black"
-          >
-            {' INICIAR A EXPERIÊNCIA '}
-            <meshBasicMaterial depthTest={false} color="black" />
-          </Text>
-        </group>
-      )}
     </group>
   );
-};
+}
