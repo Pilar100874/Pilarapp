@@ -49,7 +49,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
       <mesh
         position-y={-1.0}
-        scale={isHovered ? [2.4, 0.6, 1] : [2.2, 0.55, 1]} // Reduced from [4, 1] to [2.2, 0.55]
+        scale={isHovered ? [2.16, 0.54, 1] : [1.98, 0.495, 1]} // Reduced by 10% from previous values
         onClick={onStart}
         onPointerEnter={() => {
           setIsHovered(true);
