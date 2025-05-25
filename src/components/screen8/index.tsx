@@ -13,7 +13,8 @@ export const Screen8 = () => {
         {photoList.map(([name, src], index) => (
           <Photo
             key={name}
-            src={src}
+            defaultSrc={src.default}
+            alternateSrc={src.alternate}
             index={index}
             totalPhotos={photoList.length}
           />

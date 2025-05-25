@@ -4,16 +4,19 @@ import { useRef, useState } from 'react';
 import { MathUtils, Mesh } from 'three';
 
 type Photo = {
-  src: string;
+  defaultSrc: string;
+  alternateSrc: string;
   index: number;
   totalPhotos: number;
 };
 
 export const Photo = (props: Photo) => {
-  const photo = useTexture(props.src);
+  const defaultTexture = useTexture(props.defaultSrc);
+  const alternateTexture = useTexture(props.alternateSrc);
   const ref = useRef<Mesh>(null);
   const scroll = useScroll();
   const [isHovered, setIsHovered] = useState(false);
+  const [isAlternate, setIsAlternate] = useState(false);
 
   // Calculate initial positions in a grid
   const columns = 3;
@@ -72,13 +75,18 @@ export const Photo = (props: Photo) => {
     );
   });
 
+  const handleClick = () => {
+    setIsAlternate(!isAlternate);
+  };
+
   return (
     <Plane
       ref={ref}
       args={[3.25, 4.5]}
-      material-map={photo}
+      material-map={isAlternate ? alternateTexture : defaultTexture}
       material-transparent
       material-alphaTest={0.1}
+      onClick={handleClick}
       onPointerOver={() => {
         document.body.style.cursor = 'pointer';
         setIsHovered(true);
