@@ -99,7 +99,7 @@ export const OpenerText = ({ py }: OpenerText) => {
 
       <mesh 
         ref={arrowRef}
-        position-y={-4.9} 
+        position-y={-3.9} 
         scale={[0.5, 0.5, 1]}
         onClick={handleArrowClick}
       >
