@@ -76,6 +76,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
       {/* Scroll Down Button */}
       <group
         position-y={-2}
+        position-z={1}
         scale={isButtonHovered ? 1.1 : 1}
         onClick={onStart}
         onPointerEnter={() => setIsButtonHovered(true)}
@@ -83,7 +84,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
       >
         <mesh>
           <circleGeometry args={[0.3, 32]} />
-          <meshBasicMaterial color="black" />
+          <meshBasicMaterial color="black" depthTest={false} />
         </mesh>
         <Text
           fontSize={0.2}
