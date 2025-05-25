@@ -9,6 +9,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isHovered, setIsHovered] = useState(false);
   const { viewport } = useThree();
   const logoTexture = useTexture('/logo_branco.png');
+  const arrowTexture = useTexture('/seta_B.png');
   const textRef = useRef<any>();
   const materialRef = useRef<MeshBasicMaterial>();
   const [animationComplete, setAnimationComplete] = useState(false);
@@ -34,6 +35,12 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
       <mesh position-y={1.5} scale={[1.5, 1.5, 1]}>
         <planeGeometry args={[2, 1]} />
         <meshBasicMaterial map={logoTexture} transparent opacity={1} />
+      </mesh>
+
+      {/* Arrow */}
+      <mesh position-y={0.5} scale={[0.5, 0.5, 1]}>
+        <planeGeometry args={[1, 1]} />
+        <meshBasicMaterial map={arrowTexture} transparent opacity={1} />
       </mesh>
 
       <Text
