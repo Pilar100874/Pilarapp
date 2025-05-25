@@ -1,57 +1,100 @@
 import { Plane, useScroll, useTexture } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { MathUtils, Mesh } from 'three';
-import { easeOutQuart } from './utils';
 
 type Photo = {
   src: string;
+  z: number;
+  onClick?: () => void;
   index: number;
+  totalPhotos: number;
 };
 
 export const Photo = (props: Photo) => {
   const photo = useTexture(props.src);
   const ref = useRef<Mesh>(null);
   const scroll = useScroll();
-  const isOddIndex = props.index % 2 === 0;
-  const startPosition = isOddIndex ? -1.5 : 1.5;
   const previousOffset = useRef(-1);
-  const [isBack, setIsBack] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const pauseTimer = useRef<number | null>(null);
+  const rotationSpeed = 0.15; // Slightly slower than Screen6
+  const startTime = useRef(Date.now());
+  const lastPosition = useRef({ x: 0, z: 0, rotation: 0 });
+  const [isHovered, setIsHovered] = useState(false);
 
-  useFrame(() => {
-    if (!ref.current || previousOffset.current === Number(scroll.offset.toFixed(8))) {
-      return;
-    }
+  useFrame((state) => {
+    if (!ref.current) return;
 
-    const { x } = ref.current.position;
-    const dir = previousOffset.current > scroll.offset ? -1 : 1;
-    ref.current.position.x = isOddIndex
-      ? MathUtils.clamp(x + easeOutQuart(0.01 * dir), startPosition, 0)
-      : MathUtils.clamp(x - easeOutQuart(0.01 * dir), 0, startPosition);
+    const currentTime = Date.now();
+    const elapsedTime = (currentTime - startTime.current) / 1000;
+    
+    // Calculate the base angle for continuous rotation
+    const baseAngle = ((props.index / props.totalPhotos) * Math.PI * 2) + (isPaused ? 0 : elapsedTime * rotationSpeed);
+    
+    // Larger radius for a wider carousel
+    const radius = 4;
+    const targetX = Math.cos(baseAngle) * radius;
+    const targetZ = Math.sin(baseAngle) * radius - 2;
+    const targetRotation = baseAngle + Math.PI;
 
-    previousOffset.current = Number(scroll.offset.toFixed(8));
+    // Smooth interpolation with hover effect
+    const scale = isHovered ? 1.1 : 1;
+    ref.current.scale.setScalar(MathUtils.lerp(ref.current.scale.x, scale, 0.1));
+
+    // Position interpolation
+    lastPosition.current.x = MathUtils.lerp(lastPosition.current.x, targetX, 0.1);
+    lastPosition.current.z = MathUtils.lerp(lastPosition.current.z, targetZ, 0.1);
+    lastPosition.current.rotation = MathUtils.lerp(lastPosition.current.rotation, targetRotation, 0.1);
+
+    // Apply positions
+    ref.current.position.x = lastPosition.current.x;
+    ref.current.position.z = lastPosition.current.z;
+    ref.current.rotation.y = lastPosition.current.rotation;
   });
 
   const handleClick = () => {
-    if (!ref.current) return;
+    if (!props.onClick) return;
+
+    setIsPaused(true);
+    props.onClick();
     
-    setIsBack(!isBack);
-    if (ref.current) {
-      ref.current.position.z = isBack ? props.index * -0.35 : -2;
+    if (pauseTimer.current !== null) {
+      window.clearTimeout(pauseTimer.current);
     }
+    
+    pauseTimer.current = window.setTimeout(() => {
+      setIsPaused(false);
+      startTime.current = Date.now() - (lastPosition.current.rotation / rotationSpeed) * 1000;
+      pauseTimer.current = null;
+    }, 2000);
   };
+
+  useEffect(() => {
+    return () => {
+      if (pauseTimer.current !== null) {
+        window.clearTimeout(pauseTimer.current);
+      }
+    };
+  }, []);
 
   return (
     <Plane
       ref={ref}
-      onClick={handleClick}
-      position-x={startPosition}
-      position-y={-0.25 + Math.random() * 0.5}
-      position-z={props.index * -0.35}
+      position-y={0}
       args={[3.25, 4.5]}
       material-map={photo}
       material-transparent
       material-alphaTest={0.1}
+      onClick={handleClick}
+      onPointerOver={() => {
+        document.body.style.cursor = 'pointer';
+        setIsHovered(true);
+      }}
+      onPointerOut={() => {
+        document.body.style.cursor = 'default';
+        setIsHovered(false);
+      }}
     />
   );
 };
