@@ -1,4 +1,4 @@
-import p1 from '/SP.png';
+import p1 from '/sp.png';
 import p2 from '/rs.png';
 import p3 from '/es.png';
 import p4 from '/to.png';
