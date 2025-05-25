@@ -2,12 +2,6 @@ import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
 import { Mesh } from 'three';
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
-
-// Configure DRACOLoader globally for useGLTF
-const dracoLoader = new DRACOLoader();
-dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
-useGLTF.setDRACOLoader(dracoLoader);
 
 export function PillarModel(props: JSX.IntrinsicElements['group']) {
   const { nodes, materials } = useGLTF('pillar-ok-transformed.glb');
