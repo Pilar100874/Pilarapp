@@ -6,15 +6,16 @@ import { easeOutQuart } from './utils';
 
 type Photo = {
   src: string;
-  index: number;
+  z: number;
+  onClick?: () => void;
 };
 
 export const Photo = (props: Photo) => {
   const photo = useTexture(props.src);
   const ref = useRef<Mesh>(null);
   const scroll = useScroll();
-  const isOddIndex = props.index % 2 === 0;
-  const startPosition = isOddIndex ? -1.5 : 1.5;
+  const isOdd = Math.random() > 0.5;
+  const startPosition = isOdd ? -1.5 : 1.5;
   const previousOffset = useRef(-1);
 
   useFrame(() => {
@@ -24,7 +25,7 @@ export const Photo = (props: Photo) => {
 
     const { x } = ref.current.position;
     const dir = previousOffset.current > scroll.offset ? -1 : 1;
-    ref.current.position.x = isOddIndex
+    ref.current.position.x = isOdd
       ? MathUtils.clamp(x + easeOutQuart(0.01 * dir), startPosition, 0)
       : MathUtils.clamp(x - easeOutQuart(0.01 * dir), 0, startPosition);
 
@@ -36,11 +37,14 @@ export const Photo = (props: Photo) => {
       ref={ref}
       position-x={startPosition}
       position-y={-0.25 + Math.random() * 0.5}
-      position-z={props.index * -0.35}
+      position-z={props.z}
       args={[3.25, 4.5]}
       material-map={photo}
       material-transparent
       material-alphaTest={0.1}
+      onClick={props.onClick}
+      onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
+      onPointerOut={() => { document.body.style.cursor = 'default'; }}
     />
   );
 };
