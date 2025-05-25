@@ -5,6 +5,7 @@ import { Opener } from '@/components/opener';
 import { Screen2 } from '@/components/screen2';
 import { Screen3 } from '@/components/screen3';
 import { Screen4 } from '@/components/screen4';
+import { Screen5 } from '@/components/screen5';
 import { Screen6 } from '@/components/screen6';
 import { Screen7 } from '@/components/screen7';
 import { Screen8 } from '@/components/screen8';
@@ -17,8 +18,9 @@ export const Scene = () => {
         <Opener />
         <Screen2 />
         <Screen3 />
-        <Screen4 />
         <Screen6 />
+        <Screen4 />
+        <Screen5 />
         <Screen7 />
         <Screen8 />
       </ScrollControls>
