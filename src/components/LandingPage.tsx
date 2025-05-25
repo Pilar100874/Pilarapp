@@ -53,24 +53,30 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         position-y={-1.0}
         scale={isHovered ? 1.1 : 1}
         onClick={onStart}
-        onPointerEnter={() => setIsHovered(true)}
-        onPointerLeave={() => setIsHovered(false)}
+        onPointerEnter={() => {
+          setIsHovered(true);
+          document.body.style.cursor = 'pointer';
+        }}
+        onPointerLeave={() => {
+          setIsHovered(false);
+          document.body.style.cursor = 'default';
+        }}
       >
-        <RoundedBox args={[2.2, 0.5, 0.1]} radius={0.25} smoothness={32}>
+        <RoundedBox args={[2.5, 0.6, 0.1]} radius={0.25} smoothness={32}>
           <meshBasicMaterial color="white" />
         </RoundedBox>
         <Text
-          fontSize={0.15}
+          fontSize={0.18}
           position-z={0.1}
           font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
           anchorX="center"
           anchorY="middle"
           color="black"
         >
-          {' INICIAR A EXPERIÊNCIA '}
+          INICIAR A EXPERIÊNCIA
           <meshBasicMaterial depthTest={false} color="black" />
         </Text>
       </group>
     </group>
   );
-}
+};
