@@ -1,4 +1,4 @@
-import { Environment, ScrollControls } from '@react-three/drei';
+import { Environment, ScrollControls, Scroll } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Color } from 'three';
 import { Opener } from '@/components/opener';
@@ -11,19 +11,21 @@ import { Screen8 } from '@/components/screen8';
 import { useRef } from 'react';
 
 export const Scene = () => {
-  const openerRef = useRef();
+  const scrollRef = useRef();
 
   return (
     <Canvas style={{ width: '100vw', height: '100vh' }}>
-      <ScrollControls pages={9}>
-        <color attach="background" args={[new Color('black')]} />
-        <Opener />
-        <Screen2 />
-        <Screen3 />
-        <Screen4 />
-        <Screen6 />
-        <Screen7 />
-        <Screen8 />
+      <ScrollControls pages={9} damping={0.1}>
+        <Scroll ref={scrollRef}>
+          <color attach="background" args={[new Color('black')]} />
+          <Opener scrollRef={scrollRef} />
+          <Screen2 />
+          <Screen3 />
+          <Screen4 />
+          <Screen6 />
+          <Screen7 />
+          <Screen8 />
+        </Scroll>
       </ScrollControls>
       <ambientLight />
       <directionalLight />

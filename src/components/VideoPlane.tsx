@@ -3,7 +3,6 @@ import {
   useAspect,
   useScroll,
   useVideoTexture,
-  useTexture,
 } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { Suspense, useRef } from "react";
@@ -12,9 +11,10 @@ import { OpenerText } from "@/components/opener/openerText";
 
 type VideoPlane = {
   texturePath: string;
+  scrollRef?: any;
 };
 
-export const VideoPlane = ({ texturePath }: VideoPlane) => {
+export const VideoPlane = ({ texturePath, scrollRef }: VideoPlane) => {
   const scroll = useScroll();
   const windowSize = useAspect(1920, 1080);
   const ref = useRef<Mesh>(null);
@@ -30,7 +30,6 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
     const elapsed = state.clock.getElapsedTime();
     const targetY = 0;
     
-    // Animate from bottom to top
     if (elapsed < 1) {
       ref.current.position.y = initialY + (targetY - initialY) * elapsed;
     }
@@ -46,7 +45,7 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
           material-side={DoubleSide}
           material-map={videoTexture}
         />
-        <OpenerText py={0.5} />
+        <OpenerText py={0.5} scrollRef={scrollRef} />
       </group>
     </Suspense>
   );

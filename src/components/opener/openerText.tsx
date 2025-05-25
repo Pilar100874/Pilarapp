@@ -5,9 +5,10 @@ import { MeshBasicMaterial } from "three";
 
 type OpenerText = {
   py: number;
+  scrollRef?: any;
 };
 
-export const OpenerText = ({ py }: OpenerText) => {
+export const OpenerText = ({ py, scrollRef }: OpenerText) => {
   const logoTexture = useTexture('/logo_branco.png');
   const arrowTexture = useTexture('/seta_B.png');
   const logoRef = useRef<any>();
@@ -19,13 +20,12 @@ export const OpenerText = ({ py }: OpenerText) => {
   useFrame((state) => {
     if (!logoRef.current?.material || !text1Ref.current?.material || !text2Ref.current?.material || !arrowRef.current?.material) return;
 
-    // Start fade after 1 second (after video animation)
     if (state.clock.getElapsedTime() > 1 && !startFade) {
       setStartFade(true);
     }
 
     if (startFade) {
-      const fadeTime = state.clock.getElapsedTime() - 1; // Subtract 1 second delay
+      const fadeTime = state.clock.getElapsedTime() - 1;
       const opacity = Math.min(fadeTime, 1);
       
       logoRef.current.material.opacity = opacity;
@@ -41,17 +41,8 @@ export const OpenerText = ({ py }: OpenerText) => {
   });
 
   const handleArrowClick = () => {
-    // Get the scroll element
-    const scrollElement = document.querySelector('.scroll-container');
-    if (scrollElement) {
-      // Calculate the position of Screen2 (approximately 100vh)
-      const screen2Position = window.innerHeight * 1;
-      
-      // Scroll to Screen2 with smooth animation
-      scrollElement.scrollTo({
-        top: screen2Position,
-        behavior: 'smooth'
-      });
+    if (scrollRef?.current) {
+      scrollRef.current.scrollTo(1);
     }
   };
 
