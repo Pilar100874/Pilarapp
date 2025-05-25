@@ -2,7 +2,6 @@ import { Text, useTexture } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import { MeshBasicMaterial } from "three";
-import { RoundedBox } from "@react-three/drei";
 
 type OpenerText = {
   py: number;
@@ -14,12 +13,12 @@ export const OpenerText = ({ py }: OpenerText) => {
   const text1Ref = useRef<any>();
   const text2Ref = useRef<any>();
   const buttonRef = useRef<any>();
-  const buttonTextRef = useRef<any>();
+  const arrowRef = useRef<any>();
   const [startFade, setStartFade] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
   useFrame((state) => {
-    if (!logoRef.current?.material || !text1Ref.current?.material || !text2Ref.current?.material || !buttonRef.current?.material || !buttonTextRef.current?.material) return;
+    if (!logoRef.current?.material || !text1Ref.current?.material || !text2Ref.current?.material || !buttonRef.current?.material || !arrowRef.current?.material) return;
 
     // Start fade after 1 second (after video animation)
     if (state.clock.getElapsedTime() > 1 && !startFade) {
@@ -34,13 +33,13 @@ export const OpenerText = ({ py }: OpenerText) => {
       text1Ref.current.material.opacity = opacity;
       text2Ref.current.material.opacity = opacity;
       buttonRef.current.material.opacity = opacity;
-      buttonTextRef.current.material.opacity = opacity;
+      arrowRef.current.material.opacity = opacity;
     } else {
       logoRef.current.material.opacity = 0;
       text1Ref.current.material.opacity = 0;
       text2Ref.current.material.opacity = 0;
       buttonRef.current.material.opacity = 0;
-      buttonTextRef.current.material.opacity = 0;
+      arrowRef.current.material.opacity = 0;
     }
   });
 
@@ -97,25 +96,23 @@ export const OpenerText = ({ py }: OpenerText) => {
         onPointerEnter={() => setIsHovered(true)}
         onPointerLeave={() => setIsHovered(false)}
       >
-        <RoundedBox 
-          ref={buttonRef}
-          args={[2.2, 0.5, 0.1]} 
-          radius={0.25} 
-          smoothness={32}
-        >
+        {/* Circular button */}
+        <mesh ref={buttonRef}>
+          <circleGeometry args={[0.4, 32]} />
           <meshBasicMaterial transparent opacity={0} color="white" />
-        </RoundedBox>
+        </mesh>
+        
+        {/* Down arrow */}
         <Text
-          ref={buttonTextRef}
-          fontSize={0.15}
+          ref={arrowRef}
+          fontSize={0.4}
           position-z={0.1}
           font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
           anchorX="center"
           anchorY="middle"
-          color="black"
         >
-          {' SAIBA MAIS '}
-          <meshBasicMaterial transparent opacity={0} depthTest={false} color="black" />
+          ↓
+          <meshBasicMaterial transparent opacity={0} depthTest={false} color="white" />
         </Text>
       </group>
     </group>
