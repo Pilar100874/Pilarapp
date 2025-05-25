@@ -18,11 +18,10 @@ export const Photo = (props: Photo) => {
   const previousOffset = useRef(-1);
   const [isPaused, setIsPaused] = useState(false);
   const pauseTimer = useRef<number | null>(null);
-  const rotationSpeed = 0.2;
+  const rotationSpeed = 0.24; // Increased by 20% from 0.2 to 0.24
   const startTime = useRef(Date.now());
   const lastPosition = useRef({ x: 0, z: 0, rotation: 0 });
 
-  // Increase the base dimensions by 10%
   const baseWidth = 3.25 * 1.1;
   const baseHeight = 4.5 * 1.1;
 
