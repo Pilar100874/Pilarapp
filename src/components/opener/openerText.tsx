@@ -1,4 +1,4 @@
-import { Text, useTexture } from "@react-three/drei";
+import { Text, useTexture, useScroll } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import { MeshBasicMaterial } from "three";
@@ -15,6 +15,7 @@ export const OpenerText = ({ py }: OpenerText) => {
   const text2Ref = useRef<any>();
   const arrowRef = useRef<any>();
   const [startFade, setStartFade] = useState(false);
+  const scroll = useScroll();
 
   useFrame((state) => {
     if (!logoRef.current?.material || !text1Ref.current?.material || !text2Ref.current?.material || !arrowRef.current?.material) return;
@@ -41,18 +42,11 @@ export const OpenerText = ({ py }: OpenerText) => {
   });
 
   const handleArrowClick = () => {
-    // Get the scroll element
-    const scrollElement = document.querySelector('.scroll-container');
-    if (scrollElement) {
-      // Calculate the position to the end of screen 2 (approximately 2vh)
-      const screen2EndPosition = window.innerHeight * 2;
-      
-      // Scroll to the end of Screen2 with smooth animation
-      scrollElement.scrollTo({
-        top: screen2EndPosition,
-        behavior: 'smooth'
-      });
-    }
+    // Scroll to 25% of the total scroll length (approximately end of screen 2)
+    scroll.el.scrollTo({
+      top: scroll.el.scrollHeight * 0.25,
+      behavior: 'smooth'
+    });
   };
 
   return (
