@@ -1,1 +1,0 @@
-export const SCREEN9_OFFSET_START_Y = -47;
