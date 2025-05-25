@@ -4,8 +4,16 @@ import { LandingScene } from '@/components/LandingScene';
 
 function App() {
   const [started, setStarted] = useState(false);
+  const [transitioning, setTransitioning] = useState(false);
 
-  return started ? <Scene /> : <LandingScene onStart={() => setStarted(true)} />;
+  const handleStart = () => {
+    setTransitioning(true);
+    setTimeout(() => {
+      setStarted(true);
+    }, 1000);
+  };
+
+  return transitioning ? <Scene /> : <LandingScene onStart={handleStart} />;
 }
 
 export default App;

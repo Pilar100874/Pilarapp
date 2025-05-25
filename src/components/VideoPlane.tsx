@@ -13,20 +13,26 @@ import { OpenerText } from "@/components/opener/openerText";
 type VideoPlane = {
   texturePath: string;
 };
+
 export const VideoPlane = ({ texturePath }: VideoPlane) => {
   const scroll = useScroll();
   const windowSize = useAspect(1920, 1080);
-  const logoTexture = useTexture('/logo_branco.png');
+  const ref = useRef<Mesh>(null);
+  const initialY = -10;
 
   const videoTexture = useVideoTexture(texturePath, {
     autoplay: true,
   });
 
-  const ref = useRef<Mesh>(null);
+  useFrame((state) => {
+    if (!ref.current) return;
 
-  useFrame(() => {
-    if (!ref.current) {
-      return;
+    const elapsed = state.clock.getElapsedTime();
+    const targetY = 0;
+    
+    // Animate from bottom to top
+    if (elapsed < 1) {
+      ref.current.position.y = initialY + (targetY - initialY) * elapsed;
     }
 
     ref.current.rotation.y = scroll.offset * 2.5;
@@ -34,17 +40,14 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
 
   return (
     <Suspense fallback={null}>
-      <Plane
-        ref={ref}
-        scale={[...windowSize]}
-        material-side={DoubleSide}
-        material-map={videoTexture}
-      />
-      <mesh position={[-6, 3, 0.1]} scale={[2.5, 1.25, 1]}>
-        <planeGeometry />
-        <meshBasicMaterial map={logoTexture} transparent depthTest={false} />
-      </mesh>
-      <OpenerText py={0.5} />
+      <group ref={ref} position-y={initialY}>
+        <Plane
+          scale={windowSize}
+          material-side={DoubleSide}
+          material-map={videoTexture}
+        />
+        <OpenerText py={0.5} />
+      </group>
     </Suspense>
   );
 };

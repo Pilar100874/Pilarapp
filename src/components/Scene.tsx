@@ -8,8 +8,11 @@ import { Screen4 } from '@/components/screen4';
 import { Screen6 } from '@/components/screen6';
 import { Screen7 } from '@/components/screen7';
 import { Screen8 } from '@/components/screen8';
+import { useRef } from 'react';
 
 export const Scene = () => {
+  const openerRef = useRef();
+
   return (
     <Canvas style={{ width: '100vw', height: '100vh' }}>
       <ScrollControls pages={9}>
