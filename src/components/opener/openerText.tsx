@@ -1,12 +1,20 @@
-import { Text } from "@react-three/drei";
+import { Text, useTexture } from "@react-three/drei";
 
 type OpenerText = {
   py: number;
 };
 
 export const OpenerText = ({ py }: OpenerText) => {
+  const logoTexture = useTexture('/logo_branco.png');
+
   return (
     <group position-y={py}>
+      {/* Logo */}
+      <mesh position-y={1.5} scale={[1.5, 1.5, 1]}>
+        <planeGeometry args={[2, 1]} />
+        <meshBasicMaterial map={logoTexture} transparent opacity={1} />
+      </mesh>
+
       <Text
         fontSize={0.35}
         letterSpacing={0.005}
