@@ -20,13 +20,12 @@ export const OpenerText = ({ py }: OpenerText) => {
   useFrame((state) => {
     if (!logoRef.current?.material || !text1Ref.current?.material || !text2Ref.current?.material || !buttonRef.current?.material || !textRef.current?.material) return;
 
-    // Start fade after 1 second (after video animation)
     if (state.clock.getElapsedTime() > 1 && !startFade) {
       setStartFade(true);
     }
 
     if (startFade) {
-      const fadeTime = state.clock.getElapsedTime() - 1; // Subtract 1 second delay
+      const fadeTime = state.clock.getElapsedTime() - 1;
       const opacity = Math.min(fadeTime, 1);
       
       logoRef.current.material.opacity = opacity;
@@ -96,20 +95,19 @@ export const OpenerText = ({ py }: OpenerText) => {
         onPointerEnter={() => setIsHovered(true)}
         onPointerLeave={() => setIsHovered(false)}
       >
-        {/* Circular button */}
         <mesh ref={buttonRef}>
           <circleGeometry args={[0.2, 32]} />
           <meshBasicMaterial transparent opacity={0} color="black" />
         </mesh>
         
-        {/* V text */}
         <Text
           ref={textRef}
           fontSize={0.15}
-          position-z={0.1}
-          font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
+          position-z={0.01}
+          font="https://fonts.gstatic.com/s/robotocondensed/v19/ieVl2ZhZI2eCN5jzbjEETS9weq8-19K7DQ.woff"
           anchorX="center"
           anchorY="middle"
+          textAlign="center"
           color="white"
         >
           V
