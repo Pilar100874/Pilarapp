@@ -3,7 +3,7 @@ import { useThree } from '@react-three/fiber';
 import { useState, useRef } from 'react';
 import { RoundedBox } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { MeshBasicMaterial } from 'three';
+import { MeshBasicMaterial, MeshStandardMaterial } from 'three';
 
 export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -11,6 +11,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const logoTexture = useTexture('/logo_branco.png');
   const textRef = useRef<any>();
   const materialRef = useRef<MeshBasicMaterial>();
+  const buttonRef = useRef<any>();
   const [animationComplete, setAnimationComplete] = useState(false);
 
   useFrame((state) => {
@@ -25,6 +26,11 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
     if (opacity >= 1) {
       setAnimationComplete(true);
+    }
+
+    if (buttonRef.current) {
+      // Add subtle floating animation
+      buttonRef.current.position.y = -1.0 + Math.sin(elapsed * 2) * 0.03;
     }
   });
 
@@ -50,7 +56,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
       </Text>
 
       <group
-        position-y={-1.0}
+        ref={buttonRef}
         scale={isHovered ? 1.1 : 1}
         onClick={onStart}
         onPointerEnter={() => {
@@ -62,19 +68,42 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
           document.body.style.cursor = 'default';
         }}
       >
-        <RoundedBox args={[2.5, 0.6, 0.1]} radius={0.2} smoothness={4}>
-          <meshBasicMaterial color="white" />
+        {/* Button shadow */}
+        <RoundedBox args={[2.5, 0.6, 0.02]} radius={0.2} smoothness={4} position={[0, -0.05, -0.05]}>
+          <meshBasicMaterial color="black" opacity={0.3} transparent />
         </RoundedBox>
+
+        {/* Button back layer for depth */}
+        <RoundedBox args={[2.5, 0.6, 0.15]} radius={0.2} smoothness={4} position={[0, 0, -0.075]}>
+          <meshStandardMaterial color="#e0e0e0" metalness={0.5} roughness={0.5} />
+        </RoundedBox>
+
+        {/* Main button face */}
+        <RoundedBox args={[2.5, 0.6, 0.15]} radius={0.2} smoothness={4}>
+          <meshStandardMaterial 
+            color="white" 
+            metalness={0.3} 
+            roughness={0.4}
+            emissive="white"
+            emissiveIntensity={isHovered ? 0.2 : 0}
+          />
+        </RoundedBox>
+
         <Text
           fontSize={0.18}
-          position-z={0.06}
+          position-z={0.08}
           font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
           anchorX="center"
           anchorY="middle"
           color="black"
         >
           INICIAR A EXPERIÊNCIA
-          <meshBasicMaterial depthTest={false} color="black" />
+          <meshStandardMaterial 
+            color="black" 
+            metalness={0.1} 
+            roughness={0.8}
+            depthTest={false} 
+          />
         </Text>
       </group>
     </group>
