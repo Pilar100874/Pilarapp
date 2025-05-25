@@ -20,13 +20,12 @@ export const OpenerText = ({ py }: OpenerText) => {
   useFrame((state) => {
     if (!logoRef.current?.material || !text1Ref.current?.material || !text2Ref.current?.material || !arrowRef.current?.material) return;
 
-    // Start fade after 1 second (after video animation)
     if (state.clock.getElapsedTime() > 1 && !startFade) {
       setStartFade(true);
     }
 
     if (startFade) {
-      const fadeTime = state.clock.getElapsedTime() - 1; // Subtract 1 second delay
+      const fadeTime = state.clock.getElapsedTime() - 1;
       const opacity = Math.min(fadeTime, 1);
       
       logoRef.current.material.opacity = opacity;
@@ -42,9 +41,8 @@ export const OpenerText = ({ py }: OpenerText) => {
   });
 
   const handleArrowClick = () => {
-    // Scroll to 25% of the total scroll length (approximately end of screen 2)
     scroll.el.scrollTo({
-      top: scroll.el.scrollHeight * 0.25,
+      top: scroll.el.scrollHeight * 0.15,
       behavior: 'smooth'
     });
   };
