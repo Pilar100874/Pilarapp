@@ -1,4 +1,4 @@
-import { Text, useTexture } from "@react-three/drei";
+import { Text, useTexture, useScroll } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import { MeshBasicMaterial } from "three";
@@ -16,6 +16,7 @@ export const OpenerText = ({ py }: OpenerText) => {
   const textRef = useRef<any>();
   const [startFade, setStartFade] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const scroll = useScroll();
 
   useFrame((state) => {
     if (!logoRef.current?.material || !text1Ref.current?.material || !text2Ref.current?.material || !buttonRef.current?.material || !textRef.current?.material) return;
@@ -41,6 +42,13 @@ export const OpenerText = ({ py }: OpenerText) => {
       textRef.current.material.opacity = 0;
     }
   });
+
+  const handleClick = () => {
+    scroll.el.scrollTo({
+      top: window.innerHeight,
+      behavior: 'smooth'
+    });
+  };
 
   return (
     <group position-y={py}>
@@ -94,6 +102,7 @@ export const OpenerText = ({ py }: OpenerText) => {
         scale={isHovered ? 1.1 : 1}
         onPointerEnter={() => setIsHovered(true)}
         onPointerLeave={() => setIsHovered(false)}
+        onClick={handleClick}
       >
         <mesh ref={buttonRef}>
           <circleGeometry args={[0.2, 32]} />
