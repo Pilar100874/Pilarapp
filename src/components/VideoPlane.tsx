@@ -5,7 +5,7 @@ import {
   useVideoTexture,
 } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { Suspense, useRef } from "react";
+import { Suspense, useRef, useState } from "react";
 import { DoubleSide, Mesh } from "three";
 import { OpenerText } from "@/components/opener/openerText";
 
@@ -17,11 +17,12 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
   const scroll = useScroll();
   const windowSize = useAspect(1920, 1080);
   const ref = useRef<Mesh>(null);
-  const initialY = -10; // Starting position below the screen
-  const targetY = 0; // Final position at the top
+  const [videoStarted, setVideoStarted] = useState(false);
+  const initialY = -15; // Start position further down
+  const targetY = 0; // Final position at top
 
   const videoTexture = useVideoTexture(texturePath, {
-    autoplay: true,
+    autoplay: false, // Don't start playing immediately
   });
 
   useFrame((state) => {
@@ -35,22 +36,25 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
     const easeOutCubic = (x: number): number => 1 - Math.pow(1 - x, 3);
     const easedProgress = easeOutCubic(progress);
     
-    // Animate only the video's position from bottom to top
+    // Animate position from bottom to top
     ref.current.position.y = initialY + (targetY - initialY) * easedProgress;
 
-    // Maintain the rotation based on scroll
+    // Start video when animation is almost complete
+    if (progress >= 0.8 && !videoStarted) {
+      setVideoStarted(true);
+      (videoTexture.source.data as HTMLVideoElement).play();
+    }
+
     ref.current.rotation.y = scroll.offset * 2.5;
   });
 
   return (
     <Suspense fallback={null}>
-      <group>
+      <group ref={ref} position-y={initialY}>
         <Plane
-          ref={ref}
           scale={windowSize}
           material-side={DoubleSide}
           material-map={videoTexture}
-          position-y={initialY}
         />
         <OpenerText py={0.5} />
       </group>
