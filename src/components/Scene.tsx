@@ -19,8 +19,8 @@ export const Scene = () => {
         <Screen3 />
         <Screen4 />
         <Screen6 />
-        <Screen7 />
         <Screen8 />
+        <Screen7 />
       </ScrollControls>
       <ambientLight />
       <directionalLight />
