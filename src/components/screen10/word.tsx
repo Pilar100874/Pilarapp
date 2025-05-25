@@ -22,14 +22,13 @@ export const Word = ({ index, value }: Word) => {
 
     const rotY = scroll.offset * 8 - Math.abs(dataScreen10.length - index) * 0.15 - Math.PI / 8;
     ref.current.rotation.y = rotY;
-    ref.current.rotation.z = (240 * Math.PI) / 180; // Convert 240 degrees to radians
     refMaterial.current.opacity = MathUtils.clamp(Math.pow(rotY + 1, 10), -Infinity, 1);
   });
 
   return (
     <Text
       ref={ref}
-      fontSize={value === 'ALGUNS' ? 0.595 : 0.85}
+      fontSize={value === 'ALGUNS' ? 0.595 : 0.85} // 0.85 * 0.7 = 0.595 for "ALGUNS"
       letterSpacing={0.005}
       position-y={SCREEN10_OFFSET_START_Y - 1 * -index * 1.1}
       textAlign={'left'}
@@ -41,4 +40,4 @@ export const Word = ({ index, value }: Word) => {
       <meshBasicMaterial transparent ref={refMaterial} side={DoubleSide} />
     </Text>
   );
-}
+};
