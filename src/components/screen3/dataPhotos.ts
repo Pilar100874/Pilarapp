@@ -1,10 +1,10 @@
 import p1 from '/SP.png';
 import p2 from '/rs.png';
-import p3 from '/ES.png';
+import p3 from '/es.png';
 import p4 from '/to.png';
 import p5 from '/ba.png';
 import p6 from '/pr.png';
-import p6 from '/go.png';
+import p7 from '/go.png';
 
 type Photos = 'Photo1' | 'Photo2' | 'Photo3' | 'Photo4' | 'Photo5' | 'Photo6' | 'Photo7';
 
@@ -17,5 +17,5 @@ export const dataPhotos: DataPhotos = {
   Photo4: p4,
   Photo5: p5,
   Photo6: p6,
-  Photo6: p7,
+  Photo7: p7,
 };
