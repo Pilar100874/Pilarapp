@@ -1,21 +1,18 @@
-import { Scroll, Text } from '@react-three/drei';
+import { Scroll } from '@react-three/drei';
 import { SCREEN9_OFFSET_START_Y } from './constants';
+import { dataScreen9 } from './data';
+import { PillarModel } from './PillarModel';
+import { Word } from './word';
 
 export const Screen9 = () => {
   return (
     <Scroll>
-      <Text
-        fontSize={2}
-        letterSpacing={0.005}
-        position-y={SCREEN9_OFFSET_START_Y}
-        position-z={0.1}
-        font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
-        anchorX="center"
-        anchorY="middle"
-      >
-        Pilar Pap
-        <meshBasicMaterial depthTest={false} />
-      </Text>
+      {dataScreen9.map((word, i) => (
+        <Word key={word} value={word} index={dataScreen9.length - i} />
+      ))}
+      <group position-y={SCREEN9_OFFSET_START_Y * 0.75}>
+        <PillarModel />
+      </group>
     </Scroll>
   );
 };
