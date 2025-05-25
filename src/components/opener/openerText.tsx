@@ -12,7 +12,14 @@ export const OpenerText = ({ py }: OpenerText) => {
       {/* Logo */}
       <mesh position-y={1.5} scale={[1.5, 1.5, 1]}>
         <planeGeometry args={[2, 1]} />
-        <meshBasicMaterial map={logoTexture} transparent opacity={1} />
+        <meshBasicMaterial 
+          map={logoTexture} 
+          transparent 
+          opacity={1} 
+          depthTest={false}
+          depthWrite={false}
+          toneMapped={false}
+        />
       </mesh>
 
       <Text
