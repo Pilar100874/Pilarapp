@@ -1,6 +1,6 @@
 import { Plane, useScroll, useTexture } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { MathUtils, Mesh } from 'three';
 
 type Photo = {
@@ -12,58 +12,63 @@ type Photo = {
 export const Photo = (props: Photo) => {
   const photo = useTexture(props.src);
   const ref = useRef<Mesh>(null);
-  const velocity = useRef({ x: 0, y: 0 });
+  const scroll = useScroll();
   const [isHovered, setIsHovered] = useState(false);
   
-  // Spring physics constants
-  const springStrength = 0.1;
-  const dampening = 0.75;
-  const targetX = 0;
-  const targetY = 0;
+  // Snap points configuration
+  const snapPoints = [-4, -2, 0, 2, 4]; // Horizontal positions to snap to
+  const snapThreshold = 0.1; // How close we need to be to snap
+  const snapSpeed = 0.15; // How fast we snap into position
 
   useFrame(() => {
     if (!ref.current) return;
 
-    // Spring physics calculation
-    const dx = targetX - ref.current.position.x;
-    const dy = targetY - ref.current.position.y;
+    // Calculate scroll influence
+    const scrollInfluence = (scroll.offset - 0.5) * 10;
+    
+    // Find the closest snap point
+    let closestPoint = snapPoints[0];
+    let minDistance = Math.abs(ref.current.position.x - snapPoints[0]);
+    
+    snapPoints.forEach(point => {
+      const distance = Math.abs(ref.current.position.x - point);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestPoint = point;
+      }
+    });
 
-    // Add force towards target (spring effect)
-    velocity.current.x += dx * springStrength;
-    velocity.current.y += dy * springStrength;
+    // Apply snapping if we're close enough to a snap point
+    if (minDistance < snapThreshold) {
+      ref.current.position.x = MathUtils.lerp(
+        ref.current.position.x,
+        closestPoint,
+        snapSpeed
+      );
+    } else {
+      // Otherwise, move based on scroll
+      ref.current.position.x = MathUtils.lerp(
+        ref.current.position.x,
+        scrollInfluence,
+        0.1
+      );
+    }
 
-    // Apply dampening
-    velocity.current.x *= dampening;
-    velocity.current.y *= dampening;
-
-    // Update position
-    ref.current.position.x += velocity.current.x;
-    ref.current.position.y += velocity.current.y;
+    // Keep Z position constant
     ref.current.position.z = props.z;
-
-    // Add subtle floating animation
-    ref.current.position.y += Math.sin(Date.now() * 0.001) * 0.001;
-
-    // Elastic rotation based on velocity
-    ref.current.rotation.z = MathUtils.lerp(
-      ref.current.rotation.z,
-      -velocity.current.x * 0.2,
-      0.1
-    );
 
     // Scale effect on hover
     const targetScale = isHovered ? 1.1 : 1;
     ref.current.scale.x = MathUtils.lerp(ref.current.scale.x, targetScale, 0.1);
     ref.current.scale.y = MathUtils.lerp(ref.current.scale.y, targetScale, 0.1);
-  });
 
-  useEffect(() => {
-    // Set random initial position
-    if (ref.current) {
-      ref.current.position.x = (Math.random() - 0.5) * 10;
-      ref.current.position.y = (Math.random() - 0.5) * 5;
-    }
-  }, []);
+    // Subtle rotation based on movement
+    ref.current.rotation.y = MathUtils.lerp(
+      ref.current.rotation.y,
+      (ref.current.position.x - closestPoint) * 0.1,
+      0.1
+    );
+  });
 
   return (
     <Plane
