@@ -9,11 +9,11 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const logoTexture = useTexture('/logo_branco.png');
   const startButtonTexture = useTexture('/iniciar.png');
   const textRef = useRef<any>();
-  const materialRef = useRef<MeshBasicMaterial>();
+  const materialRef = useRef<MeshBasicMaterial | null>(null);
   const [animationComplete, setAnimationComplete] = useState(false);
 
   useFrame((state) => {
-    if (!textRef.current || !materialRef.current || animationComplete) return;
+    if (!textRef.current || animationComplete) return;
 
     const elapsed = state.clock.getElapsedTime();
     const opacity = Math.min(elapsed * 0.5, 1);
@@ -44,12 +44,12 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         anchorY="middle"
       >
         PILAR APRESENTA
-        <meshBasicMaterial ref={materialRef} transparent depthTest={false} />
+        <meshBasicMaterial ref={materialRef as any} transparent depthTest={false} />
       </Text>
 
       <mesh
         position-y={-1.0}
-        scale={isHovered ? [2.16, 0.54, 1] : [1.98, 0.495, 1]} // Reduced by 10% from previous values
+        scale={isHovered ? [2.16, 0.54, 1] : [1.98, 0.495, 1]}
         onClick={onStart}
         onPointerEnter={() => {
           setIsHovered(true);
