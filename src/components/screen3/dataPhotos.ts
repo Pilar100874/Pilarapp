@@ -1,10 +1,10 @@
 import p1 from '/SP.png';
-import p2 from '/RS.png';
+import p2 from '/rs.png';
 import p3 from '/ES.png';
-import p4 from '/TO.png';
-import p5 from '/BA.png';
-import p6 from '/PR.png';
-import p6 from '/GO.png';
+import p4 from '/to.png';
+import p5 from '/ba.png';
+import p6 from '/pr.png';
+import p6 from '/go.png';
 
 type Photos = 'Photo1' | 'Photo2' | 'Photo3' | 'Photo4' | 'Photo5' | 'Photo6' | 'Photo7';
 
