@@ -12,7 +12,7 @@ export const Screen3 = () => {
     const newOrder = [...order];
     const currentPosition = order.indexOf(clickedIndex);
     
-    // Move clicked photo to front
+    // Move clicked photo to front with elastic animation
     newOrder.splice(currentPosition, 1);
     newOrder.unshift(clickedIndex);
     

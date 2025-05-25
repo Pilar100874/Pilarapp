@@ -12,55 +12,57 @@ type Photo = {
 export const Photo = (props: Photo) => {
   const photo = useTexture(props.src);
   const ref = useRef<Mesh>(null);
-  const scroll = useScroll();
-  const [targetPosition, setTargetPosition] = useState({ x: 0, y: 0 });
-  const currentPosition = useRef({ x: 0, y: 0 });
-  const startTime = useRef(Date.now());
+  const velocity = useRef({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+  
+  // Spring physics constants
+  const springStrength = 0.1;
+  const dampening = 0.75;
+  const targetX = 0;
+  const targetY = 0;
 
   useFrame(() => {
     if (!ref.current) return;
 
-    const now = Date.now();
-    const elapsed = (now - startTime.current) / 1000;
-    
-    // Smooth glide animation
-    currentPosition.current.x = MathUtils.lerp(
-      currentPosition.current.x,
-      targetPosition.x,
-      0.05
-    );
-    
-    currentPosition.current.y = MathUtils.lerp(
-      currentPosition.current.y,
-      targetPosition.y + Math.sin(elapsed) * 0.1, // Subtle floating effect
-      0.05
-    );
+    // Spring physics calculation
+    const dx = targetX - ref.current.position.x;
+    const dy = targetY - ref.current.position.y;
 
-    ref.current.position.x = currentPosition.current.x;
-    ref.current.position.y = currentPosition.current.y;
+    // Add force towards target (spring effect)
+    velocity.current.x += dx * springStrength;
+    velocity.current.y += dy * springStrength;
+
+    // Apply dampening
+    velocity.current.x *= dampening;
+    velocity.current.y *= dampening;
+
+    // Update position
+    ref.current.position.x += velocity.current.x;
+    ref.current.position.y += velocity.current.y;
     ref.current.position.z = props.z;
 
-    // Subtle rotation based on movement
-    ref.current.rotation.y = MathUtils.lerp(
-      ref.current.rotation.y,
-      (currentPosition.current.x - targetPosition.x) * 0.2,
-      0.05
+    // Add subtle floating animation
+    ref.current.position.y += Math.sin(Date.now() * 0.001) * 0.001;
+
+    // Elastic rotation based on velocity
+    ref.current.rotation.z = MathUtils.lerp(
+      ref.current.rotation.z,
+      -velocity.current.x * 0.2,
+      0.1
     );
+
+    // Scale effect on hover
+    const targetScale = isHovered ? 1.1 : 1;
+    ref.current.scale.x = MathUtils.lerp(ref.current.scale.x, targetScale, 0.1);
+    ref.current.scale.y = MathUtils.lerp(ref.current.scale.y, targetScale, 0.1);
   });
 
   useEffect(() => {
-    // Random initial position
-    const randomX = (Math.random() - 0.5) * 4;
-    const randomY = (Math.random() - 0.5) * 2;
-    
-    currentPosition.current = { x: randomX, y: randomY };
+    // Set random initial position
     if (ref.current) {
-      ref.current.position.x = randomX;
-      ref.current.position.y = randomY;
+      ref.current.position.x = (Math.random() - 0.5) * 10;
+      ref.current.position.y = (Math.random() - 0.5) * 5;
     }
-    
-    // Animate to center
-    setTargetPosition({ x: 0, y: 0 });
   }, []);
 
   return (
@@ -71,8 +73,14 @@ export const Photo = (props: Photo) => {
       material-transparent
       material-alphaTest={0.1}
       onClick={props.onClick}
-      onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
-      onPointerOut={() => { document.body.style.cursor = 'default'; }}
+      onPointerOver={() => {
+        setIsHovered(true);
+        document.body.style.cursor = 'pointer';
+      }}
+      onPointerOut={() => {
+        setIsHovered(false);
+        document.body.style.cursor = 'default';
+      }}
     />
   );
 };
