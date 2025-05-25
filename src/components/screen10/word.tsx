@@ -1,8 +1,7 @@
-import { Text, useScroll } from '@react-three/drei';
+import { Text } from '@react-three/drei';
 import { SCREEN10_OFFSET_START_Y } from './constants';
-import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
-import { DoubleSide, MathUtils, Mesh, MeshBasicMaterial } from 'three';
+import { DoubleSide, Mesh, MeshBasicMaterial } from 'three';
 import { dataScreen10 } from './data';
 
 type Word = {
@@ -11,19 +10,8 @@ type Word = {
 };
 
 export const Word = ({ index, value }: Word) => {
-  const scroll = useScroll();
   const ref = useRef<Mesh>(null);
   const refMaterial = useRef<MeshBasicMaterial>(null);
-
-  useFrame(() => {
-    if (!ref.current || !refMaterial.current) {
-      return;
-    }
-
-    const rotY = (scroll.offset * 8 - Math.abs(dataScreen10.length - index) * 0.15 - Math.PI / 8) + Math.PI; // Added Math.PI for 180-degree rotation
-    ref.current.rotation.y = rotY;
-    refMaterial.current.opacity = MathUtils.clamp(Math.pow(rotY + 1, 10), -Infinity, 1);
-  });
 
   return (
     <Text
@@ -37,7 +25,7 @@ export const Word = ({ index, value }: Word) => {
       anchorY="middle"
     >
       {value}
-      <meshBasicMaterial transparent ref={refMaterial} side={DoubleSide} />
+      <meshBasicMaterial transparent ref={refMaterial} side={DoubleSide} opacity={1} />
     </Text>
   );
 }
