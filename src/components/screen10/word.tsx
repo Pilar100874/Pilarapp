@@ -20,13 +20,9 @@ export const Word = ({ index, value }: Word) => {
       return;
     }
 
-    // Calculate rotation including a full 360-degree spin
-    const baseRotation = scroll.offset * 8 - Math.abs(dataScreen10.length - index) * 0.15;
-    const fullRotation = Math.PI * 2; // 360 degrees in radians
-    const rotY = baseRotation * fullRotation;
-    
+    const rotY = scroll.offset * 8 - Math.abs(dataScreen10.length - index) * 0.15 - Math.PI / 8;
     ref.current.rotation.y = rotY;
-    refMaterial.current.opacity = MathUtils.clamp(Math.pow(rotY / fullRotation + 1, 10), -Infinity, 1);
+    refMaterial.current.opacity = MathUtils.clamp(Math.pow(rotY + 1, 10), -Infinity, 1);
   });
 
   return (
