@@ -18,17 +18,20 @@ export const Photo = (props: Photo) => {
   const previousOffset = useRef(-1);
   const [isPaused, setIsPaused] = useState(false);
   const pauseTimer = useRef<number | null>(null);
-  const rotationSpeed = 0.2; // Speed of rotation
+  const rotationSpeed = 0.2;
   const startTime = useRef(Date.now());
   const lastPosition = useRef({ x: 0, z: 0, rotation: 0 });
+
+  // Increase the base dimensions by 10%
+  const baseWidth = 3.25 * 1.1;
+  const baseHeight = 4.5 * 1.1;
 
   useFrame((state) => {
     if (!ref.current) return;
 
     const currentTime = Date.now();
-    const elapsedTime = (currentTime - startTime.current) / 1000; // Convert to seconds
+    const elapsedTime = (currentTime - startTime.current) / 1000;
     
-    // Calculate the base angle for continuous rotation
     const baseAngle = ((props.index / props.totalPhotos) * Math.PI * 2) + (isPaused ? 0 : elapsedTime * rotationSpeed);
     
     const radius = 3;
@@ -36,12 +39,10 @@ export const Photo = (props: Photo) => {
     const targetZ = Math.sin(baseAngle) * radius - 2;
     const targetRotation = baseAngle + Math.PI;
 
-    // Smooth interpolation
     lastPosition.current.x = MathUtils.lerp(lastPosition.current.x, targetX, 0.1);
     lastPosition.current.z = MathUtils.lerp(lastPosition.current.z, targetZ, 0.1);
     lastPosition.current.rotation = MathUtils.lerp(lastPosition.current.rotation, targetRotation, 0.1);
 
-    // Apply positions
     ref.current.position.x = lastPosition.current.x;
     ref.current.position.z = lastPosition.current.z;
     ref.current.rotation.y = lastPosition.current.rotation;
@@ -76,7 +77,7 @@ export const Photo = (props: Photo) => {
     <Plane
       ref={ref}
       position-y={0}
-      args={[3.25, 4.5]}
+      args={[baseWidth, baseHeight]}
       material-map={photo}
       material-transparent
       material-alphaTest={0.1}
