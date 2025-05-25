@@ -1,4 +1,7 @@
 import { Text, useTexture } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
+import { useRef, useState } from "react";
+import { MeshBasicMaterial } from "three";
 
 type OpenerText = {
   py: number;
@@ -6,16 +9,45 @@ type OpenerText = {
 
 export const OpenerText = ({ py }: OpenerText) => {
   const logoTexture = useTexture('/logo_branco.png');
+  const logoRef = useRef<any>();
+  const text1Ref = useRef<any>();
+  const text2Ref = useRef<any>();
+  const [startFade, setStartFade] = useState(false);
+
+  useFrame((state) => {
+    if (!logoRef.current?.material || !text1Ref.current?.material || !text2Ref.current?.material) return;
+
+    // Start fade after 1 second (after video animation)
+    if (state.clock.getElapsedTime() > 1 && !startFade) {
+      setStartFade(true);
+    }
+
+    if (startFade) {
+      const fadeTime = state.clock.getElapsedTime() - 1; // Subtract 1 second delay
+      const opacity = Math.min(fadeTime, 1);
+      
+      logoRef.current.material.opacity = opacity;
+      text1Ref.current.material.opacity = opacity;
+      text2Ref.current.material.opacity = opacity;
+    } else {
+      logoRef.current.material.opacity = 0;
+      text1Ref.current.material.opacity = 0;
+      text2Ref.current.material.opacity = 0;
+    }
+  });
 
   return (
     <group position-y={py}>
-      {/* Logo */}
-      <mesh position-y={1.25} scale={[1.5, 1.5, 1]}>
+      <mesh 
+        ref={logoRef}
+        position-y={1.25} 
+        scale={[1.5, 1.5, 1]}
+      >
         <planeGeometry args={[2, 1]} />
         <meshBasicMaterial 
           map={logoTexture} 
           transparent 
-          opacity={1} 
+          opacity={0}
           depthTest={false}
           depthWrite={false}
           toneMapped={false}
@@ -23,6 +55,7 @@ export const OpenerText = ({ py }: OpenerText) => {
       </mesh>
 
       <Text
+        ref={text1Ref}
         fontSize={0.35}
         letterSpacing={0.005}
         position-z={0.1}
@@ -32,9 +65,11 @@ export const OpenerText = ({ py }: OpenerText) => {
         anchorY="middle"
       >
         PROCURANDO PAPÉIS ??
-        <meshBasicMaterial depthTest={false} />
+        <meshBasicMaterial transparent opacity={0} depthTest={false} />
       </Text>
+
       <Text
+        ref={text2Ref}
         fontSize={1.05}
         letterSpacing={0.005}
         position-z={0.1}
@@ -45,7 +80,7 @@ export const OpenerText = ({ py }: OpenerText) => {
         anchorY="middle"
       >
         VOCÊ ENCONTRA AQUI !!
-        <meshBasicMaterial depthTest={false} />
+        <meshBasicMaterial transparent opacity={0} depthTest={false} />
       </Text>
     </group>
   );
