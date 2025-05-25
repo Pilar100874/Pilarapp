@@ -49,7 +49,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
       <mesh
         position-y={-1.0}
-        scale={isHovered ? 1.1 : 1}
+        scale={isHovered ? [2.4, 0.6, 1] : [2.2, 0.55, 1]} // Reduced from [4, 1] to [2.2, 0.55]
         onClick={onStart}
         onPointerEnter={() => {
           setIsHovered(true);
@@ -60,7 +60,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
           document.body.style.cursor = 'default';
         }}
       >
-        <planeGeometry args={[4, 1]} />
+        <planeGeometry args={[1, 1]} />
         <meshBasicMaterial
           map={startButtonTexture}
           transparent
