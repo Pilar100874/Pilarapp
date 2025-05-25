@@ -1,1 +1,0 @@
-export const dataScreen9 = ["27", "ANOS NO", "MERCADO", "9 UNIDADES", "PELO BRASIL"];
