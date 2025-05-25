@@ -91,28 +91,28 @@ export const OpenerText = ({ py }: OpenerText) => {
       </Text>
 
       <group
-        position-y={-2}
+        position-y={-3.9}
         scale={isHovered ? 1.1 : 1}
         onPointerEnter={() => setIsHovered(true)}
         onPointerLeave={() => setIsHovered(false)}
       >
         {/* Circular button */}
         <mesh ref={buttonRef}>
-          <circleGeometry args={[0.4, 32]} />
-          <meshBasicMaterial transparent opacity={0} color="white" />
+          <circleGeometry args={[0.2, 32]} />
+          <meshBasicMaterial transparent opacity={0} color="black" />
         </mesh>
         
         {/* Down arrow */}
         <Text
           ref={arrowRef}
-          fontSize={0.4}
+          fontSize={0.2}
           position-z={0.1}
           font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
           anchorX="center"
           anchorY="middle"
         >
           ↓
-          <meshBasicMaterial transparent opacity={0} depthTest={false} color="white" />
+          <meshBasicMaterial transparent opacity={0} depthTest={false} color="black" />
         </Text>
       </group>
     </group>
