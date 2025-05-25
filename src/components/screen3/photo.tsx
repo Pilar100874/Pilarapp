@@ -1,73 +1,56 @@
-import { Plane, useScroll, useTexture } from '@react-three/drei';
+import { Plane, useTexture } from '@react-three/drei';
+import { useRef, useState } from 'react';
+import { Mesh, Vector3, Euler } from 'three';
 import { useFrame } from '@react-three/fiber';
-import { useRef, useState, useEffect } from 'react';
-import { MathUtils, Mesh } from 'three';
 
 type Photo = {
   src: string;
-  z: number;
+  position: [number, number, number];
+  rotation: [number, number, number];
   onClick?: () => void;
 };
 
 export const Photo = (props: Photo) => {
   const photo = useTexture(props.src);
   const ref = useRef<Mesh>(null);
-  const velocity = useRef({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
   
-  // Spring physics constants
-  const springStrength = 0.1;
-  const dampening = 0.75;
-  const targetX = 0;
-  const targetY = 0;
+  const targetPosition = useRef(new Vector3(...props.position));
+  const targetRotation = useRef(new Euler(...props.rotation));
 
   useFrame(() => {
     if (!ref.current) return;
 
-    // Spring physics calculation
-    const dx = targetX - ref.current.position.x;
-    const dy = targetY - ref.current.position.y;
-
-    // Add force towards target (spring effect)
-    velocity.current.x += dx * springStrength;
-    velocity.current.y += dy * springStrength;
-
-    // Apply dampening
-    velocity.current.x *= dampening;
-    velocity.current.y *= dampening;
-
-    // Update position
-    ref.current.position.x += velocity.current.x;
-    ref.current.position.y += velocity.current.y;
-    ref.current.position.z = props.z;
-
-    // Add subtle floating animation
-    ref.current.position.y += Math.sin(Date.now() * 0.001) * 0.001;
-
-    // Elastic rotation based on velocity
-    ref.current.rotation.z = MathUtils.lerp(
+    // Smooth position transition
+    ref.current.position.lerp(targetPosition.current, 0.1);
+    
+    // Smooth rotation transition
+    ref.current.rotation.x = THREE.MathUtils.lerp(
+      ref.current.rotation.x,
+      targetRotation.current.x,
+      0.1
+    );
+    ref.current.rotation.y = THREE.MathUtils.lerp(
+      ref.current.rotation.y,
+      targetRotation.current.y,
+      0.1
+    );
+    ref.current.rotation.z = THREE.MathUtils.lerp(
       ref.current.rotation.z,
-      -velocity.current.x * 0.2,
+      targetRotation.current.z,
       0.1
     );
 
     // Scale effect on hover
     const targetScale = isHovered ? 1.1 : 1;
-    ref.current.scale.x = MathUtils.lerp(ref.current.scale.x, targetScale, 0.1);
-    ref.current.scale.y = MathUtils.lerp(ref.current.scale.y, targetScale, 0.1);
+    ref.current.scale.lerp(new Vector3(targetScale, targetScale, 1), 0.1);
   });
-
-  useEffect(() => {
-    // Set random initial position
-    if (ref.current) {
-      ref.current.position.x = (Math.random() - 0.5) * 10;
-      ref.current.position.y = (Math.random() - 0.5) * 5;
-    }
-  }, []);
 
   return (
     <Plane
       ref={ref}
+      position={props.position}
+      rotation={props.rotation}
       args={[3.25, 4.5]}
       material-map={photo}
       material-transparent
