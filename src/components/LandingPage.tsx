@@ -62,12 +62,12 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
           document.body.style.cursor = 'default';
         }}
       >
-        <RoundedBox args={[2.5, 0.6, 0.1]} radius={0.25} smoothness={32}>
+        <RoundedBox args={[2.5, 0.6, 0.1]} radius={0.2} smoothness={4}>
           <meshBasicMaterial color="white" />
         </RoundedBox>
         <Text
           fontSize={0.18}
-          position-z={0.1}
+          position-z={0.06}
           font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
           anchorX="center"
           anchorY="middle"
