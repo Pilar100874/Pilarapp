@@ -13,12 +13,12 @@ export const OpenerText = ({ py }: OpenerText) => {
   const text1Ref = useRef<any>();
   const text2Ref = useRef<any>();
   const buttonRef = useRef<any>();
-  const arrowRef = useRef<any>();
+  const textRef = useRef<any>();
   const [startFade, setStartFade] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
   useFrame((state) => {
-    if (!logoRef.current?.material || !text1Ref.current?.material || !text2Ref.current?.material || !buttonRef.current?.material || !arrowRef.current?.material) return;
+    if (!logoRef.current?.material || !text1Ref.current?.material || !text2Ref.current?.material || !buttonRef.current?.material || !textRef.current?.material) return;
 
     // Start fade after 1 second (after video animation)
     if (state.clock.getElapsedTime() > 1 && !startFade) {
@@ -33,13 +33,13 @@ export const OpenerText = ({ py }: OpenerText) => {
       text1Ref.current.material.opacity = opacity;
       text2Ref.current.material.opacity = opacity;
       buttonRef.current.material.opacity = opacity;
-      arrowRef.current.material.opacity = opacity;
+      textRef.current.material.opacity = opacity;
     } else {
       logoRef.current.material.opacity = 0;
       text1Ref.current.material.opacity = 0;
       text2Ref.current.material.opacity = 0;
       buttonRef.current.material.opacity = 0;
-      arrowRef.current.material.opacity = 0;
+      textRef.current.material.opacity = 0;
     }
   });
 
@@ -102,17 +102,18 @@ export const OpenerText = ({ py }: OpenerText) => {
           <meshBasicMaterial transparent opacity={0} color="black" />
         </mesh>
         
-        {/* Down arrow */}
+        {/* V text */}
         <Text
-          ref={arrowRef}
-          fontSize={0.2}
+          ref={textRef}
+          fontSize={0.15}
           position-z={0.1}
           font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
           anchorX="center"
           anchorY="middle"
+          color="white"
         >
-          ↓
-          <meshBasicMaterial transparent opacity={0} depthTest={false} color="black" />
+          V
+          <meshBasicMaterial transparent opacity={0} depthTest={false} color="white" />
         </Text>
       </group>
     </group>
