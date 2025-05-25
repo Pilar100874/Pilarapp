@@ -19,16 +19,18 @@ export const Photo = (props: Photo) => {
   const scroll = useScroll();
 
   // Configuration
-  const spacing = 4; // Space between photos
-  const centerZ = -2; // Z position of center photo
-  const sideZ = -4; // Z position of side photos
-  const rotationFactor = 0.5; // How much photos rotate
-  const perspective = 2; // Perspective effect strength
+  const spacing = 2.5; // Reduced spacing between photos
+  const centerZ = 0; // Centered Z position
+  const sideZ = -2; // Closer side Z position
+  const rotationFactor = 0.35; // Reduced rotation for smoother effect
+  const perspective = 1.5; // Adjusted perspective
 
   useFrame(() => {
     if (!ref.current) return;
 
     const relativeIndex = props.index - props.activeIndex;
+    
+    // Center the photos horizontally
     const targetX = relativeIndex * spacing;
     
     // Calculate z-position with perspective
@@ -37,12 +39,12 @@ export const Photo = (props: Photo) => {
       targetZ = sideZ - Math.abs(relativeIndex) * perspective;
     }
 
-    // Calculate rotation
+    // Calculate rotation - centered photos have less rotation
     const targetRotationY = -relativeIndex * rotationFactor;
 
-    // Calculate scale based on position
+    // Scale based on position and hover state
     const baseScale = isHovered ? 1.1 : 1;
-    const targetScale = props.isActive ? baseScale : baseScale * 0.8;
+    const targetScale = props.isActive ? baseScale : baseScale * 0.85;
 
     // Smooth transitions
     ref.current.position.x = MathUtils.lerp(ref.current.position.x, targetX, 0.1);
@@ -53,7 +55,7 @@ export const Photo = (props: Photo) => {
 
     // Add subtle movement based on scroll
     const scrollOffset = scroll.offset - 0.5;
-    ref.current.position.x += scrollOffset * 2;
+    ref.current.position.x += scrollOffset;
   });
 
   return (
