@@ -44,12 +44,12 @@ export const OpenerText = ({ py }: OpenerText) => {
     // Get the scroll element
     const scrollElement = document.querySelector('.scroll-container');
     if (scrollElement) {
-      // Calculate the position of Screen2 (approximately 100vh)
-      const screen2Position = window.innerHeight * 1;
+      // Calculate the position to the end of screen 2 (approximately 2vh)
+      const screen2EndPosition = window.innerHeight * 2;
       
-      // Scroll to Screen2 with smooth animation
+      // Scroll to the end of Screen2 with smooth animation
       scrollElement.scrollTo({
-        top: screen2Position,
+        top: screen2EndPosition,
         behavior: 'smooth'
       });
     }
