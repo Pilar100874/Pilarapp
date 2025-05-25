@@ -18,7 +18,7 @@ export const OpenerText = ({ py }: OpenerText) => {
   const [isHovered, setIsHovered] = useState(false);
   const scroll = useScroll();
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     if (!logoRef.current?.material || !text1Ref.current?.material || !text2Ref.current?.material || !buttonRef.current?.material || !textRef.current?.material) return;
 
     if (state.clock.getElapsedTime() > 1 && !startFade) {
@@ -40,6 +40,13 @@ export const OpenerText = ({ py }: OpenerText) => {
       text2Ref.current.material.opacity = 0;
       buttonRef.current.material.opacity = 0;
       textRef.current.material.opacity = 0;
+    }
+
+    // Keep button fixed on screen
+    if (buttonRef.current && textRef.current) {
+      const scrollOffset = scroll.offset * 10;
+      buttonRef.current.position.y = scrollOffset;
+      textRef.current.position.y = scrollOffset;
     }
   });
 
@@ -98,7 +105,7 @@ export const OpenerText = ({ py }: OpenerText) => {
       </Text>
 
       <group
-        position-y={-3.9}
+        position={[0, -3.9, 0.1]}
         scale={isHovered ? 1.1 : 1}
         onPointerEnter={() => setIsHovered(true)}
         onPointerLeave={() => setIsHovered(false)}
@@ -106,7 +113,7 @@ export const OpenerText = ({ py }: OpenerText) => {
       >
         <mesh ref={buttonRef}>
           <circleGeometry args={[0.2, 32]} />
-          <meshBasicMaterial transparent opacity={0} color="black" />
+          <meshBasicMaterial transparent opacity={0} color="black" depthTest={false} />
         </mesh>
         
         <Text
