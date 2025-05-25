@@ -6,33 +6,23 @@ import { useState } from 'react';
 
 export const Screen3 = () => {
   const photoList = Object.entries(dataPhotos);
-  const [order, setOrder] = useState(photoList.map((_, i) => i));
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  const handlePhotoClick = (clickedIndex: number) => {
-    const newOrder = [...order];
-    const currentPosition = order.indexOf(clickedIndex);
-    
-    // Move clicked photo to front with elastic animation
-    newOrder.splice(currentPosition, 1);
-    newOrder.unshift(clickedIndex);
-    
-    setOrder(newOrder);
+  const handlePhotoClick = (index: number) => {
+    setActiveIndex(index);
   };
 
   return (
     <Scroll>
       <group position-y={SCREEN3_OFFSET_START_Y}>
-        {order.map((originalIndex, displayIndex) => {
-          const [name, src] = photoList[originalIndex];
-          return (
-            <Photo
-              key={name}
-              src={src}
-              z={-displayIndex * 0.35}
-              onClick={() => handlePhotoClick(originalIndex)}
-            />
-          );
-        })}
+        {photoList.map(([name, src], index) => (
+          <Photo
+            key={name}
+            src={src}
+            z={index === activeIndex ? -1 : -2 - Math.abs(index - activeIndex) * 0.5}
+            onClick={() => handlePhotoClick(index)}
+          />
+        ))}
       </group>
     </Scroll>
   );
