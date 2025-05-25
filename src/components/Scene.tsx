@@ -14,7 +14,7 @@ export const Scene = () => {
   return (
     <Canvas style={{ width: '100vw', height: '100vh' }}>
       <color attach="background" args={[new Color('black')]} />
-      <ScrollControls pages={9} damping={0.25} distance={0.5}>
+      <ScrollControls pages={9} damping={0.35} distance={0.35}>
         <Opener />
         <Screen2 />
         <Screen3 />
