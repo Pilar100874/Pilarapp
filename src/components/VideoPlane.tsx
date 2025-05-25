@@ -26,7 +26,7 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
   });
 
   useFrame((state) => {
-    if (!ref.current || !ref.current.material) return;
+    if (!ref.current) return;
 
     const elapsed = state.clock.getElapsedTime();
     const duration = 1.5; // Animation duration in seconds
@@ -38,9 +38,6 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
     
     // Animate position from bottom to top
     ref.current.position.y = initialY + (targetY - initialY) * easedProgress;
-
-    // Fade in opacity
-    ref.current.material.opacity = easedProgress;
 
     // Start video when animation is almost complete
     if (progress >= 0.8 && !videoStarted) {
@@ -58,8 +55,6 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
           scale={windowSize}
           material-side={DoubleSide}
           material-map={videoTexture}
-          material-transparent={true}
-          material-opacity={0}
         />
         <OpenerText py={0.5} />
       </group>
