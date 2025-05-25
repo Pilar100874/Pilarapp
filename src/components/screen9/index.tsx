@@ -1,14 +1,11 @@
-import { Scroll, Text, useThree } from '@react-three/drei';
+import { Scroll, Text } from '@react-three/drei';
 import { SCREEN9_OFFSET_START_Y } from './constants';
 
 export const Screen9 = () => {
-  const { viewport } = useThree();
-  const fontSize = Math.min(2, viewport.width / 3);
-
   return (
     <Scroll>
       <Text
-        fontSize={fontSize}
+        fontSize={2}
         letterSpacing={0.005}
         position-y={SCREEN9_OFFSET_START_Y}
         position-z={0.1}
