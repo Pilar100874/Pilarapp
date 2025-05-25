@@ -20,7 +20,7 @@ export const Word = ({ index, value }: Word) => {
       return;
     }
 
-    const rotY = scroll.offset * 8 - Math.abs(dataScreen10.length - index) * 0.15 - Math.PI / 8;
+    const rotY = (scroll.offset * 8 - Math.abs(dataScreen10.length - index) * 0.15 - Math.PI / 8) + Math.PI; // Added Math.PI for 180-degree rotation
     ref.current.rotation.y = rotY;
     refMaterial.current.opacity = MathUtils.clamp(Math.pow(rotY + 1, 10), -Infinity, 1);
   });
@@ -40,4 +40,4 @@ export const Word = ({ index, value }: Word) => {
       <meshBasicMaterial transparent ref={refMaterial} side={DoubleSide} />
     </Text>
   );
-};
+}
