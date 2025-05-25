@@ -12,6 +12,7 @@ import { OpenerText } from "@/components/screen7/openerText";
 type VideoPlane = {
   texturePath: string;
 };
+
 export const VideoPlane = ({ texturePath }: VideoPlane) => {
   const scroll = useScroll();
   const windowSize = useAspect(1920, 1080);
@@ -39,9 +40,9 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
         scale={scale}
         material-side={DoubleSide}
         material-map={videoTexture}
-        position-y={-46.5}
+        position-y={-58.5}
       />
-      <OpenerText py={-46} />
+      <OpenerText py={-58} />
     </Suspense>
   );
 };
