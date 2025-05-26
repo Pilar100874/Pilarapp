@@ -1,4 +1,4 @@
-import { Text, useTexture } from '@react-three/drei';
+import { Text, useTexture, useThree } from '@react-three/drei';
 import { useThree, useFrame } from '@react-three/fiber';
 import { useState, useRef } from 'react';
 import { MeshBasicMaterial } from 'three';
@@ -11,6 +11,14 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const textRef = useRef<any>();
   const materialRef = useRef<MeshBasicMaterial | null>(null);
   const [animationComplete, setAnimationComplete] = useState(false);
+
+  // Calculate responsive scales
+  const isMobile = viewport.width < 5;
+  const logoScale = isMobile ? [1, 1, 1] : [1.5, 1.5, 1];
+  const fontSize = isMobile ? 0.4 : 0.6;
+  const buttonScale = isHovered 
+    ? (isMobile ? [1.5, 0.375, 1] : [2.16, 0.54, 1])
+    : (isMobile ? [1.375, 0.344, 1] : [1.98, 0.495, 1]);
 
   useFrame((state) => {
     if (!textRef.current || animationComplete) return;
@@ -29,16 +37,17 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
   return (
     <group position-y={0}>
-      <mesh position-y={1.5} scale={[1.5, 1.5, 1]}>
+      <mesh position-y={isMobile ? 1 : 1.5} scale={logoScale}>
         <planeGeometry args={[2, 1]} />
         <meshBasicMaterial map={logoTexture} transparent opacity={1} />
       </mesh>
 
       <Text
         ref={textRef}
-        fontSize={0.6}
+        fontSize={fontSize}
         letterSpacing={0.005}
         position-z={0.1}
+        position-y={isMobile ? 0 : undefined}
         font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
         anchorX="center"
         anchorY="middle"
@@ -48,8 +57,8 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
       </Text>
 
       <mesh
-        position-y={-1.0}
-        scale={isHovered ? [2.16, 0.54, 1] : [1.98, 0.495, 1]}
+        position-y={isMobile ? -0.75 : -1.0}
+        scale={buttonScale}
         onClick={onStart}
         onPointerEnter={() => {
           setIsHovered(true);

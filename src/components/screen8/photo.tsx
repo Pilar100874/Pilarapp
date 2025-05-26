@@ -1,4 +1,4 @@
-import { Plane, useScroll, useTexture } from '@react-three/drei';
+import { Plane, useScroll, useTexture, useThree } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useRef, useState } from 'react';
 import { MathUtils, Mesh } from 'three';
@@ -17,30 +17,33 @@ export const Photo = (props: Photo) => {
   const scroll = useScroll();
   const [isHovered, setIsHovered] = useState(false);
   const [isAlternate, setIsAlternate] = useState(false);
+  const { viewport } = useThree();
 
-  // Calculate initial positions in a grid
-  const columns = 3;
-  const rows = Math.ceil(props.totalPhotos / columns);
+  // Responsive configuration
+  const isMobile = viewport.width < 5;
+  const columns = isMobile ? 2 : 3;
+  const spacing = isMobile ? 3 : 4;
+  const verticalSpacing = isMobile ? 4.5 : 6;
+  
   const column = props.index % columns;
   const row = Math.floor(props.index / columns);
   
-  const baseX = (column - 1) * 4; // Spread horizontally
-  const baseY = -row * 6; // Spread vertically
+  const baseX = (column - (columns === 2 ? 0.5 : 1)) * spacing;
+  const baseY = -row * verticalSpacing;
   const baseZ = 0;
+
+  const scale = isMobile ? 0.7 : 1;
 
   useFrame((state) => {
     if (!ref.current) return;
 
-    // Parallax effect based on scroll
     const scrollOffset = scroll.offset;
-    const parallaxStrength = 2;
+    const parallaxStrength = isMobile ? 1.5 : 2;
     const parallaxY = scrollOffset * parallaxStrength;
     
-    // Calculate movement based on mouse position
-    const mouseX = state.mouse.x * 0.5;
-    const mouseY = state.mouse.y * 0.5;
+    const mouseX = state.mouse.x * (isMobile ? 0.3 : 0.5);
+    const mouseY = state.mouse.y * (isMobile ? 0.3 : 0.5);
 
-    // Smooth transitions
     ref.current.position.x = MathUtils.lerp(
       ref.current.position.x,
       baseX + mouseX,
@@ -57,27 +60,21 @@ export const Photo = (props: Photo) => {
       0.1
     );
 
-    // Scale effect on hover
-    const targetScale = isHovered ? 1.1 : 1;
+    const targetScale = (isHovered ? 1.1 : 1) * scale;
     ref.current.scale.x = MathUtils.lerp(ref.current.scale.x, targetScale, 0.1);
     ref.current.scale.y = MathUtils.lerp(ref.current.scale.y, targetScale, 0.1);
 
-    // Subtle rotation based on mouse position
     ref.current.rotation.x = MathUtils.lerp(
       ref.current.rotation.x,
-      mouseY * 0.2,
+      mouseY * (isMobile ? 0.1 : 0.2),
       0.1
     );
     ref.current.rotation.y = MathUtils.lerp(
       ref.current.rotation.y,
-      mouseX * 0.2,
+      mouseX * (isMobile ? 0.1 : 0.2),
       0.1
     );
   });
-
-  const handleClick = () => {
-    setIsAlternate(!isAlternate);
-  };
 
   return (
     <Plane
@@ -86,7 +83,7 @@ export const Photo = (props: Photo) => {
       material-map={isAlternate ? alternateTexture : defaultTexture}
       material-transparent
       material-alphaTest={0.1}
-      onClick={handleClick}
+      onClick={() => setIsAlternate(!isAlternate)}
       onPointerOver={() => {
         document.body.style.cursor = 'pointer';
         setIsHovered(true);

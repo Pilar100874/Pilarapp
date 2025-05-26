@@ -1,4 +1,4 @@
-import { Plane, useScroll, useTexture } from '@react-three/drei';
+import { Plane, useScroll, useTexture, useThree } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useRef, useState } from 'react';
 import { MathUtils, Mesh } from 'three';
@@ -17,43 +17,40 @@ export const Photo = (props: Photo) => {
   const ref = useRef<Mesh>(null);
   const [isHovered, setIsHovered] = useState(false);
   const scroll = useScroll();
+  const { viewport } = useThree();
 
-  // Configuration
-  const spacing = 2.5; // Reduced spacing between photos
-  const centerZ = 0; // Centered Z position
-  const sideZ = -2; // Closer side Z position
-  const rotationFactor = 0.35; // Reduced rotation for smoother effect
-  const perspective = 1.5; // Adjusted perspective
+  // Responsive configuration
+  const isMobile = viewport.width < 5;
+  const spacing = isMobile ? 1.75 : 2.5;
+  const centerZ = 0;
+  const sideZ = isMobile ? -1.5 : -2;
+  const rotationFactor = isMobile ? 0.25 : 0.35;
+  const perspective = isMobile ? 1 : 1.5;
+  const baseScale = isMobile ? 0.7 : 1;
 
   useFrame(() => {
     if (!ref.current) return;
 
     const relativeIndex = props.index - props.activeIndex;
     
-    // Center the photos horizontally
     const targetX = relativeIndex * spacing;
     
-    // Calculate z-position with perspective
     let targetZ = centerZ;
     if (relativeIndex !== 0) {
       targetZ = sideZ - Math.abs(relativeIndex) * perspective;
     }
 
-    // Calculate rotation - centered photos have less rotation
     const targetRotationY = -relativeIndex * rotationFactor;
 
-    // Scale based on position and hover state
-    const baseScale = isHovered ? 1.1 : 1;
-    const targetScale = props.isActive ? baseScale : baseScale * 0.85;
+    const hoverScale = isHovered ? 1.1 : 1;
+    const targetScale = props.isActive ? hoverScale * baseScale : hoverScale * baseScale * 0.85;
 
-    // Smooth transitions
     ref.current.position.x = MathUtils.lerp(ref.current.position.x, targetX, 0.1);
     ref.current.position.z = MathUtils.lerp(ref.current.position.z, targetZ, 0.1);
     ref.current.rotation.y = MathUtils.lerp(ref.current.rotation.y, targetRotationY, 0.1);
     ref.current.scale.x = MathUtils.lerp(ref.current.scale.x, targetScale, 0.1);
     ref.current.scale.y = MathUtils.lerp(ref.current.scale.y, targetScale, 0.1);
 
-    // Add subtle movement based on scroll
     const scrollOffset = scroll.offset - 0.5;
     ref.current.position.x += scrollOffset;
   });

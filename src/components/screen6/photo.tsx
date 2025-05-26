@@ -1,4 +1,4 @@
-import { Plane, useScroll, useTexture } from '@react-three/drei';
+import { Plane, useScroll, useTexture, useThree } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useRef, useState, useEffect } from 'react';
 import { MathUtils, Mesh } from 'three';
@@ -18,12 +18,16 @@ export const Photo = (props: Photo) => {
   const previousOffset = useRef(-1);
   const [isPaused, setIsPaused] = useState(false);
   const pauseTimer = useRef<number | null>(null);
-  const rotationSpeed = 0.24; // Increased by 20% from 0.2 to 0.24
   const startTime = useRef(Date.now());
   const lastPosition = useRef({ x: 0, z: 0, rotation: 0 });
+  const { viewport } = useThree();
 
-  const baseWidth = 3.25 * 1.1;
-  const baseHeight = 4.5 * 1.1;
+  // Responsive configuration
+  const isMobile = viewport.width < 5;
+  const baseWidth = (3.25 * 1.1) * (isMobile ? 0.7 : 1);
+  const baseHeight = (4.5 * 1.1) * (isMobile ? 0.7 : 1);
+  const rotationSpeed = isMobile ? 0.18 : 0.24;
+  const radius = isMobile ? 2 : 3;
 
   useFrame((state) => {
     if (!ref.current) return;
@@ -33,9 +37,8 @@ export const Photo = (props: Photo) => {
     
     const baseAngle = ((props.index / props.totalPhotos) * Math.PI * 2) + (isPaused ? 0 : elapsedTime * rotationSpeed);
     
-    const radius = 3;
     const targetX = Math.cos(baseAngle) * radius;
-    const targetZ = Math.sin(baseAngle) * radius - 2;
+    const targetZ = Math.sin(baseAngle) * radius - (isMobile ? 1.5 : 2);
     const targetRotation = baseAngle + Math.PI;
 
     lastPosition.current.x = MathUtils.lerp(lastPosition.current.x, targetX, 0.1);
