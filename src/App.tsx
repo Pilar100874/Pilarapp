@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Scene } from '@/components/Scene';
 import { LandingScene } from '@/components/LandingScene';
-import { InstallPWA } from '@/components/InstallPWA';
 
 function App() {
   const [started, setStarted] = useState(false);
@@ -22,13 +21,17 @@ function App() {
   };
 
   const handleStart = async () => {
+    // First set started to true to ensure the interaction is registered
     setStarted(true);
     
+    // For Android Chrome, we need to request fullscreen after a short delay
+    // This ensures the user interaction is properly registered
     setTimeout(async () => {
       await requestFullscreen();
     }, 100);
   };
 
+  // Re-request fullscreen when visibility changes (e.g., when switching apps)
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden && started) {
@@ -43,12 +46,7 @@ function App() {
     };
   }, [started]);
 
-  return (
-    <>
-      <InstallPWA />
-      {started ? <Scene /> : <LandingScene onStart={handleStart} />}
-    </>
-  );
+  return started ? <Scene /> : <LandingScene onStart={handleStart} />;
 }
 
 export default App;
