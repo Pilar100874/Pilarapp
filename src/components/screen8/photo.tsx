@@ -33,8 +33,8 @@ export const Photo = (props: Photo) => {
   const baseY = -row * verticalSpacing;
   const baseZ = 0;
 
-  // Increase base scale by 10%
-  const baseScale = 0.88; // Increased from 0.8 to 0.88 (10% increase)
+  // Apply 20% reduction to the base scale
+  const baseScale = 0.8; // 20% reduction from 1
   const scale = isMobile ? (baseScale * 0.7) : baseScale;
 
   useFrame((state) => {
