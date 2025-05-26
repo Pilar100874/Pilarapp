@@ -7,7 +7,7 @@ type OpenerText = {
   py: number;
 };
 
-export const OpenerText = ({ py }: OpenerText) => {
+const OpenerText = ({ py }: OpenerText) => {
   const logoTexture = useTexture('/logo_branco.png');
   const arrowTexture = useTexture('/seta_B.png');
   const logoRef = useRef<any>();
@@ -184,4 +184,5 @@ export const OpenerText = ({ py }: OpenerText) => {
   );
 };
 
-export { OpenerText }
+export { OpenerText as default };
+export type { OpenerText };
