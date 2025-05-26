@@ -2,12 +2,14 @@ import { Text, useTexture, useScroll } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import { MeshBasicMaterial } from "three";
+import { useResponsiveScale } from '@/utils/responsive';
 
-type OpenerText = {
+interface OpenerTextProps {
   py: number;
-};
+  isMobile: boolean;
+}
 
-export const OpenerText = ({ py }: OpenerText) => {
+export const OpenerText = ({ py, isMobile }: OpenerTextProps) => {
   const logoTexture = useTexture('/logo_branco.png');
   const arrowTexture = useTexture('/seta_B.png');
   const logoRef = useRef<any>();
@@ -16,6 +18,10 @@ export const OpenerText = ({ py }: OpenerText) => {
   const arrowRef = useRef<any>();
   const [startFade, setStartFade] = useState(false);
   const scroll = useScroll();
+
+  const smallFontSize = useResponsiveScale(0.35, isMobile);
+  const largeFontSize = useResponsiveScale(1.05, isMobile);
+  const logoScale = useResponsiveScale(1.5, isMobile);
 
   useFrame((state) => {
     if (!logoRef.current?.material || !text1Ref.current?.material || !text2Ref.current?.material || !arrowRef.current?.material) return;
@@ -52,7 +58,7 @@ export const OpenerText = ({ py }: OpenerText) => {
       <mesh 
         ref={logoRef}
         position-y={1.25} 
-        scale={[1.5, 1.5, 1]}
+        scale={[logoScale, logoScale, 1]}
       >
         <planeGeometry args={[2, 1]} />
         <meshBasicMaterial 
@@ -67,7 +73,7 @@ export const OpenerText = ({ py }: OpenerText) => {
 
       <Text
         ref={text1Ref}
-        fontSize={0.35}
+        fontSize={smallFontSize}
         letterSpacing={0.005}
         position-z={0.1}
         textAlign={"left"}
@@ -81,7 +87,7 @@ export const OpenerText = ({ py }: OpenerText) => {
 
       <Text
         ref={text2Ref}
-        fontSize={1.05}
+        fontSize={largeFontSize}
         letterSpacing={0.005}
         position-z={0.1}
         position-y={-0.75}
