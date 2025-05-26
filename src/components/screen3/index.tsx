@@ -4,7 +4,11 @@ import { dataPhotos } from './dataPhotos';
 import { Photo } from './photo';
 import { useState } from 'react';
 
-export const Screen3 = () => {
+interface Screen3Props {
+  isMobile: boolean;
+}
+
+export const Screen3 = ({ isMobile }: Screen3Props) => {
   const photoList = Object.entries(dataPhotos);
   const [activeIndex, setActiveIndex] = useState(Math.floor(photoList.length / 2));
 
@@ -14,7 +18,10 @@ export const Screen3 = () => {
 
   return (
     <Scroll>
-      <group position-y={SCREEN3_OFFSET_START_Y} position-x={0}>
+      <group 
+        position-y={SCREEN3_OFFSET_START_Y * (isMobile ? 0.85 : 1)} 
+        position-x={0}
+      >
         {photoList.map(([name, src], index) => (
           <Photo
             key={name}
@@ -24,6 +31,7 @@ export const Screen3 = () => {
             totalPhotos={photoList.length}
             activeIndex={activeIndex}
             onClick={() => handlePhotoClick(index)}
+            isMobile={isMobile}
           />
         ))}
       </group>
