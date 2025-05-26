@@ -6,7 +6,7 @@ import {
 } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { Suspense, useRef, useState } from "react";
-import { DoubleSide, Mesh } from "three";
+import { DoubleSide, Mesh, Group } from "three";
 import { OpenerText } from "@/components/opener/openerText";
 
 type VideoPlane = {
@@ -16,7 +16,7 @@ type VideoPlane = {
 export const VideoPlane = ({ texturePath }: VideoPlane) => {
   const scroll = useScroll();
   const windowSize = useAspect(1920, 1080);
-  const ref = useRef<Mesh>(null);
+  const ref = useRef<Group>(null);
   const [videoStarted, setVideoStarted] = useState(false);
   const initialY = -15; // Start position further down
   const targetY = 0; // Final position at top
