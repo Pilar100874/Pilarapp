@@ -1,5 +1,5 @@
-import { Plane, useScroll, useTexture, useThree } from '@react-three/drei';
-import { useFrame } from '@react-three/fiber';
+import { Plane, useScroll, useTexture } from '@react-three/drei';
+import { useFrame, useThree } from '@react-three/fiber';
 import { useRef, useState } from 'react';
 import { MathUtils, Mesh } from 'three';
 
@@ -32,7 +32,9 @@ export const Photo = (props: Photo) => {
   const baseY = -row * verticalSpacing;
   const baseZ = 0;
 
-  const scale = isMobile ? 0.7 : 1;
+  // Apply 20% reduction to the base scale
+  const baseScale = 0.8; // 20% reduction from 1
+  const scale = isMobile ? (baseScale * 0.7) : baseScale;
 
   useFrame((state) => {
     if (!ref.current) return;
