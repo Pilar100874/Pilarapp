@@ -1,43 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Scene } from '@/components/Scene';
 import { LandingScene } from '@/components/LandingScene';
 
 function App() {
   const [started, setStarted] = useState(false);
 
-  const handleStart = async () => {
+  const requestFullscreen = async (element: HTMLElement) => {
     try {
-      // Try to request fullscreen on start
-      if (document.documentElement.requestFullscreen) {
-        await document.documentElement.requestFullscreen();
-      } else if ((document.documentElement as any).webkitRequestFullscreen) {
-        await (document.documentElement as any).webkitRequestFullscreen();
-      } else if ((document.documentElement as any).msRequestFullscreen) {
-        await (document.documentElement as any).msRequestFullscreen();
+      if (element.requestFullscreen) {
+        await element.requestFullscreen();
+      } else if ((element as any).webkitRequestFullscreen) {
+        await (element as any).webkitRequestFullscreen();
+      } else if ((element as any).msRequestFullscreen) {
+        await (element as any).msRequestFullscreen();
       }
     } catch (error) {
       console.warn('Fullscreen request failed:', error);
     }
+  };
+
+  const handleStart = async () => {
+    await requestFullscreen(document.documentElement);
     setStarted(true);
   };
 
-  // Request fullscreen immediately on component mount
-  useState(() => {
-    const requestFullscreen = async () => {
-      try {
-        if (document.documentElement.requestFullscreen) {
-          await document.documentElement.requestFullscreen();
-        } else if ((document.documentElement as any).webkitRequestFullscreen) {
-          await (document.documentElement as any).webkitRequestFullscreen();
-        } else if ((document.documentElement as any).msRequestFullscreen) {
-          await (document.documentElement as any).msRequestFullscreen();
-        }
-      } catch (error) {
-        console.warn('Initial fullscreen request failed:', error);
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && started) {
+        requestFullscreen(document.documentElement);
       }
     };
-    requestFullscreen();
-  }, []);
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [started]);
 
   return started ? <Scene /> : <LandingScene onStart={handleStart} />;
 }
