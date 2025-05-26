@@ -25,7 +25,8 @@ export const OpenerText = ({ py }: OpenerText) => {
   const text1Size = isMobile ? 0.25 : 0.35;
   const text2Size = isMobile ? 0.6 : 0.84;
   const arrowScale = isMobile ? [0.35, 0.35, 1] : [0.5, 0.5, 1];
-  const arrowY = isMobile ? -2.4 : -3.4;
+  // Move arrow down by 1cm (approximately -4.4 for desktop, -3.4 for mobile)
+  const arrowY = isMobile ? -3.4 : -4.4;
 
   useFrame((state) => {
     if (!logoRef.current?.material || !text1Ref.current?.material || 
