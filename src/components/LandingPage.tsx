@@ -41,7 +41,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   // Handle fullscreen changes
   useEffect(() => {
     const handleFullscreenChange = () => {
-      if (!document.fullscreenElement && !(document as any).webkitFullscreenElement) {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
         // Try to re-enter fullscreen if it was exited
         const element = document.documentElement;
         if (element.requestFullscreen) {
