@@ -5,29 +5,34 @@ import { LandingScene } from '@/components/LandingScene';
 function App() {
   const [started, setStarted] = useState(false);
 
-  const requestFullscreen = async (element: HTMLElement) => {
+  const requestFullscreen = async () => {
     try {
-      if (element.requestFullscreen) {
-        await element.requestFullscreen();
-      } else if ((element as any).webkitRequestFullscreen) {
-        await (element as any).webkitRequestFullscreen();
-      } else if ((element as any).msRequestFullscreen) {
-        await (element as any).msRequestFullscreen();
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        await elem.requestFullscreen();
+      } else if ((elem as any).webkitRequestFullscreen) {
+        await (elem as any).webkitRequestFullscreen();
+      } else if ((elem as any).msRequestFullscreen) {
+        await (elem as any).msRequestFullscreen();
       }
     } catch (error) {
       console.warn('Fullscreen request failed:', error);
     }
   };
 
-  const handleStart = async () => {
-    await requestFullscreen(document.documentElement);
+  const handleStart = () => {
+    // For mobile Chrome, we need to handle the interaction first
     setStarted(true);
+    // Then request fullscreen after a short delay to ensure the interaction is processed
+    setTimeout(() => {
+      requestFullscreen();
+    }, 100);
   };
 
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden && started) {
-        requestFullscreen(document.documentElement);
+        requestFullscreen();
       }
     };
 
