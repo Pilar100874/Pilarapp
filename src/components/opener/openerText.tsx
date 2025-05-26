@@ -1,4 +1,4 @@
-import { Text, useTexture, useScroll } from "@react-three/drei";
+import { Text, useTexture, useScroll, useThree } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import { MeshBasicMaterial } from "three";
@@ -16,6 +16,18 @@ export const OpenerText = ({ py }: OpenerText) => {
   const arrowRef = useRef<any>();
   const [startFade, setStartFade] = useState(false);
   const scroll = useScroll();
+  const { viewport } = useThree();
+
+  // Responsive configuration
+  const isMobile = viewport.width < 5;
+  const logoScale = isMobile ? [1, 1, 1] : [1.5, 1.5, 1];
+  const text1FontSize = isMobile ? 0.25 : 0.35;
+  const text2FontSize = isMobile ? 0.75 : 1.05;
+  const arrowScale = isMobile ? [0.35, 0.35, 1] : [0.5, 0.5, 1];
+  const text1Y = 0;
+  const text2Y = isMobile ? -0.5 : -0.75;
+  const arrowY = isMobile ? -2.5 : -3.4;
+  const logoY = isMobile ? 0.75 : 1.25;
 
   useFrame((state) => {
     if (!logoRef.current?.material || !text1Ref.current?.material || !text2Ref.current?.material || !arrowRef.current?.material) return;
@@ -51,8 +63,8 @@ export const OpenerText = ({ py }: OpenerText) => {
     <group position-y={py}>
       <mesh 
         ref={logoRef}
-        position-y={1.25} 
-        scale={[1.5, 1.5, 1]}
+        position-y={logoY} 
+        scale={logoScale}
       >
         <planeGeometry args={[2, 1]} />
         <meshBasicMaterial 
@@ -67,9 +79,10 @@ export const OpenerText = ({ py }: OpenerText) => {
 
       <Text
         ref={text1Ref}
-        fontSize={0.35}
+        fontSize={text1FontSize}
         letterSpacing={0.005}
         position-z={0.1}
+        position-y={text1Y}
         textAlign={"left"}
         font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
         anchorX="center"
@@ -81,10 +94,10 @@ export const OpenerText = ({ py }: OpenerText) => {
 
       <Text
         ref={text2Ref}
-        fontSize={1.05}
+        fontSize={text2FontSize}
         letterSpacing={0.005}
         position-z={0.1}
-        position-y={-0.75}
+        position-y={text2Y}
         textAlign={"left"}
         font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
         anchorX="center"
@@ -96,8 +109,8 @@ export const OpenerText = ({ py }: OpenerText) => {
 
       <mesh 
         ref={arrowRef}
-        position-y={-3.4} 
-        scale={[0.5, 0.5, 1]}
+        position-y={arrowY} 
+        scale={arrowScale}
         onClick={handleArrowClick}
         onPointerOver={() => document.body.style.cursor = 'pointer'}
         onPointerOut={() => document.body.style.cursor = 'default'}
