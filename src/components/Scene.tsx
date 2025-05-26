@@ -10,22 +10,36 @@ import { Screen7 } from '@/components/screen7';
 import { Screen8 } from '@/components/screen8';
 import { Screen10 } from '@/components/screen10';
 
-export const Scene = () => {
+interface SceneProps {
+  isMobile: boolean;
+}
+
+export const Scene = ({ isMobile }: SceneProps) => {
   return (
-    <Canvas style={{ width: '100vw', height: '100vh' }}>
+    <Canvas
+      style={{ width: '100vw', height: '100vh' }}
+      camera={{ 
+        fov: isMobile ? 75 : 60,
+        position: [0, 0, isMobile ? 8 : 5]
+      }}
+    >
       <color attach="background" args={[new Color('black')]} />
-      <ScrollControls pages={10} damping={0.35} distance={0.25}>
-        <Opener />
-        <Screen2 />
-        <Screen3 />
-        <Screen4 />
-        <Screen6 />
-        <Screen8 />
-        <Screen7 />
-        <Screen10 />
+      <ScrollControls 
+        pages={isMobile ? 12 : 10} 
+        damping={0.35} 
+        distance={isMobile ? 0.5 : 0.25}
+      >
+        <Opener isMobile={isMobile} />
+        <Screen2 isMobile={isMobile} />
+        <Screen3 isMobile={isMobile} />
+        <Screen4 isMobile={isMobile} />
+        <Screen6 isMobile={isMobile} />
+        <Screen8 isMobile={isMobile} />
+        <Screen7 isMobile={isMobile} />
+        <Screen10 isMobile={isMobile} />
       </ScrollControls>
-      <ambientLight />
-      <directionalLight />
+      <ambientLight intensity={1.2} />
+      <directionalLight position={[5, 5, 5]} intensity={0.8} />
     </Canvas>
   );
 };
