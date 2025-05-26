@@ -123,3 +123,5 @@ export const OpenerText = ({ py, isMobile }: OpenerTextProps) => {
     </group>
   );
 };
+
+export { OpenerText }
