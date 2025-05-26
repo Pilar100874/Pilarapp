@@ -1,5 +1,5 @@
 import { Text, useTexture, useThree } from '@react-three/drei';
-import { useThree, useFrame } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { useState, useRef } from 'react';
 import { MeshBasicMaterial } from 'three';
 
