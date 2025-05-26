@@ -186,3 +186,5 @@ const OpenerText = ({ py }: OpenerText) => {
 
 export { OpenerText as default };
 export type { OpenerText };
+
+export { OpenerText }
