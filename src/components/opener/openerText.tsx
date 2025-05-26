@@ -2,14 +2,12 @@ import { Text, useTexture, useScroll } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import { MeshBasicMaterial } from "three";
-import { useResponsiveScale, useResponsivePosition } from '@/utils/responsive';
 
-interface OpenerTextProps {
+type OpenerText = {
   py: number;
-  isMobile: boolean;
-}
+};
 
-export const OpenerText = ({ py, isMobile }: OpenerTextProps) => {
+export const OpenerText = ({ py }: OpenerText) => {
   const logoTexture = useTexture('/logo_branco.png');
   const arrowTexture = useTexture('/seta_B.png');
   const logoRef = useRef<any>();
@@ -18,11 +16,6 @@ export const OpenerText = ({ py, isMobile }: OpenerTextProps) => {
   const arrowRef = useRef<any>();
   const [startFade, setStartFade] = useState(false);
   const scroll = useScroll();
-
-  const titleScale = useResponsiveScale(0.35, isMobile);
-  const subtitleScale = useResponsiveScale(1.05, isMobile);
-  const logoScale = useResponsiveScale(1.5, isMobile);
-  const verticalSpacing = useResponsivePosition(0.75, isMobile);
 
   useFrame((state) => {
     if (!logoRef.current?.material || !text1Ref.current?.material || !text2Ref.current?.material || !arrowRef.current?.material) return;
@@ -59,7 +52,7 @@ export const OpenerText = ({ py, isMobile }: OpenerTextProps) => {
       <mesh 
         ref={logoRef}
         position-y={1.25} 
-        scale={[logoScale, logoScale, 1]}
+        scale={[1.5, 1.5, 1]}
       >
         <planeGeometry args={[2, 1]} />
         <meshBasicMaterial 
@@ -74,14 +67,13 @@ export const OpenerText = ({ py, isMobile }: OpenerTextProps) => {
 
       <Text
         ref={text1Ref}
-        fontSize={titleScale}
+        fontSize={0.35}
         letterSpacing={0.005}
         position-z={0.1}
-        textAlign="center"
+        textAlign={"left"}
         font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
         anchorX="center"
         anchorY="middle"
-        position-y={verticalSpacing}
       >
         PROCURANDO PAPÉIS ??
         <meshBasicMaterial transparent opacity={0} depthTest={false} />
@@ -89,11 +81,11 @@ export const OpenerText = ({ py, isMobile }: OpenerTextProps) => {
 
       <Text
         ref={text2Ref}
-        fontSize={subtitleScale}
+        fontSize={1.05}
         letterSpacing={0.005}
         position-z={0.1}
-        position-y={-verticalSpacing}
-        textAlign="center"
+        position-y={-0.75}
+        textAlign={"left"}
         font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
         anchorX="center"
         anchorY="middle"

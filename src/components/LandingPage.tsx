@@ -2,14 +2,8 @@ import { Text, useTexture } from '@react-three/drei';
 import { useThree, useFrame } from '@react-three/fiber';
 import { useState, useRef } from 'react';
 import { MeshBasicMaterial } from 'three';
-import { useResponsiveScale } from '@/utils/responsive';
 
-interface LandingPageProps {
-  onStart: () => void;
-  isMobile: boolean;
-}
-
-export const LandingPage = ({ onStart, isMobile }: LandingPageProps) => {
+export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isHovered, setIsHovered] = useState(false);
   const { viewport } = useThree();
   const logoTexture = useTexture('/logo_branco.png');
@@ -17,12 +11,6 @@ export const LandingPage = ({ onStart, isMobile }: LandingPageProps) => {
   const textRef = useRef<any>();
   const materialRef = useRef<MeshBasicMaterial | null>(null);
   const [animationComplete, setAnimationComplete] = useState(false);
-
-  const textScale = useResponsiveScale(0.6, isMobile);
-  const logoScale = useResponsiveScale(1.5, isMobile);
-  const buttonScale = isHovered 
-    ? useResponsiveScale(2.16, isMobile) 
-    : useResponsiveScale(1.98, isMobile);
 
   useFrame((state) => {
     if (!textRef.current || animationComplete) return;
@@ -41,14 +29,14 @@ export const LandingPage = ({ onStart, isMobile }: LandingPageProps) => {
 
   return (
     <group position-y={0}>
-      <mesh position-y={1.5} scale={[logoScale, logoScale, 1]}>
+      <mesh position-y={1.5} scale={[1.5, 1.5, 1]}>
         <planeGeometry args={[2, 1]} />
         <meshBasicMaterial map={logoTexture} transparent opacity={1} />
       </mesh>
 
       <Text
         ref={textRef}
-        fontSize={textScale}
+        fontSize={0.6}
         letterSpacing={0.005}
         position-z={0.1}
         font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
@@ -61,7 +49,7 @@ export const LandingPage = ({ onStart, isMobile }: LandingPageProps) => {
 
       <mesh
         position-y={-1.0}
-        scale={[buttonScale, buttonScale * 0.25, 1]}
+        scale={isHovered ? [2.16, 0.54, 1] : [1.98, 0.495, 1]}
         onClick={onStart}
         onPointerEnter={() => {
           setIsHovered(true);

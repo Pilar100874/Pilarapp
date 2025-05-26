@@ -7,16 +7,12 @@ import { dataPhotos as screen3Photos } from '@/components/screen3/dataPhotos';
 import { dataPhotos as screen6Photos } from '@/components/screen6/dataPhotos';
 import { dataPhotos as screen8Photos } from '@/components/screen8/dataPhotos';
 
-interface LandingSceneProps {
-  onStart: () => void;
-  isMobile: boolean;
-}
-
 const AssetPreloader = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadAssets = async () => {
+      // Load all images
       const imageUrls = [
         ...Object.values(screen3Photos),
         ...Object.values(screen6Photos),
@@ -25,6 +21,7 @@ const AssetPreloader = () => {
         '/seta_B.png',
       ];
 
+      // Create promises for all image loads
       const imagePromises = imageUrls.map(url => 
         new Promise((resolve) => {
           const loader = new TextureLoader();
@@ -32,6 +29,7 @@ const AssetPreloader = () => {
         })
       );
 
+      // Load video
       const videoPromise = new Promise((resolve) => {
         const video = document.createElement('video');
         video.src = '/opener.mp4';
@@ -42,11 +40,13 @@ const AssetPreloader = () => {
         };
       });
 
+      // Load 3D model
       const modelPromise = new Promise((resolve) => {
         const loader = new TextureLoader();
         loader.load('pillar-ok-transformed.glb', resolve);
       });
 
+      // Wait for all assets to load
       await Promise.all([...imagePromises, videoPromise, modelPromise]);
       setIsLoading(false);
     };
@@ -57,22 +57,16 @@ const AssetPreloader = () => {
   return null;
 };
 
-export const LandingScene = ({ onStart, isMobile }: LandingSceneProps) => {
+export const LandingScene = ({ onStart }: { onStart: () => void }) => {
   return (
-    <Canvas 
-      style={{ width: '100vw', height: '100vh' }}
-      camera={{ 
-        fov: isMobile ? 75 : 60,
-        position: [0, 0, isMobile ? 8 : 5]
-      }}
-    >
+    <Canvas style={{ width: '100vw', height: '100vh' }}>
       <color attach="background" args={[new Color('black')]} />
       <Suspense fallback={null}>
         <AssetPreloader />
-        <LandingPage onStart={onStart} isMobile={isMobile} />
+        <LandingPage onStart={onStart} />
       </Suspense>
-      <ambientLight intensity={1.2} />
-      <directionalLight position={[5, 5, 5]} intensity={0.8} />
+      <ambientLight />
+      <directionalLight />
     </Canvas>
   );
 };

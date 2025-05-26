@@ -4,20 +4,16 @@ import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
 import { DoubleSide, MathUtils, Mesh, MeshBasicMaterial } from 'three';
 import { dataScreen2 } from './data';
-import { useResponsiveScale } from '@/utils/responsive';
 
-interface WordProps {
+type Word = {
   value: string;
   index: number;
-  isMobile: boolean;
-}
+};
 
-export const Word = ({ index, value, isMobile }: WordProps) => {
+export const Word = ({ index, value }: Word) => {
   const scroll = useScroll();
   const ref = useRef<Mesh>(null);
   const refMaterial = useRef<MeshBasicMaterial>(null);
-
-  const fontSize = useResponsiveScale(1.05, isMobile);
 
   useFrame(() => {
     if (!ref.current || !refMaterial.current) {
@@ -32,9 +28,9 @@ export const Word = ({ index, value, isMobile }: WordProps) => {
   return (
     <Text
       ref={ref}
-      fontSize={fontSize}
+      fontSize={1.05}
       letterSpacing={0.005}
-      position-y={SCREEN2_OFFSET_START_Y - 1 * -index * (isMobile ? 0.9 : 1.1)}
+      position-y={SCREEN2_OFFSET_START_Y - 1 * -index * 1.1}
       textAlign={'left'}
       font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
       anchorX="center"
