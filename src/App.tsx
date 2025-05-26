@@ -20,15 +20,18 @@ function App() {
     }
   };
 
-  const handleStart = () => {
-    // For mobile Chrome, we need to handle the interaction first
+  const handleStart = async () => {
+    // First set started to true to ensure the interaction is registered
     setStarted(true);
-    // Then request fullscreen after a short delay to ensure the interaction is processed
-    setTimeout(() => {
-      requestFullscreen();
+    
+    // For Android Chrome, we need to request fullscreen after a short delay
+    // This ensures the user interaction is properly registered
+    setTimeout(async () => {
+      await requestFullscreen();
     }, 100);
   };
 
+  // Re-request fullscreen when visibility changes (e.g., when switching apps)
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden && started) {
