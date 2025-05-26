@@ -58,32 +58,8 @@ const AssetPreloader = () => {
 };
 
 export const LandingScene = ({ onStart }: { onStart: () => void }) => {
-  const [aspectRatio, setAspectRatio] = useState(window.innerWidth / window.innerHeight);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setAspectRatio(window.innerWidth / window.innerHeight);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Adjust camera settings based on aspect ratio
-  const isMobile = aspectRatio < 1;
-  const fov = isMobile ? 75 : 60;
-  const position = isMobile ? [0, 0, 5] : [0, 0, 4];
-
   return (
-    <Canvas 
-      style={{ width: '100vw', height: '100vh' }}
-      camera={{ 
-        fov: fov,
-        position: position,
-        near: 0.1,
-        far: 1000
-      }}
-    >
+    <Canvas style={{ width: '100vw', height: '100vh' }}>
       <color attach="background" args={[new Color('black')]} />
       <Suspense fallback={null}>
         <AssetPreloader />
