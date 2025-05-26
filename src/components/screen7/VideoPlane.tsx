@@ -37,7 +37,7 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
     <Suspense fallback={null}>
       <Plane
         ref={ref}
-        scale={scale}
+        scale={[scale[0], scale[1], 1]}
         material-side={DoubleSide}
         material-map={videoTexture}
         position-y={-58.5}
