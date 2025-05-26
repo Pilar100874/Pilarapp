@@ -2,7 +2,7 @@ import { Text, useTexture, useScroll } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import { MeshBasicMaterial } from "three";
-import { useResponsiveScale } from '@/utils/responsive';
+import { useResponsiveScale, useResponsivePosition } from '@/utils/responsive';
 
 interface OpenerTextProps {
   py: number;
@@ -19,9 +19,10 @@ export const OpenerText = ({ py, isMobile }: OpenerTextProps) => {
   const [startFade, setStartFade] = useState(false);
   const scroll = useScroll();
 
-  const smallFontSize = useResponsiveScale(0.35, isMobile);
-  const largeFontSize = useResponsiveScale(1.05, isMobile);
+  const titleScale = useResponsiveScale(0.35, isMobile);
+  const subtitleScale = useResponsiveScale(1.05, isMobile);
   const logoScale = useResponsiveScale(1.5, isMobile);
+  const verticalSpacing = useResponsivePosition(0.75, isMobile);
 
   useFrame((state) => {
     if (!logoRef.current?.material || !text1Ref.current?.material || !text2Ref.current?.material || !arrowRef.current?.material) return;
@@ -73,13 +74,14 @@ export const OpenerText = ({ py, isMobile }: OpenerTextProps) => {
 
       <Text
         ref={text1Ref}
-        fontSize={smallFontSize}
+        fontSize={titleScale}
         letterSpacing={0.005}
         position-z={0.1}
-        textAlign={"left"}
+        textAlign="center"
         font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
         anchorX="center"
         anchorY="middle"
+        position-y={verticalSpacing}
       >
         PROCURANDO PAPÉIS ??
         <meshBasicMaterial transparent opacity={0} depthTest={false} />
@@ -87,11 +89,11 @@ export const OpenerText = ({ py, isMobile }: OpenerTextProps) => {
 
       <Text
         ref={text2Ref}
-        fontSize={largeFontSize}
+        fontSize={subtitleScale}
         letterSpacing={0.005}
         position-z={0.1}
-        position-y={-0.75}
-        textAlign={"left"}
+        position-y={-verticalSpacing}
+        textAlign="center"
         font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
         anchorX="center"
         anchorY="middle"

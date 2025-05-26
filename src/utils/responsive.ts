@@ -4,21 +4,39 @@ export const useResponsiveScale = (baseScale: number, isMobile: boolean) => {
   const { viewport } = useThree();
   const aspectRatio = viewport.width / viewport.height;
 
-  // Base multiplier for mobile devices
-  const mobileMultiplier = isMobile ? 0.7 : 1;
+  // Calculate base scale based on viewport size
+  let scale = baseScale * Math.min(viewport.width, viewport.height) / 10;
 
-  // Scale based on viewport width and aspect ratio
-  let scale = baseScale * mobileMultiplier;
+  // Adjust for mobile devices
+  if (isMobile) {
+    scale *= aspectRatio < 1 ? 1.2 : 0.8; // Larger text for portrait, smaller for landscape
+  }
 
-  // Adjust scale based on aspect ratio
-  if (aspectRatio < 1) { // Portrait
-    scale *= 0.8;
-  } else if (aspectRatio > 2) { // Ultra-wide
+  // Adjust for different aspect ratios
+  if (aspectRatio < 0.6) { // Very tall
+    scale *= 1.4;
+  } else if (aspectRatio < 1) { // Portrait
     scale *= 1.2;
+  } else if (aspectRatio > 2) { // Ultra-wide
+    scale *= 0.8;
   }
 
   // Ensure minimum and maximum bounds
-  scale = Math.max(0.4, Math.min(scale, 1.5));
+  const minScale = isMobile ? 0.5 : 0.4;
+  const maxScale = isMobile ? 2.0 : 1.5;
+  return Math.max(minScale, Math.min(scale, maxScale));
+};
 
-  return scale;
+export const useResponsivePosition = (basePosition: number, isMobile: boolean) => {
+  const { viewport } = useThree();
+  const aspectRatio = viewport.width / viewport.height;
+
+  let position = basePosition;
+
+  // Adjust position based on viewport
+  if (isMobile) {
+    position *= aspectRatio < 1 ? 0.8 : 1.2;
+  }
+
+  return position;
 };
