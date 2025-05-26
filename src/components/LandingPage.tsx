@@ -1,7 +1,7 @@
 import { Text, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useState, useRef, useEffect } from 'react';
-import { MeshBasicMaterial } from 'three';
+import { MeshBasicMaterial, Vector3 } from 'three';
 import { useResponsive } from '@/hooks/useResponsive';
 
 export const LandingPage = ({ onStart }: { onStart: () => void }) => {
@@ -15,7 +15,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const { isPortrait, getTextSize, getSpacing } = useResponsive();
 
   // Calculate responsive scales
-  const logoScale = isPortrait ? [0.8, 0.8, 1] : [1.5, 1.5, 1];
+  const logoScale = new Vector3(...(isPortrait ? [0.8, 0.8, 1] : [1.5, 1.5, 1]));
   const fontSize = getTextSize(0.6);
   const buttonScale = isHovered 
     ? (isPortrait ? [1.2, 0.3, 1] : [2.16, 0.54, 1])
@@ -41,7 +41,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   // Handle fullscreen changes
   useEffect(() => {
     const handleFullscreenChange = () => {
-      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      if (!document.fullscreenElement && !(document as any).webkitFullscreenElement) {
         // Try to re-enter fullscreen if it was exited
         const element = document.documentElement;
         if (element.requestFullscreen) {
