@@ -13,19 +13,29 @@ import { useEffect, useState } from 'react';
 
 export const Scene = () => {
   const [aspectRatio, setAspectRatio] = useState(window.innerWidth / window.innerHeight);
+  const [orientation, setOrientation] = useState<'portrait' | 'landscape'>(
+    window.innerWidth > window.innerHeight ? 'landscape' : 'portrait'
+  );
 
   useEffect(() => {
     const handleResize = () => {
-      setAspectRatio(window.innerWidth / window.innerHeight);
+      const newAspectRatio = window.innerWidth / window.innerHeight;
+      setAspectRatio(newAspectRatio);
+      setOrientation(window.innerWidth > window.innerHeight ? 'landscape' : 'portrait');
     };
 
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
   }, []);
 
-  // Adjust damping and distance based on aspect ratio
-  const damping = aspectRatio < 1 ? 0.5 : 0.35; // More damping on mobile
-  const distance = aspectRatio < 1 ? 0.35 : 0.25; // More distance on mobile
+  // Adjust damping and distance based on orientation and aspect ratio
+  const damping = orientation === 'portrait' ? 0.5 : 0.35;
+  const distance = orientation === 'portrait' ? 0.35 : 0.25;
 
   return (
     <Canvas style={{ width: '100vw', height: '100vh' }}>
