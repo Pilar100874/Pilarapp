@@ -1,5 +1,5 @@
 import { Text, useTexture, useScroll } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import { MeshBasicMaterial } from "three";
 
@@ -16,6 +16,14 @@ export const OpenerText = ({ py }: OpenerText) => {
   const arrowRef = useRef<any>();
   const [startFade, setStartFade] = useState(false);
   const scroll = useScroll();
+  const { viewport } = useThree();
+
+  // Calculate responsive sizes
+  const isMobile = viewport.width < 5;
+  const text1Size = isMobile ? 0.25 : 0.35;
+  const text2Size = isMobile ? 0.6 : 0.84; // Reduced by 20% from previous values (0.75 and 1.05)
+  const arrowScale = isMobile ? [0.35, 0.35, 1] : [0.5, 0.5, 1];
+  const arrowY = isMobile ? -2.4 : -3.4;
 
   useFrame((state) => {
     if (!logoRef.current?.material || !text1Ref.current?.material || !text2Ref.current?.material || !arrowRef.current?.material) return;
@@ -67,7 +75,7 @@ export const OpenerText = ({ py }: OpenerText) => {
 
       <Text
         ref={text1Ref}
-        fontSize={0.35}
+        fontSize={text1Size}
         letterSpacing={0.005}
         position-z={0.1}
         textAlign={"left"}
@@ -81,7 +89,7 @@ export const OpenerText = ({ py }: OpenerText) => {
 
       <Text
         ref={text2Ref}
-        fontSize={1.05}
+        fontSize={text2Size}
         letterSpacing={0.005}
         position-z={0.1}
         position-y={-0.75}
@@ -96,8 +104,8 @@ export const OpenerText = ({ py }: OpenerText) => {
 
       <mesh 
         ref={arrowRef}
-        position-y={-3.4} 
-        scale={[0.5, 0.5, 1]}
+        position-y={arrowY}
+        scale={arrowScale}
         onClick={handleArrowClick}
         onPointerOver={() => document.body.style.cursor = 'pointer'}
         onPointerOut={() => document.body.style.cursor = 'default'}
