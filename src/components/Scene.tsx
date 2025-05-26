@@ -9,15 +9,20 @@ import { Screen6 } from '@/components/screen6';
 import { Screen7 } from '@/components/screen7';
 import { Screen8 } from '@/components/screen8';
 import { Screen10 } from '@/components/screen10';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 
 export const Scene = () => {
   const [aspectRatio, setAspectRatio] = useState(window.innerWidth / window.innerHeight);
   const [orientation, setOrientation] = useState<'portrait' | 'landscape'>(
     window.innerWidth > window.innerHeight ? 'landscape' : 'portrait'
   );
-  const [touchStartY, setTouchStartY] = useState(0);
-  const [scrollPosition, setScrollPosition] = useState(0);
+  const touchStartY = useRef(0);
+  const lastTouchY = useRef(0);
+  const scrollRef = useRef(0);
+  const velocityRef = useRef(0);
+  const lastTimeRef = useRef(Date.now());
+  const isScrollingRef = useRef(false);
+  const rafRef = useRef<number>();
 
   const handleResize = useCallback(() => {
     const newAspectRatio = window.innerWidth / window.innerHeight;
@@ -35,40 +40,84 @@ export const Scene = () => {
     };
   }, [handleResize]);
 
-  // Touch handling for smooth scrolling
+  const updateScroll = useCallback(() => {
+    if (!isScrollingRef.current) return;
+
+    const now = Date.now();
+    const deltaTime = (now - lastTimeRef.current) / 1000;
+    lastTimeRef.current = now;
+
+    // Apply velocity with decay
+    if (Math.abs(velocityRef.current) > 0.0001) {
+      scrollRef.current = Math.max(0, Math.min(1, scrollRef.current + velocityRef.current * deltaTime));
+      velocityRef.current *= 0.95; // Decay factor
+    } else {
+      isScrollingRef.current = false;
+      velocityRef.current = 0;
+    }
+
+    rafRef.current = requestAnimationFrame(updateScroll);
+  }, []);
+
   const handleTouchStart = useCallback((e: TouchEvent) => {
-    setTouchStartY(e.touches[0].clientY);
+    touchStartY.current = e.touches[0].clientY;
+    lastTouchY.current = e.touches[0].clientY;
+    isScrollingRef.current = false;
+    velocityRef.current = 0;
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
   }, []);
 
   const handleTouchMove = useCallback((e: TouchEvent) => {
     e.preventDefault();
     const touchY = e.touches[0].clientY;
-    const deltaY = touchStartY - touchY;
+    const deltaY = lastTouchY.current - touchY;
     
-    // Adjust sensitivity based on orientation
+    const now = Date.now();
+    const deltaTime = (now - lastTimeRef.current) / 1000;
+    lastTimeRef.current = now;
+
+    // Calculate velocity based on touch movement
+    if (deltaTime > 0) {
+      velocityRef.current = (deltaY / window.innerHeight) * (orientation === 'portrait' ? 2 : 1) / deltaTime;
+    }
+
+    // Update scroll position
     const sensitivity = orientation === 'portrait' ? 0.002 : 0.001;
-    const newPosition = scrollPosition + (deltaY * sensitivity);
+    scrollRef.current = Math.max(0, Math.min(1, scrollRef.current + deltaY * sensitivity));
     
-    // Clamp scroll position between 0 and 1
-    setScrollPosition(Math.max(0, Math.min(1, newPosition)));
-    setTouchStartY(touchY);
-  }, [touchStartY, scrollPosition, orientation]);
+    lastTouchY.current = touchY;
+    isScrollingRef.current = true;
+
+    if (!rafRef.current) {
+      rafRef.current = requestAnimationFrame(updateScroll);
+    }
+  }, [orientation, updateScroll]);
+
+  const handleTouchEnd = useCallback(() => {
+    isScrollingRef.current = true;
+    if (!rafRef.current) {
+      rafRef.current = requestAnimationFrame(updateScroll);
+    }
+  }, [updateScroll]);
 
   useEffect(() => {
     const canvas = document.querySelector('canvas');
     if (canvas) {
       canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
       canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+      canvas.addEventListener('touchend', handleTouchEnd);
       
       return () => {
         canvas.removeEventListener('touchstart', handleTouchStart);
         canvas.removeEventListener('touchmove', handleTouchMove);
+        canvas.removeEventListener('touchend', handleTouchEnd);
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
       };
     }
-  }, [handleTouchStart, handleTouchMove]);
+  }, [handleTouchStart, handleTouchMove, handleTouchEnd]);
 
   // Adjust damping and distance based on orientation
-  const damping = orientation === 'portrait' ? 0.5 : 0.35;
+  const damping = orientation === 'portrait' ? 0.85 : 0.65;
   const distance = orientation === 'portrait' ? 0.35 : 0.25;
 
   return (
@@ -80,9 +129,9 @@ export const Scene = () => {
         distance={distance}
         enabled={true}
         infinite={false}
-        eps={0.00001}
+        eps={0.001}
         horizontal={false}
-      >
+      />
         <Opener />
         <Screen2 />
         <Screen3 />
