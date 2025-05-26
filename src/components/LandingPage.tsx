@@ -17,9 +17,9 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   // Calculate responsive scales
   const logoScale = new Vector3(...(isPortrait ? [0.8, 0.8, 1] : [1.5, 1.5, 1]));
   const fontSize = getTextSize(0.6);
-  const buttonScale = isHovered 
+  const buttonScale = new Vector3(...(isHovered 
     ? (isPortrait ? [1.2, 0.3, 1] : [2.16, 0.54, 1])
-    : (isPortrait ? [1.1, 0.275, 1] : [1.98, 0.495, 1]);
+    : (isPortrait ? [1.1, 0.275, 1] : [1.98, 0.495, 1])));
 
   useFrame((state) => {
     if (!textRef.current || animationComplete) return;
