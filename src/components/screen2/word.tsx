@@ -1,6 +1,6 @@
 import { Text, useScroll } from '@react-three/drei';
 import { SCREEN2_OFFSET_START_Y } from './constants';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { useRef } from 'react';
 import { DoubleSide, MathUtils, Mesh, MeshBasicMaterial } from 'three';
 import { dataScreen2 } from './data';
@@ -14,6 +14,15 @@ export const Word = ({ index, value }: Word) => {
   const scroll = useScroll();
   const ref = useRef<Mesh>(null);
   const refMaterial = useRef<MeshBasicMaterial>(null);
+  const { viewport } = useThree();
+
+  // Calculate responsive font size
+  const isMobile = viewport.width < 5;
+  const baseFontSize = isMobile ? 0.75 : 1.05;
+  const fontSize = value === '27' ? baseFontSize * 1.2 : baseFontSize;
+  
+  // Adjust vertical spacing for mobile
+  const verticalSpacing = isMobile ? 0.9 : 1.1;
 
   useFrame(() => {
     if (!ref.current || !refMaterial.current) {
@@ -28,9 +37,9 @@ export const Word = ({ index, value }: Word) => {
   return (
     <Text
       ref={ref}
-      fontSize={1.05}
+      fontSize={fontSize}
       letterSpacing={0.005}
-      position-y={SCREEN2_OFFSET_START_Y - 1 * -index * 1.1}
+      position-y={SCREEN2_OFFSET_START_Y - 1 * -index * verticalSpacing}
       textAlign={'left'}
       font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
       anchorX="center"
