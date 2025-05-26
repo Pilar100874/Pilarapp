@@ -131,7 +131,7 @@ export const Scene = () => {
         infinite={false}
         eps={0.001}
         horizontal={false}
-      />
+      >
         <Opener />
         <Screen2 />
         <Screen3 />
