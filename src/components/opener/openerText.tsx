@@ -13,6 +13,8 @@ export const OpenerText = ({ py }: OpenerText) => {
   const logoRef = useRef<any>();
   const text1Ref = useRef<any>();
   const text2Ref = useRef<any>();
+  const text3Ref = useRef<any>();
+  const text4Ref = useRef<any>();
   const arrowRef = useRef<any>();
   const [startFade, setStartFade] = useState(false);
   const scroll = useScroll();
@@ -21,12 +23,14 @@ export const OpenerText = ({ py }: OpenerText) => {
   // Calculate responsive sizes
   const isMobile = viewport.width < 5;
   const text1Size = isMobile ? 0.25 : 0.35;
-  const text2Size = isMobile ? 0.6 : 0.84; // Reduced by 20% from previous values (0.75 and 1.05)
+  const text2Size = isMobile ? 0.6 : 0.84;
   const arrowScale = isMobile ? [0.35, 0.35, 1] : [0.5, 0.5, 1];
   const arrowY = isMobile ? -2.4 : -3.4;
 
   useFrame((state) => {
-    if (!logoRef.current?.material || !text1Ref.current?.material || !text2Ref.current?.material || !arrowRef.current?.material) return;
+    if (!logoRef.current?.material || !text1Ref.current?.material || 
+        !text2Ref.current?.material || !arrowRef.current?.material ||
+        (isMobile && (!text3Ref.current?.material || !text4Ref.current?.material))) return;
 
     if (state.clock.getElapsedTime() > 1 && !startFade) {
       setStartFade(true);
@@ -39,11 +43,19 @@ export const OpenerText = ({ py }: OpenerText) => {
       logoRef.current.material.opacity = opacity;
       text1Ref.current.material.opacity = opacity;
       text2Ref.current.material.opacity = opacity;
+      if (isMobile) {
+        text3Ref.current.material.opacity = opacity;
+        text4Ref.current.material.opacity = opacity;
+      }
       arrowRef.current.material.opacity = opacity;
     } else {
       logoRef.current.material.opacity = 0;
       text1Ref.current.material.opacity = 0;
       text2Ref.current.material.opacity = 0;
+      if (isMobile) {
+        text3Ref.current.material.opacity = 0;
+        text4Ref.current.material.opacity = 0;
+      }
       arrowRef.current.material.opacity = 0;
     }
   });
@@ -87,20 +99,67 @@ export const OpenerText = ({ py }: OpenerText) => {
         <meshBasicMaterial transparent opacity={0} depthTest={false} />
       </Text>
 
-      <Text
-        ref={text2Ref}
-        fontSize={text2Size}
-        letterSpacing={0.005}
-        position-z={0.1}
-        position-y={-0.75}
-        textAlign={"left"}
-        font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
-        anchorX="center"
-        anchorY="middle"
-      >
-        VOCÊ ENCONTRA AQUI !!
-        <meshBasicMaterial transparent opacity={0} depthTest={false} />
-      </Text>
+      {isMobile ? (
+        <>
+          <Text
+            ref={text2Ref}
+            fontSize={text2Size}
+            letterSpacing={0.005}
+            position-z={0.1}
+            position-y={-0.75}
+            textAlign={"left"}
+            font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
+            anchorX="center"
+            anchorY="middle"
+          >
+            VOCÊ
+            <meshBasicMaterial transparent opacity={0} depthTest={false} />
+          </Text>
+          <Text
+            ref={text3Ref}
+            fontSize={text2Size}
+            letterSpacing={0.005}
+            position-z={0.1}
+            position-y={-1.5}
+            textAlign={"left"}
+            font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
+            anchorX="center"
+            anchorY="middle"
+          >
+            ENCONTRA
+            <meshBasicMaterial transparent opacity={0} depthTest={false} />
+          </Text>
+          <Text
+            ref={text4Ref}
+            fontSize={text2Size}
+            letterSpacing={0.005}
+            position-z={0.1}
+            position-y={-2.25}
+            textAlign={"left"}
+            font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
+            anchorX="center"
+            anchorY="middle"
+          >
+            AQUI !!
+            <meshBasicMaterial transparent opacity={0} depthTest={false} />
+          </Text>
+        </>
+      ) : (
+        <Text
+          ref={text2Ref}
+          fontSize={text2Size}
+          letterSpacing={0.005}
+          position-z={0.1}
+          position-y={-0.75}
+          textAlign={"left"}
+          font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
+          anchorX="center"
+          anchorY="middle"
+        >
+          VOCÊ ENCONTRA AQUI !!
+          <meshBasicMaterial transparent opacity={0} depthTest={false} />
+        </Text>
+      )}
 
       <mesh 
         ref={arrowRef}
