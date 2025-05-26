@@ -7,7 +7,7 @@ import {
 import { useFrame } from "@react-three/fiber";
 import { Suspense, useRef, useState } from "react";
 import { DoubleSide, Mesh, Group } from "three";
-import { OpenerText } from "@/components/opener/openerText";
+import OpenerText from "@/components/opener/openerText";
 
 type VideoPlane = {
   texturePath: string;

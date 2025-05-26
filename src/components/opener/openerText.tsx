@@ -3,11 +3,11 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import { MeshBasicMaterial } from "three";
 
-type OpenerText = {
+type OpenerTextProps = {
   py: number;
 };
 
-const OpenerText = ({ py }: OpenerText) => {
+const OpenerText = ({ py }: OpenerTextProps) => {
   const logoTexture = useTexture('/logo_branco.png');
   const arrowTexture = useTexture('/seta_B.png');
   const logoRef = useRef<any>();
@@ -184,7 +184,4 @@ const OpenerText = ({ py }: OpenerText) => {
   );
 };
 
-export { OpenerText as default };
-export type { OpenerText };
-
-export { OpenerText }
+export default OpenerText;
