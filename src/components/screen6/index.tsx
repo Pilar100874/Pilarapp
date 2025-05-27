@@ -42,7 +42,7 @@ export const Screen6 = () => {
         
         {/* Play/Pause Button */}
         <mesh
-          position={[0, -3, 0]}
+          position={[0, -3, 2]} // Increased z position to 2 to ensure it stays on top
           scale={[0.5, 0.5, 1]}
           rotation={[0, 0, isAnimationPaused ? Math.PI : 0]}
           onClick={() => setIsAnimationPaused(!isAnimationPaused)}
@@ -50,7 +50,7 @@ export const Screen6 = () => {
           onPointerOut={() => { document.body.style.cursor = 'default'; }}
         >
           <planeGeometry args={[1, 1]} />
-          <meshBasicMaterial map={playTexture} transparent opacity={1} />
+          <meshBasicMaterial map={playTexture} transparent opacity={1} depthTest={false} />
         </mesh>
       </group>
     </Scroll>
