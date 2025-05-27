@@ -33,9 +33,9 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
     ref.current.rotation.y = scroll.offset * 2.5;
   });
 
-  // Move up by 2cm (20 units)
-  const baseY = -58.5 + 2;
-  const textY = -58 + 2;
+  // Move up by 4cm (40 units)
+  const baseY = -58.5 + 4;
+  const textY = -58 + 4;
 
   return (
     <Suspense fallback={null}>
