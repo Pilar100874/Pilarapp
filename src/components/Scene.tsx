@@ -24,9 +24,21 @@ export const Scene = () => {
     window.addEventListener('resize', handleResize);
     window.addEventListener('orientationchange', handleResize);
     
+    // Prevent default touch behavior
+    const preventDefaultTouch = (e: TouchEvent) => {
+      if (e.touches.length === 1) {
+        e.preventDefault();
+      }
+    };
+    
+    document.addEventListener('touchmove', preventDefaultTouch, { passive: false });
+    document.addEventListener('touchstart', preventDefaultTouch, { passive: false });
+    
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('orientationchange', handleResize);
+      document.removeEventListener('touchmove', preventDefaultTouch);
+      document.removeEventListener('touchstart', preventDefaultTouch);
     };
   }, [handleResize]);
 
@@ -35,7 +47,17 @@ export const Scene = () => {
   const distance = orientation === 'portrait' ? 0.35 : 0.25;
 
   return (
-    <Canvas style={{ width: '100vw', height: '100vh', touchAction: 'none' }}>
+    <Canvas 
+      style={{ 
+        width: '100vw', 
+        height: '100vh', 
+        touchAction: 'none',
+        WebkitTouchCallout: 'none',
+        WebkitUserSelect: 'none',
+        userSelect: 'none'
+      }}
+      onTouchMove={(e) => e.preventDefault()}
+    >
       <color attach="background" args={[new Color('black')]} />
       <ScrollControls 
         pages={10} 

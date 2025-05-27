@@ -36,6 +36,7 @@ html, body {
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   background-color: #000;
+  touch-action: none;
 }
 
 #root {
@@ -45,6 +46,7 @@ html, body {
   top: 0;
   left: 0;
   overflow: hidden;
+  touch-action: none;
 }
 
 a {
