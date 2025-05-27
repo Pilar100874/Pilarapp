@@ -59,11 +59,11 @@ export const Photo = (props: Photo) => {
   const handleClick = () => {
     const locationUrls: { [key: string]: string } = {
       'sp.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=Rua+Jardim+Suspenso+126+Embu+das+Artes+SP',
-      'rs.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=Rua+Joao+Bettega+513+Curitiba+PR',
-      'es.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=Rua+Jose+Alexandre+Buaiz+300+Vitoria+ES',
-      'to.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=Rua+SE+03+Lote+13+Palmas+TO',
-      'ba.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=Rua+Campina+Grande+318+Salvador+BA',
-      'pr.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=Rua+Joao+Bettega+513+Curitiba+PR',
+      'rs.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=Rua+Frederico+Groehs+Neto+775+Novo+Hamburgo+RS',
+      'es.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=RUA+OCIDENTAL+16+vila+velha+es',
+      'to.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=Q+1012+SUL+ALAMEDA+3+8+palmas+to',
+      'ba.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=AVENIDA+DUQUE+DE+CAXIAS+30+Bauru+SP',
+      'pr.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=ESTRADA+PROGRESSO+968+maringa+pr',
       'go.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=Rua+250+933+Goiania+GO'
     };
 
