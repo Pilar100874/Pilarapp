@@ -17,24 +17,22 @@ export const Word = ({ index, value }: Word) => {
 
   // Calculate responsive font size
   const isMobile = viewport.width < 5;
-  const baseFontSize = isMobile ? 0.54 : 0.765;
-  const fontSize = value === 'NOSSA' 
-    ? (isMobile ? 0.36 : 0.535)
-    : baseFontSize;
-
+  const baseFontSize = isMobile ? 0.3 : 0.4;
+  
   // Adjust vertical spacing for mobile
-  const verticalSpacing = isMobile ? 0.9 : 1.1;
+  const verticalSpacing = isMobile ? 0.6 : 0.8;
 
   return (
     <Text
       ref={ref}
-      fontSize={fontSize}
+      fontSize={baseFontSize}
       letterSpacing={0.005}
       position-y={SCREEN9_OFFSET_START_Y - 1 * -index * verticalSpacing}
       textAlign={'left'}
       font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
       anchorX="center"
       anchorY="middle"
+      maxWidth={isMobile ? 5 : 8}
     >
       {value}
       <meshBasicMaterial transparent ref={refMaterial} side={DoubleSide} opacity={1} />
