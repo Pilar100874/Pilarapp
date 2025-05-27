@@ -14,12 +14,14 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [animationComplete, setAnimationComplete] = useState(false);
   const { isPortrait, getTextSize, getSpacing } = useResponsive();
 
-  // Calculate responsive scales
-  const logoScale = isPortrait ? [0.8, 0.8, 1] : [1.5, 1.5, 1];
+  // Calculate responsive scales with proper typing
+  const logoScale = isPortrait 
+    ? [0.8, 0.8, 1] as [number, number, number]
+    : [1.5, 1.5, 1] as [number, number, number];
   const fontSize = getTextSize(0.6);
   const buttonScale = isHovered 
-    ? (isPortrait ? [1.2, 0.3, 1] : [2.16, 0.54, 1])
-    : (isPortrait ? [1.1, 0.275, 1] : [1.98, 0.495, 1]);
+    ? (isPortrait ? [1.2, 0.3, 1] as [number, number, number] : [2.16, 0.54, 1] as [number, number, number])
+    : (isPortrait ? [1.1, 0.275, 1] as [number, number, number] : [1.98, 0.495, 1] as [number, number, number]);
 
   useFrame((state) => {
     if (!textRef.current || animationComplete) return;
