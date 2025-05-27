@@ -1,0 +1,1 @@
+export const dataScreen9 = ["NOSSA", "MISSÃO"];
