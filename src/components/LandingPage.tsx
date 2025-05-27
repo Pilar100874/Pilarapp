@@ -14,11 +14,11 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
   // Calculate responsive scales
   const isMobile = viewport.width < 5;
-  const logoScale = isMobile ? [1, 1, 1] : [1.5, 1.5, 1];
+  const logoScale = (isMobile ? [1, 1, 1] : [1.5, 1.5, 1]) as [number, number, number];
   const fontSize = isMobile ? 0.4 : 0.6;
-  const buttonScale = isHovered 
+  const buttonScale = (isHovered 
     ? (isMobile ? [1.5, 0.375, 1] : [2.16, 0.54, 1])
-    : (isMobile ? [1.375, 0.344, 1] : [1.98, 0.495, 1]);
+    : (isMobile ? [1.375, 0.344, 1] : [1.98, 0.495, 1])) as [number, number, number];
 
   useFrame((state) => {
     if (!textRef.current || animationComplete) return;
