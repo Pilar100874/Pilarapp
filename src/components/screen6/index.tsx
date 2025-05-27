@@ -49,7 +49,7 @@ export const Screen6 = () => {
             onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
             onPointerOut={() => { document.body.style.cursor = 'default'; }}
           >
-            {isAnimationPaused ? 'PLAY' : 'PAUSE'}
+            {isAnimationPaused ? '▶' : '⏸'}
             <meshBasicMaterial transparent opacity={1} />
           </Text>
         </group>
