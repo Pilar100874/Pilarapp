@@ -2,7 +2,6 @@ import { Text, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useState, useRef } from 'react';
 import { MeshBasicMaterial } from 'three';
-import { useResponsive } from '@/hooks/useResponsive';
 
 export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -12,16 +11,14 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const textRef = useRef<any>();
   const materialRef = useRef<MeshBasicMaterial | null>(null);
   const [animationComplete, setAnimationComplete] = useState(false);
-  const { isPortrait, getTextSize, getSpacing } = useResponsive();
 
-  // Calculate responsive scales with proper typing
-  const logoScale = isPortrait 
-    ? [0.8, 0.8, 1] as [number, number, number]
-    : [1.5, 1.5, 1] as [number, number, number];
-  const fontSize = getTextSize(0.6);
+  // Calculate responsive scales
+  const isMobile = viewport.width < 5;
+  const logoScale = isMobile ? [1, 1, 1] : [1.5, 1.5, 1];
+  const fontSize = isMobile ? 0.4 : 0.6;
   const buttonScale = isHovered 
-    ? (isPortrait ? [1.2, 0.3, 1] as [number, number, number] : [2.16, 0.54, 1] as [number, number, number])
-    : (isPortrait ? [1.1, 0.275, 1] as [number, number, number] : [1.98, 0.495, 1] as [number, number, number]);
+    ? (isMobile ? [1.5, 0.375, 1] : [2.16, 0.54, 1])
+    : (isMobile ? [1.375, 0.344, 1] : [1.98, 0.495, 1]);
 
   useFrame((state) => {
     if (!textRef.current || animationComplete) return;
@@ -38,11 +35,9 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
     }
   });
 
-  const verticalSpacing = getSpacing(1.1);
-
   return (
     <group position-y={0}>
-      <mesh position-y={isPortrait ? 0.8 : 1.5} scale={logoScale}>
+      <mesh position-y={isMobile ? 1 : 1.5} scale={logoScale}>
         <planeGeometry args={[2, 1]} />
         <meshBasicMaterial map={logoTexture} transparent opacity={1} />
       </mesh>
@@ -52,7 +47,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         fontSize={fontSize}
         letterSpacing={0.005}
         position-z={0.1}
-        position-y={isPortrait ? 0 : undefined}
+        position-y={isMobile ? 0 : undefined}
         font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
         anchorX="center"
         anchorY="middle"
@@ -62,7 +57,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
       </Text>
 
       <mesh
-        position-y={isPortrait ? -0.6 : -1.0}
+        position-y={isMobile ? -0.75 : -1.0}
         scale={buttonScale}
         onClick={onStart}
         onPointerEnter={() => {
