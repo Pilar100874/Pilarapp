@@ -20,10 +20,10 @@ export const Word = ({ index, value }: Word) => {
   const baseFontSize = isMobile ? 0.225 : 0.3;
   
   // Increase vertical spacing
-  const verticalSpacing = isMobile ? 1.2 : 1.6;
+  const verticalSpacing = isMobile ? 1.8 : 2.4;
 
-  // Increase text width for better readability
-  const maxWidth = isMobile ? 6 : 10;
+  // Adjust text width for better readability
+  const maxWidth = isMobile ? 5 : 8;
 
   return (
     <Text
@@ -36,7 +36,7 @@ export const Word = ({ index, value }: Word) => {
       anchorX="center"
       anchorY="middle"
       maxWidth={maxWidth}
-      lineHeight={3.6} // Increased line height for better spacing
+      lineHeight={2} // Adjusted line height
     >
       {value}
       <meshBasicMaterial transparent ref={refMaterial} side={DoubleSide} opacity={1} />
