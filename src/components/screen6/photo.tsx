@@ -1,7 +1,8 @@
-import { Plane, useScroll, useTexture, useThree } from '@react-three/drei';
+import { useScroll, useTexture, useThree } from '@react-three/fiber';
 import { useFrame } from '@react-three/fiber';
 import { useRef, useState, useEffect } from 'react';
-import { MathUtils, Mesh } from 'three';
+import { MathUtils, Mesh, PlaneGeometry } from 'three';
+import { Plane } from '@react-three/drei';
 
 type Photo = {
   src: string;

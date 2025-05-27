@@ -1,5 +1,4 @@
 import {
-  Plane,
   useAspect,
   useScroll,
   useVideoTexture,
@@ -8,6 +7,7 @@ import { useFrame } from "@react-three/fiber";
 import { Suspense, useRef, useState } from "react";
 import { DoubleSide, Mesh, Group } from "three";
 import { OpenerText } from "@/components/opener/openerText";
+import { Plane } from "@react-three/drei";
 
 type VideoPlane = {
   texturePath: string;
