@@ -1,1 +1,1 @@
-export const SCREEN9_OFFSET_START_Y = -75; // Moved down by 10cm (10 units) from -65
+export const SCREEN9_OFFSET_START_Y = -85; // Moved down by 10cm (100 units) from -75
