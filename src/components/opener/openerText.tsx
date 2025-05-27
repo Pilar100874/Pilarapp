@@ -24,7 +24,7 @@ export const OpenerText = ({ py }: OpenerText) => {
   const isMobile = viewport.width < 5;
   const text1Size = isMobile ? 0.25 : 0.35;
   const text2Size = isMobile ? 0.6 : 0.84;
-  const arrowScale = isMobile ? [0.35, 0.35, 1] : [0.5, 0.5, 1];
+  const arrowScale = isMobile ? [0.35, 0.35, 1] as [number, number, number] : [0.5, 0.5, 1] as [number, number, number];
   const arrowY = isMobile ? -2.4 : -3.4;
 
   useFrame((state) => {
