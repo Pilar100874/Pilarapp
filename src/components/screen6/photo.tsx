@@ -27,8 +27,9 @@ export const Photo = (props: Photo) => {
   const isMobile = viewport.width < 5;
   const baseWidth = (3.25 * 1.1) * (isMobile ? 0.7 : 1);
   const baseHeight = (4.5 * 1.1) * (isMobile ? 0.7 : 1);
-  const rotationSpeed = isMobile ? 0.18 : 0.24;
+  const rotationSpeed = isMobile ? 0.198 : 0.264; // Increased by 10% from 0.18 and 0.24
   const radius = isMobile ? 2 : 3;
+  const xOffset = 1; // Add 1cm offset to the right
 
   useFrame((state) => {
     if (!ref.current) return;
@@ -38,7 +39,7 @@ export const Photo = (props: Photo) => {
     
     const baseAngle = ((props.index / props.totalPhotos) * Math.PI * 2) + (isPaused ? 0 : elapsedTime * rotationSpeed);
     
-    const targetX = Math.cos(baseAngle) * radius;
+    const targetX = Math.cos(baseAngle) * radius + xOffset; // Add xOffset here
     const targetZ = Math.sin(baseAngle) * radius - (isMobile ? 1.5 : 2);
     const targetRotation = baseAngle + Math.PI;
 
