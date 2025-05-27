@@ -56,6 +56,15 @@ export const Photo = (props: Photo) => {
     ref.current.position.x += scrollOffset;
   });
 
+  const handleClick = () => {
+    if (props.src.includes('sp.png')) {
+      window.open('https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=Rua+Jardim+Suspenso+126+Embu+das+Artes+SP', '_blank');
+    }
+    if (props.onClick) {
+      props.onClick();
+    }
+  };
+
   return (
     <Plane
       ref={ref}
@@ -63,7 +72,7 @@ export const Photo = (props: Photo) => {
       material-map={photo}
       material-transparent
       material-alphaTest={0.1}
-      onClick={props.onClick}
+      onClick={handleClick}
       onPointerOver={() => {
         setIsHovered(true);
         document.body.style.cursor = 'pointer';
