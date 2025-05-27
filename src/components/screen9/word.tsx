@@ -15,12 +15,12 @@ export const Word = ({ index, value }: Word) => {
   const refMaterial = useRef<MeshBasicMaterial>(null);
   const { viewport } = useThree();
 
-  // Calculate responsive font size - reduced by 25%
+  // Calculate responsive font size
   const isMobile = viewport.width < 5;
   const baseFontSize = isMobile ? 0.225 : 0.3;
   
-  // Adjust vertical spacing - reduced by 25%
-  const verticalSpacing = isMobile ? 0.45 : 0.6;
+  // Further reduce vertical spacing by 20%
+  const verticalSpacing = isMobile ? 0.36 : 0.48;
 
   // Increase text width for better readability
   const maxWidth = isMobile ? 6 : 10;
@@ -36,7 +36,7 @@ export const Word = ({ index, value }: Word) => {
       anchorX="center"
       anchorY="middle"
       maxWidth={maxWidth}
-      lineHeight={1.5}
+      lineHeight={1.2} // Reduced from 1.5 to 1.2 for tighter line spacing
     >
       {value}
       <meshBasicMaterial transparent ref={refMaterial} side={DoubleSide} opacity={1} />
