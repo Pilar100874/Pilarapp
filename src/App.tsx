@@ -11,8 +11,8 @@ function App() {
         href="https://www.pilar.com.br"
         style={{
           position: 'fixed',
-          top: '20px',
-          right: '20px',
+          top: '25px', // Moved down by 0.5cm (5px)
+          right: '25px', // Moved left by 0.5cm (5px)
           zIndex: 1000,
           width: '50px',
           height: '50px',
