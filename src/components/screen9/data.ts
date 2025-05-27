@@ -1,12 +1,12 @@
 export const dataScreen9 = [
-  "Fundada em 1998 a Pilar Comercial e Serviços iniciou suas atividades fabricando e revendendo papel para outras empresas do setor de embalagem de papel.",
-  "Com o intuito de ampliar as vendas, decidimos iniciar uma linha de produtos comerciais, utilizando como base nossa matéria prima industrial.",
-  "A família Pilar tem longa tradição no mercado papeleiro. A primeira empresa de grupo foi montada em 1960 pelo patriarca da família, Sr. Adhemur Pilar, que depois colocou seus filhos Fernando Pilar e Marcello como sócios",
-  "Aproveitando a experiência do pai, a empresa começou como representação de papel. No final dos anos 70, assumiu a fábrica de papel CIBRAP - Cia. Brasileira de Papel, dirigida pelos irmãos até o final da década de 80, quando foi vendida para o grupo KLABIN. Ambos continuaram trabalhando no segmento, atuando na área comercial e industrial de empresas como KLABIN, VOTORANTIM E CELULOSE IRANI.",
-  "Desde 2002, a matriz da empresa está instalada em área própria, entre o Rodoanel e a Regis Bittencourt, na cidade de Embu das Artes. E hoje já ampliou sua area para mais 2 novas unidades mais uma em Embú e outra em São Lourenço da Serra. Perfazendo uma área de mais de 24 mil metros de area contruida.",
-  "As principais linhas de atuação são os mercados industriais e gráficos, porém utilizando como base nossos papéis hoje trabalhados acrescentamos a nossa linha produtos descartáveis, escolares, embalagens e produtos para proteção.",
-  "Afim de proporcionar um melhor atendimento, com maior rapidez nas entregas, nos últimos anos algumas filiais pelo Brasil foram abertas. (Hoje contando com mais 9 unidades e uma fábrica de papel em Sengês PR)",
-  "A idéia de unir vários produtos fabricados, tendo como base a matéria prima papel, é a que nos move e incentiva a continuar crescendo",
-  "Bem vindo a Pilar,",
-  "Uma empresa que \"Respira\" papel!"
+  "FUNDADA EM 1998 A PILAR COMERCIAL E SERVIÇOS INICIOU SUAS ATIVIDADES FABRICANDO E REVENDENDO PAPEL PARA OUTRAS EMPRESAS DO SETOR DE EMBALAGEM DE PAPEL.",
+  "COM O INTUITO DE AMPLIAR AS VENDAS, DECIDIMOS INICIAR UMA LINHA DE PRODUTOS COMERCIAIS, UTILIZANDO COMO BASE NOSSA MATÉRIA PRIMA INDUSTRIAL.",
+  "A FAMÍLIA PILAR TEM LONGA TRADIÇÃO NO MERCADO PAPELEIRO. A PRIMEIRA EMPRESA DE GRUPO FOI MONTADA EM 1960 PELO PATRIARCA DA FAMÍLIA, SR. ADHEMUR PILAR, QUE DEPOIS COLOCOU SEUS FILHOS FERNANDO PILAR E MARCELLO COMO SÓCIOS",
+  "APROVEITANDO A EXPERIÊNCIA DO PAI, A EMPRESA COMEÇOU COMO REPRESENTAÇÃO DE PAPEL. NO FINAL DOS ANOS 70, ASSUMIU A FÁBRICA DE PAPEL CIBRAP - CIA. BRASILEIRA DE PAPEL, DIRIGIDA PELOS IRMÃOS ATÉ O FINAL DA DÉCADA DE 80, QUANDO FOI VENDIDA PARA O GRUPO KLABIN. AMBOS CONTINUARAM TRABALHANDO NO SEGMENTO, ATUANDO NA ÁREA COMERCIAL E INDUSTRIAL DE EMPRESAS COMO KLABIN, VOTORANTIM E CELULOSE IRANI.",
+  "DESDE 2002, A MATRIZ DA EMPRESA ESTÁ INSTALADA EM ÁREA PRÓPRIA, ENTRE O RODOANEL E A REGIS BITTENCOURT, NA CIDADE DE EMBU DAS ARTES. E HOJE JÁ AMPLIOU SUA AREA PARA MAIS 2 NOVAS UNIDADES MAIS UMA EM EMBÚ E OUTRA EM SÃO LOURENÇO DA SERRA. PERFAZENDO UMA ÁREA DE MAIS DE 24 MIL METROS DE AREA CONTRUIDA.",
+  "AS PRINCIPAIS LINHAS DE ATUAÇÃO SÃO OS MERCADOS INDUSTRIAIS E GRÁFICOS, PORÉM UTILIZANDO COMO BASE NOSSOS PAPÉIS HOJE TRABALHADOS ACRESCENTAMOS A NOSSA LINHA PRODUTOS DESCARTÁVEIS, ESCOLARES, EMBALAGENS E PRODUTOS PARA PROTEÇÃO.",
+  "AFIM DE PROPORCIONAR UM MELHOR ATENDIMENTO, COM MAIOR RAPIDEZ NAS ENTREGAS, NOS ÚLTIMOS ANOS ALGUMAS FILIAIS PELO BRASIL FORAM ABERTAS. (HOJE CONTANDO COM MAIS 9 UNIDADES E UMA FÁBRICA DE PAPEL EM SENGÊS PR)",
+  "A IDÉIA DE UNIR VÁRIOS PRODUTOS FABRICADOS, TENDO COMO BASE A MATÉRIA PRIMA PAPEL, É A QUE NOS MOVE E INCENTIVA A CONTINUAR CRESCENDO",
+  "BEM VINDO A PILAR,",
+  "UMA EMPRESA QUE \"RESPIRA\" PAPEL!"
 ];
