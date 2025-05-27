@@ -1,1 +1,1 @@
-export const SCREEN9_OFFSET_START_Y = -65; // Positioned below Screen7
+export const SCREEN9_OFFSET_START_Y = -75; // Moved down by 10cm (10 units) from -65
