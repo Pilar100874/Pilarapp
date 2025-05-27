@@ -27,7 +27,7 @@ export const Screen6 = () => {
       <group position-y={SCREEN6_OFFSET_START_Y} rotation-y={Math.PI * -0.05}>
         {/* Play/Pause Button */}
         <mesh
-          position={[-1, 0, 2]} // Moved 3cm to the right (from -4 to -1)
+          position={[-2, 0, 2]} // Moved 1cm to the left (from -1 to -2)
           scale={[0.5, 0.5, 1]}
           rotation={[0, 0, isAnimationPaused ? Math.PI : 0]}
           onClick={() => setIsAnimationPaused(!isAnimationPaused)}
