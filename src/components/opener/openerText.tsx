@@ -183,5 +183,3 @@ export const OpenerText = ({ py }: OpenerText) => {
     </group>
   );
 };
-
-export { OpenerText }
