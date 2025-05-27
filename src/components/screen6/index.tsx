@@ -1,4 +1,4 @@
-import { Scroll } from '@react-three/drei';
+import { Scroll, Text } from '@react-three/drei';
 import { SCREEN6_OFFSET_START_Y } from './constants';
 import { dataPhotos } from './dataPhotos';
 import { Photo } from './photo';
@@ -7,6 +7,7 @@ import { useState } from 'react';
 export const Screen6 = () => {
   const photoList = Object.entries(dataPhotos);
   const [order, setOrder] = useState(photoList.map((_, i) => i));
+  const [isAnimationPaused, setIsAnimationPaused] = useState(false);
 
   const rotatePhotos = (clickedIndex: number) => {
     const newOrder = [...order];
@@ -32,9 +33,26 @@ export const Screen6 = () => {
               index={displayIndex}
               totalPhotos={photoList.length}
               onClick={() => rotatePhotos(originalIndex)}
+              isPaused={isAnimationPaused}
             />
           );
         })}
+        
+        {/* Play/Pause Button */}
+        <group position-y={-3}>
+          <Text
+            fontSize={0.5}
+            color="white"
+            anchorX="center"
+            anchorY="middle"
+            onClick={() => setIsAnimationPaused(!isAnimationPaused)}
+            onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
+            onPointerOut={() => { document.body.style.cursor = 'default'; }}
+          >
+            {isAnimationPaused ? 'PLAY' : 'PAUSE'}
+            <meshBasicMaterial transparent opacity={1} />
+          </Text>
+        </group>
       </group>
     </Scroll>
   );

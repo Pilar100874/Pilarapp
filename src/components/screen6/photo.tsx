@@ -10,6 +10,7 @@ type Photo = {
   onClick?: () => void;
   index: number;
   totalPhotos: number;
+  isPaused: boolean;
 };
 
 export const Photo = (props: Photo) => {
@@ -37,19 +38,23 @@ export const Photo = (props: Photo) => {
     const currentTime = Date.now();
     const elapsedTime = (currentTime - startTime.current) / 1000;
     
-    const baseAngle = ((props.index / props.totalPhotos) * Math.PI * 2) + (isPaused ? 0 : elapsedTime * rotationSpeed);
+    const baseAngle = ((props.index / props.totalPhotos) * Math.PI * 2) + 
+      (props.isPaused ? lastPosition.current.rotation : elapsedTime * rotationSpeed);
     
-    const targetX = Math.cos(baseAngle) * radius + xOffset; // Add xOffset here
+    const targetX = Math.cos(baseAngle) * radius + xOffset;
     const targetZ = Math.sin(baseAngle) * radius - (isMobile ? 1.5 : 2);
     const targetRotation = baseAngle + Math.PI;
 
+    if (!props.isPaused) {
+      lastPosition.current.rotation = baseAngle;
+    }
+
     lastPosition.current.x = MathUtils.lerp(lastPosition.current.x, targetX, 0.1);
     lastPosition.current.z = MathUtils.lerp(lastPosition.current.z, targetZ, 0.1);
-    lastPosition.current.rotation = MathUtils.lerp(lastPosition.current.rotation, targetRotation, 0.1);
 
     ref.current.position.x = lastPosition.current.x;
     ref.current.position.z = lastPosition.current.z;
-    ref.current.rotation.y = lastPosition.current.rotation;
+    ref.current.rotation.y = targetRotation;
   });
 
   const handleClick = () => {
