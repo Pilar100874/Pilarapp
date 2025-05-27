@@ -25,6 +25,19 @@ export const Screen6 = () => {
   return (
     <Scroll>
       <group position-y={SCREEN6_OFFSET_START_Y} rotation-y={Math.PI * -0.05}>
+        {/* Play/Pause Button */}
+        <mesh
+          position={[-4, 0, 2]} // Moved to the left side and centered vertically
+          scale={[0.5, 0.5, 1]}
+          rotation={[0, 0, isAnimationPaused ? Math.PI : 0]}
+          onClick={() => setIsAnimationPaused(!isAnimationPaused)}
+          onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
+          onPointerOut={() => { document.body.style.cursor = 'default'; }}
+        >
+          <planeGeometry args={[1, 1]} />
+          <meshBasicMaterial map={playTexture} transparent opacity={1} depthTest={false} />
+        </mesh>
+
         {order.map((originalIndex, displayIndex) => {
           const [name, src] = photoList[originalIndex];
           return (
@@ -39,19 +52,6 @@ export const Screen6 = () => {
             />
           );
         })}
-        
-        {/* Play/Pause Button */}
-        <mesh
-          position={[0, -3, 2]} // Increased z position to 2 to ensure it stays on top
-          scale={[0.5, 0.5, 1]}
-          rotation={[0, 0, isAnimationPaused ? Math.PI : 0]}
-          onClick={() => setIsAnimationPaused(!isAnimationPaused)}
-          onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
-          onPointerOut={() => { document.body.style.cursor = 'default'; }}
-        >
-          <planeGeometry args={[1, 1]} />
-          <meshBasicMaterial map={playTexture} transparent opacity={1} depthTest={false} />
-        </mesh>
       </group>
     </Scroll>
   );
