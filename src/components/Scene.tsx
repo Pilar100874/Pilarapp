@@ -26,9 +26,7 @@ export const Scene = () => {
     
     // Prevent default touch behavior
     const preventDefaultTouch = (e: TouchEvent) => {
-      if (e.touches.length === 1) {
-        e.preventDefault();
-      }
+      e.preventDefault();
     };
     
     document.addEventListener('touchmove', preventDefaultTouch, { passive: false });
@@ -50,7 +48,7 @@ export const Scene = () => {
     <Canvas 
       style={{ 
         width: '100vw', 
-        height: '100vh', 
+        height: '100vh',
         touchAction: 'none',
         WebkitTouchCallout: 'none',
         WebkitUserSelect: 'none',
