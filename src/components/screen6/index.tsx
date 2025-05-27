@@ -28,7 +28,7 @@ export const Screen6 = () => {
         {/* Play/Pause Button */}
         <mesh
           position={[-2, 0, 2]}
-          scale={[0.5, 0.5, 1]}
+          scale={[0.45, 0.45, 1]} {/* Reduced by 10% from 0.5 to 0.45 */}
           rotation={[0, 0, isAnimationPaused ? Math.PI : 0]}
           onClick={() => setIsAnimationPaused(!isAnimationPaused)}
           onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
