@@ -51,15 +51,12 @@ export const Photo = (props: Photo) => {
     ref.current.rotation.y = MathUtils.lerp(ref.current.rotation.y, targetRotationY, 0.1);
     ref.current.scale.x = MathUtils.lerp(ref.current.scale.x, targetScale, 0.1);
     ref.current.scale.y = MathUtils.lerp(ref.current.scale.y, targetScale, 0.1);
-
-    const scrollOffset = scroll.offset - 0.5;
-    ref.current.position.x += scrollOffset;
   });
 
   const handleClick = () => {
     const locationUrls: { [key: string]: string } = {
       'sp.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=Rua+Jardim+Suspenso+126+Embu+das+Artes+SP',
-      'rs.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=Rua+Frederico+Groehs+Neto+775+Novo+Hamburgo+RS',
+      'rs.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=Rua+Frederico+Groehs+Neto+755+Novo+Hamburgo+RS',
       'es.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=RUA+OCIDENTAL+16+vila+velha+es',
       'to.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=Q+1012+SUL+ALAMEDA+3+8+palmas+to',
       'ba.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=AVENIDA+DUQUE+DE+CAXIAS+30+Bauru+SP',
