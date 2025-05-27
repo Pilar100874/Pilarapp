@@ -1,7 +1,7 @@
 import { Text, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useState, useRef, useEffect } from 'react';
-import { MeshBasicMaterial, Vector3 } from 'three';
+import { useState, useRef } from 'react';
+import { MeshBasicMaterial } from 'three';
 import { useResponsive } from '@/hooks/useResponsive';
 
 export const LandingPage = ({ onStart }: { onStart: () => void }) => {
@@ -15,11 +15,11 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const { isPortrait, getTextSize, getSpacing } = useResponsive();
 
   // Calculate responsive scales
-  const logoScale = isPortrait ? [0.8, 0.8, 1] as [number, number, number] : [1.5, 1.5, 1] as [number, number, number];
+  const logoScale = isPortrait ? [0.8, 0.8, 1] : [1.5, 1.5, 1];
   const fontSize = getTextSize(0.6);
   const buttonScale = isHovered 
-    ? (isPortrait ? [1.2, 0.3, 1] as [number, number, number] : [2.16, 0.54, 1] as [number, number, number])
-    : (isPortrait ? [1.1, 0.275, 1] as [number, number, number] : [1.98, 0.495, 1] as [number, number, number]);
+    ? (isPortrait ? [1.2, 0.3, 1] : [2.16, 0.54, 1])
+    : (isPortrait ? [1.1, 0.275, 1] : [1.98, 0.495, 1]);
 
   useFrame((state) => {
     if (!textRef.current || animationComplete) return;
@@ -37,29 +37,6 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   });
 
   const verticalSpacing = getSpacing(1.1);
-
-  // Handle fullscreen changes
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      if (!document.fullscreenElement && !(document as any).webkitFullscreenElement) {
-        // Try to re-enter fullscreen if it was exited
-        const element = document.documentElement;
-        if (element.requestFullscreen) {
-          element.requestFullscreen().catch(() => {});
-        } else if ((element as any).webkitRequestFullscreen) {
-          (element as any).webkitRequestFullscreen().catch(() => {});
-        }
-      }
-    };
-
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
-    };
-  }, []);
 
   return (
     <group position-y={0}>
