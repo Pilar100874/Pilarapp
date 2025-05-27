@@ -16,7 +16,7 @@ export const OpenerText = ({ py }: OpenerText) => {
         anchorX="center"
         anchorY="middle"
       >
-        FUNDADA EM 1998 
+        HISTÓRIA 
         <meshBasicMaterial depthTest={false} />
       </Text>
       <Text
@@ -29,7 +29,7 @@ export const OpenerText = ({ py }: OpenerText) => {
         anchorX="center"
         anchorY="middle"
       >
-        9 UNIDADES
+        3 FÁBRICAS e 10 UNIDADES
         <meshBasicMaterial depthTest={false} />
       </Text>
     </group>
