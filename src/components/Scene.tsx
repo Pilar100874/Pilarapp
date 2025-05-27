@@ -24,25 +24,47 @@ export const Scene = () => {
     window.addEventListener('resize', handleResize);
     window.addEventListener('orientationchange', handleResize);
     
-    // Prevent default touch behavior
-    const preventDefaultTouch = (e: TouchEvent) => {
-      e.preventDefault();
+    // Handle touch events
+    let touchStartY = 0;
+    let lastTouchY = 0;
+    let scrolling = false;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+      lastTouchY = touchStartY;
+      scrolling = false;
     };
-    
-    document.addEventListener('touchmove', preventDefaultTouch, { passive: false });
-    document.addEventListener('touchstart', preventDefaultTouch, { passive: false });
+
+    const handleTouchMove = (e: TouchEvent) => {
+      const currentY = e.touches[0].clientY;
+      const deltaY = currentY - lastTouchY;
+      
+      // Only prevent default if we determine this is a scroll gesture
+      if (!scrolling && Math.abs(currentY - touchStartY) > 10) {
+        scrolling = true;
+      }
+      
+      if (scrolling) {
+        e.preventDefault();
+      }
+      
+      lastTouchY = currentY;
+    };
+
+    document.addEventListener('touchstart', handleTouchStart, { passive: true });
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
     
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('orientationchange', handleResize);
-      document.removeEventListener('touchmove', preventDefaultTouch);
-      document.removeEventListener('touchstart', preventDefaultTouch);
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchmove', handleTouchMove);
     };
   }, [handleResize]);
 
   // Adjust damping and distance based on orientation
-  const damping = orientation === 'portrait' ? 0.85 : 0.65;
-  const distance = orientation === 'portrait' ? 0.35 : 0.25;
+  const damping = orientation === 'portrait' ? 0.75 : 0.55;
+  const distance = orientation === 'portrait' ? 0.5 : 0.35;
 
   return (
     <Canvas 
@@ -52,9 +74,11 @@ export const Scene = () => {
         touchAction: 'none',
         WebkitTouchCallout: 'none',
         WebkitUserSelect: 'none',
-        userSelect: 'none'
+        userSelect: 'none',
+        position: 'fixed',
+        top: 0,
+        left: 0
       }}
-      onTouchMove={(e) => e.preventDefault()}
     >
       <color attach="background" args={[new Color('black')]} />
       <ScrollControls 
@@ -63,7 +87,7 @@ export const Scene = () => {
         distance={distance}
         enabled={true}
         infinite={false}
-        eps={0.001}
+        eps={0.00001}
         horizontal={false}
       >
         <Opener />
