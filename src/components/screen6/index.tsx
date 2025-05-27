@@ -1,13 +1,15 @@
-import { Scroll, Text } from '@react-three/drei';
+import { Scroll } from '@react-three/drei';
 import { SCREEN6_OFFSET_START_Y } from './constants';
 import { dataPhotos } from './dataPhotos';
 import { Photo } from './photo';
 import { useState } from 'react';
+import { useTexture } from '@react-three/drei';
 
 export const Screen6 = () => {
   const photoList = Object.entries(dataPhotos);
   const [order, setOrder] = useState(photoList.map((_, i) => i));
   const [isAnimationPaused, setIsAnimationPaused] = useState(false);
+  const playTexture = useTexture('/play.png');
 
   const rotatePhotos = (clickedIndex: number) => {
     const newOrder = [...order];
@@ -39,20 +41,17 @@ export const Screen6 = () => {
         })}
         
         {/* Play/Pause Button */}
-        <group position-y={-3}>
-          <Text
-            fontSize={0.5}
-            color="white"
-            anchorX="center"
-            anchorY="middle"
-            onClick={() => setIsAnimationPaused(!isAnimationPaused)}
-            onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
-            onPointerOut={() => { document.body.style.cursor = 'default'; }}
-          >
-            {isAnimationPaused ? '▶' : '⏸'}
-            <meshBasicMaterial transparent opacity={1} />
-          </Text>
-        </group>
+        <mesh
+          position={[0, -3, 0]}
+          scale={[0.5, 0.5, 1]}
+          rotation={[0, 0, isAnimationPaused ? Math.PI : 0]}
+          onClick={() => setIsAnimationPaused(!isAnimationPaused)}
+          onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
+          onPointerOut={() => { document.body.style.cursor = 'default'; }}
+        >
+          <planeGeometry args={[1, 1]} />
+          <meshBasicMaterial map={playTexture} transparent opacity={1} />
+        </mesh>
       </group>
     </Scroll>
   );
