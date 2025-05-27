@@ -83,11 +83,11 @@ export const Photo = (props: Photo) => {
       material-transparent
       material-alphaTest={0.1}
       onClick={handleClick}
-      onPointerOver={() => {
+      onPointerEnter={() => {
         setIsHovered(true);
         document.body.style.cursor = 'pointer';
       }}
-      onPointerOut={() => {
+      onPointerLeave={() => {
         setIsHovered(false);
         document.body.style.cursor = 'default';
       }}
