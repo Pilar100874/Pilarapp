@@ -9,12 +9,17 @@ import { Screen6 } from '@/components/screen6';
 import { Screen7 } from '@/components/screen7';
 import { Screen8 } from '@/components/screen8';
 import { Screen10 } from '@/components/screen10';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 
 export const Scene = () => {
   const [orientation, setOrientation] = useState<'portrait' | 'landscape'>(
     window.innerWidth > window.innerHeight ? 'landscape' : 'portrait'
   );
+  const touchStartRef = useRef({ x: 0, y: 0, time: 0 });
+  const lastTouchRef = useRef({ x: 0, y: 0 });
+  const velocityRef = useRef(0);
+  const scrollingRef = useRef(false);
+  const frameRef = useRef<number>();
 
   const handleResize = useCallback(() => {
     setOrientation(window.innerWidth > window.innerHeight ? 'landscape' : 'portrait');
@@ -24,47 +29,72 @@ export const Scene = () => {
     window.addEventListener('resize', handleResize);
     window.addEventListener('orientationchange', handleResize);
     
-    // Handle touch events
-    let touchStartY = 0;
-    let lastTouchY = 0;
-    let scrolling = false;
-
     const handleTouchStart = (e: TouchEvent) => {
-      touchStartY = e.touches[0].clientY;
-      lastTouchY = touchStartY;
-      scrolling = false;
+      const touch = e.touches[0];
+      touchStartRef.current = {
+        x: touch.clientX,
+        y: touch.clientY,
+        time: Date.now()
+      };
+      lastTouchRef.current = { x: touch.clientX, y: touch.clientY };
+      scrollingRef.current = false;
+      velocityRef.current = 0;
+      
+      if (frameRef.current) {
+        cancelAnimationFrame(frameRef.current);
+      }
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      const currentY = e.touches[0].clientY;
-      const deltaY = currentY - lastTouchY;
+      e.preventDefault();
+      const touch = e.touches[0];
+      const deltaY = touch.clientY - lastTouchRef.current.y;
+      const deltaTime = Date.now() - touchStartRef.current.time;
       
-      // Only prevent default if we determine this is a scroll gesture
-      if (!scrolling && Math.abs(currentY - touchStartY) > 10) {
-        scrolling = true;
+      if (!scrollingRef.current && Math.abs(deltaY) > 10) {
+        scrollingRef.current = true;
       }
       
-      if (scrolling) {
-        e.preventDefault();
+      if (scrollingRef.current) {
+        velocityRef.current = deltaY / deltaTime;
       }
       
-      lastTouchY = currentY;
+      lastTouchRef.current = { x: touch.clientX, y: touch.clientY };
+    };
+
+    const handleTouchEnd = () => {
+      if (scrollingRef.current && Math.abs(velocityRef.current) > 0.1) {
+        const decay = () => {
+          velocityRef.current *= 0.95;
+          
+          if (Math.abs(velocityRef.current) > 0.01) {
+            frameRef.current = requestAnimationFrame(decay);
+          }
+        };
+        
+        frameRef.current = requestAnimationFrame(decay);
+      }
     };
 
     document.addEventListener('touchstart', handleTouchStart, { passive: true });
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd);
     
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('orientationchange', handleResize);
       document.removeEventListener('touchstart', handleTouchStart);
       document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+      
+      if (frameRef.current) {
+        cancelAnimationFrame(frameRef.current);
+      }
     };
   }, [handleResize]);
 
-  // Adjust damping and distance based on orientation
-  const damping = orientation === 'portrait' ? 0.75 : 0.55;
-  const distance = orientation === 'portrait' ? 0.5 : 0.35;
+  const damping = orientation === 'portrait' ? 0.85 : 0.65;
+  const distance = orientation === 'portrait' ? 0.6 : 0.45;
 
   return (
     <Canvas 
@@ -77,7 +107,13 @@ export const Scene = () => {
         userSelect: 'none',
         position: 'fixed',
         top: 0,
-        left: 0
+        left: 0,
+        overscrollBehavior: 'none',
+        WebkitOverflowScrolling: 'touch'
+      }}
+      gl={{ 
+        antialias: false,
+        powerPreference: 'high-performance'
       }}
     >
       <color attach="background" args={[new Color('black')]} />

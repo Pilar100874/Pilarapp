@@ -33,6 +33,7 @@ html, body {
   position: fixed;
   background-color: #000;
   overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 #root {
@@ -42,4 +43,11 @@ html, body {
   top: 0;
   left: 0;
   overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+canvas {
+  touch-action: none !important;
+  -ms-touch-action: none !important;
 }
