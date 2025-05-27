@@ -27,7 +27,7 @@ export const Screen3 = () => {
       <group position-y={SCREEN3_OFFSET_START_Y} position-x={0}>
         {/* Previous Button */}
         <mesh
-          position={[-4, 0, 0]}
+          position={[-5, 0, 0]}
           scale={[0.5, 0.5, 1]}
           rotation={[0, 0, Math.PI / 2]}
           onClick={handlePrevious}
@@ -40,7 +40,7 @@ export const Screen3 = () => {
 
         {/* Next Button */}
         <mesh
-          position={[4, 0, 0]}
+          position={[5, 0, 0]}
           scale={[0.5, 0.5, 1]}
           rotation={[0, 0, -Math.PI / 2]}
           onClick={handleNext}
