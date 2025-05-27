@@ -40,18 +40,33 @@ export const Screen6 = () => {
         
         {/* Play/Pause Button */}
         <group position-y={-3}>
-          <Text
-            fontSize={0.5}
-            color="white"
-            anchorX="center"
-            anchorY="middle"
+          <mesh
             onClick={() => setIsAnimationPaused(!isAnimationPaused)}
             onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
             onPointerOut={() => { document.body.style.cursor = 'default'; }}
           >
-            {isAnimationPaused ? 'PLAY' : 'PAUSE'}
-            <meshBasicMaterial transparent opacity={1} />
-          </Text>
+            <planeGeometry args={[0.5, 0.5]} />
+            <meshBasicMaterial color="white" transparent>
+              <shapeGeometry args={[
+                isAnimationPaused 
+                  ? [
+                      { x: -0.15, y: -0.15 },
+                      { x: -0.15, y: 0.15 },
+                      { x: 0.15, y: 0 }
+                    ] // Play triangle
+                  : [
+                      { x: -0.15, y: -0.15 },
+                      { x: -0.15, y: 0.15 },
+                      { x: -0.05, y: 0.15 },
+                      { x: -0.05, y: -0.15 },
+                      { x: 0.05, y: -0.15 },
+                      { x: 0.05, y: 0.15 },
+                      { x: 0.15, y: 0.15 },
+                      { x: 0.15, y: -0.15 }
+                    ] // Pause bars
+              ]} />
+            </meshBasicMaterial>
+          </mesh>
         </group>
       </group>
     </Scroll>
