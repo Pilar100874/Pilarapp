@@ -33,6 +33,10 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
     ref.current.rotation.y = scroll.offset * 2.5;
   });
 
+  // Move up by 2cm (20 units)
+  const baseY = -58.5 + 2;
+  const textY = -58 + 2;
+
   return (
     <Suspense fallback={null}>
       <Plane
@@ -40,9 +44,9 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
         scale={[scale[0], scale[1], 1]}
         material-side={DoubleSide}
         material-map={videoTexture}
-        position-y={-58.5}
+        position-y={baseY}
       />
-      <OpenerText py={-58} />
+      <OpenerText py={textY} />
     </Suspense>
   );
 };
