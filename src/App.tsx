@@ -9,8 +9,6 @@ function App() {
     <>
       <a 
         href="https://www.pilar.com.br"
-        target="_blank"
-        rel="noopener noreferrer"
         style={{
           position: 'fixed',
           top: '20px',
