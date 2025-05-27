@@ -27,7 +27,7 @@ export const Screen6 = () => {
       <group position-y={SCREEN6_OFFSET_START_Y} rotation-y={Math.PI * -0.05}>
         {/* Play/Pause Button */}
         <mesh
-          position={[-2, 0, 2]} // Moved 1cm to the left (from -1 to -2)
+          position={[-2, 0, 2]}
           scale={[0.5, 0.5, 1]}
           rotation={[0, 0, isAnimationPaused ? Math.PI : 0]}
           onClick={() => setIsAnimationPaused(!isAnimationPaused)}
@@ -35,7 +35,13 @@ export const Screen6 = () => {
           onPointerOut={() => { document.body.style.cursor = 'default'; }}
         >
           <planeGeometry args={[1, 1]} />
-          <meshBasicMaterial map={playTexture} transparent opacity={1} depthTest={false} />
+          <meshBasicMaterial 
+            map={playTexture} 
+            transparent 
+            opacity={1} 
+            depthTest={false}
+            alphaTest={0.1}
+          />
         </mesh>
 
         {order.map((originalIndex, displayIndex) => {
