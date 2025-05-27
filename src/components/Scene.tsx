@@ -25,9 +25,7 @@ export const Scene = () => {
     };
 
     window.addEventListener('resize', handleResize);
-    window.addEventListener('orientationchange', () => {
-      setTimeout(handleResize, 100);
-    });
+    window.addEventListener('orientationchange', handleResize);
     
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -40,9 +38,9 @@ export const Scene = () => {
   const distance = orientation === 'portrait' ? 0.35 : 0.25;
 
   return (
-    <Canvas style={{ width: '100vw', height: '100vh', touchAction: 'none' }}>
+    <Canvas style={{ width: '100vw', height: '100vh' }}>
       <color attach="background" args={[new Color('black')]} />
-      <ScrollControls pages={10} damping={damping} distance={distance} enabled>
+      <ScrollControls pages={10} damping={damping} distance={distance}>
         <Opener />
         <Screen2 />
         <Screen3 />

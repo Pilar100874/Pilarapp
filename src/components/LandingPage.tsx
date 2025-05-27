@@ -1,6 +1,6 @@
 import { Text, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { MeshBasicMaterial } from 'three';
 import { useResponsive } from '@/hooks/useResponsive';
 
@@ -38,9 +38,32 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
   const verticalSpacing = getSpacing(1.1);
 
+  // Handle fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        // Try to re-enter fullscreen if it was exited
+        const element = document.documentElement;
+        if (element.requestFullscreen) {
+          element.requestFullscreen().catch(() => {});
+        } else if ((element as any).webkitRequestFullscreen) {
+          (element as any).webkitRequestFullscreen().catch(() => {});
+        }
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
   return (
     <group position-y={0}>
-      <mesh position-y={isPortrait ? 0.8 : 1.5} scale-x={logoScale[0]} scale-y={logoScale[1]} scale-z={logoScale[2]}>
+      <mesh position-y={isPortrait ? 0.8 : 1.5} scale={logoScale}>
         <planeGeometry args={[2, 1]} />
         <meshBasicMaterial map={logoTexture} transparent opacity={1} />
       </mesh>
@@ -61,9 +84,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
       <mesh
         position-y={isPortrait ? -0.6 : -1.0}
-        scale-x={buttonScale[0]}
-        scale-y={buttonScale[1]}
-        scale-z={buttonScale[2]}
+        scale={buttonScale}
         onClick={onStart}
         onPointerEnter={() => {
           setIsHovered(true);
