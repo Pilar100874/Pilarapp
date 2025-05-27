@@ -1,3 +1,4 @@
+
 :root {
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
@@ -20,13 +21,16 @@
   padding: 0;
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: auto;
+  min-height: 100vh;
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -34,6 +38,8 @@ html, body {
 }
 
 #root {
-  min-height: 100vh;
   width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
