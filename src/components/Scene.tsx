@@ -28,7 +28,17 @@ export const Scene = () => {
   const distance = aspectRatio < 1 ? 0.35 : 0.25; // More distance on mobile
 
   return (
-    <Canvas style={{ width: '100vw', height: '100vh' }}>
+    <Canvas 
+      style={{ 
+        width: '100vw', 
+        height: '100vh',
+        background: 'black' // Add explicit background color
+      }}
+      gl={{
+        antialias: true,
+        alpha: false, // Disable alpha to prevent transparency issues
+      }}
+    >
       <color attach="background" args={[new Color('black')]} />
       <ScrollControls pages={10} damping={damping} distance={distance}>
         <Opener />
