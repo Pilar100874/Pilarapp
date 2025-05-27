@@ -57,23 +57,6 @@ export const Photo = (props: Photo) => {
     ref.current.rotation.y = targetRotation;
   });
 
-  const handleClick = () => {
-    if (!props.onClick) return;
-
-    setIsPaused(true);
-    props.onClick();
-    
-    if (pauseTimer.current !== null) {
-      window.clearTimeout(pauseTimer.current);
-    }
-    
-    pauseTimer.current = window.setTimeout(() => {
-      setIsPaused(false);
-      startTime.current = Date.now() - (lastPosition.current.rotation / rotationSpeed) * 1000;
-      pauseTimer.current = null;
-    }, 2000);
-  };
-
   useEffect(() => {
     return () => {
       if (pauseTimer.current !== null) {
@@ -90,9 +73,6 @@ export const Photo = (props: Photo) => {
       material-map={photo}
       material-transparent
       material-alphaTest={0.1}
-      onClick={handleClick}
-      onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
-      onPointerOut={() => { document.body.style.cursor = 'default'; }}
     />
   );
 };
