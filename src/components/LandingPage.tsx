@@ -15,9 +15,9 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const { isPortrait, getTextSize, getSpacing } = useResponsive();
 
   // Calculate responsive scales
-  const logoScale: [number, number, number] = isPortrait ? [0.8, 0.8, 1] : [1.5, 1.5, 1];
+  const logoScale = isPortrait ? [0.8, 0.8, 1] : [1.5, 1.5, 1];
   const fontSize = getTextSize(0.6);
-  const buttonScale: [number, number, number] = isHovered 
+  const buttonScale = isHovered 
     ? (isPortrait ? [1.2, 0.3, 1] : [2.16, 0.54, 1])
     : (isPortrait ? [1.1, 0.275, 1] : [1.98, 0.495, 1]);
 
@@ -41,7 +41,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   // Handle fullscreen changes
   useEffect(() => {
     const handleFullscreenChange = () => {
-      if (!document.fullscreenElement && !(document as any).webkitFullscreenElement) {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
         // Try to re-enter fullscreen if it was exited
         const element = document.documentElement;
         if (element.requestFullscreen) {

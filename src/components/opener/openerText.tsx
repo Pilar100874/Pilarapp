@@ -3,11 +3,11 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import { MeshBasicMaterial } from "three";
 
-type OpenerTextProps = {
+type OpenerText = {
   py: number;
 };
 
-const OpenerText = ({ py }: OpenerTextProps) => {
+export const OpenerText = ({ py }: OpenerText) => {
   const logoTexture = useTexture('/logo_branco.png');
   const arrowTexture = useTexture('/seta_B.png');
   const logoRef = useRef<any>();
@@ -24,7 +24,7 @@ const OpenerText = ({ py }: OpenerTextProps) => {
   const isMobile = viewport.width < 5;
   const text1Size = isMobile ? 0.25 : 0.35;
   const text2Size = isMobile ? 0.6 : 0.84;
-  const arrowScale: [number, number, number] = isMobile ? [0.35, 0.35, 1] : [0.5, 0.5, 1];
+  const arrowScale = isMobile ? [0.35, 0.35, 1] : [0.5, 0.5, 1];
   // Move arrow up by 0.5cm (approximately -3.9 for desktop, -2.9 for mobile)
   const arrowY = isMobile ? -2.9 : -3.9;
 
@@ -183,5 +183,3 @@ const OpenerText = ({ py }: OpenerTextProps) => {
     </group>
   );
 };
-
-export default OpenerText;
