@@ -41,7 +41,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   // Handle fullscreen changes
   useEffect(() => {
     const handleFullscreenChange = () => {
-      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      if (!document.fullscreenElement && !(document as any).webkitFullscreenElement) {
         // Try to re-enter fullscreen if it was exited
         const element = document.documentElement;
         if (element.requestFullscreen) {
@@ -63,7 +63,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
   return (
     <group position-y={0}>
-      <mesh position-y={isPortrait ? 0.8 : 1.5} scale={logoScale}>
+      <mesh position-y={isPortrait ? 0.8 : 1.5} scale-x={logoScale[0]} scale-y={logoScale[1]} scale-z={logoScale[2]}>
         <planeGeometry args={[2, 1]} />
         <meshBasicMaterial map={logoTexture} transparent opacity={1} />
       </mesh>
@@ -84,7 +84,9 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
       <mesh
         position-y={isPortrait ? -0.6 : -1.0}
-        scale={buttonScale}
+        scale-x={buttonScale[0]}
+        scale-y={buttonScale[1]}
+        scale-z={buttonScale[2]}
         onClick={onStart}
         onPointerEnter={() => {
           setIsHovered(true);
