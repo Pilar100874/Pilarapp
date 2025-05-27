@@ -34,7 +34,7 @@ export const Screen6 = () => {
         {/* Previous Button */}
         <mesh
           position={[-5, 0, 0]}
-          scale={[0.5, 0.5, 1]}
+          scale={[0.35, 0.35, 1]}
           rotation={[0, 0, Math.PI / 2]}
           onClick={handlePrevious}
           onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
@@ -47,7 +47,7 @@ export const Screen6 = () => {
         {/* Next Button */}
         <mesh
           position={[5, 0, 0]}
-          scale={[0.5, 0.5, 1]}
+          scale={[0.35, 0.35, 1]}
           rotation={[0, 0, -Math.PI / 2]}
           onClick={handleNext}
           onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
