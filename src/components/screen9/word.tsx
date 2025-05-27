@@ -17,13 +17,13 @@ export const Word = ({ index, value }: Word) => {
 
   // Calculate responsive font size (reduced by 30%)
   const isMobile = viewport.width < 5;
-  const baseFontSize = isMobile ? 0.157 : 0.21; // Original sizes (0.225 and 0.3) reduced by 30%
+  const baseFontSize = isMobile ? 0.11 : 0.147; // Original sizes (0.157 and 0.21) reduced by 30%
   
-  // Increase vertical spacing
-  const verticalSpacing = isMobile ? 1.8 : 2.4;
+  // Adjust vertical spacing proportionally
+  const verticalSpacing = isMobile ? 1.26 : 1.68; // Original spacing (1.8 and 2.4) reduced by 30%
 
   // Adjust text width for better readability
-  const maxWidth = isMobile ? 5 : 8;
+  const maxWidth = isMobile ? 3.5 : 5.6; // Original widths (5 and 8) reduced by 30%
 
   return (
     <Text
