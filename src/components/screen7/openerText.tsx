@@ -16,7 +16,7 @@ export const OpenerText = ({ py }: OpenerText) => {
         anchorX="center"
         anchorY="middle"
       >
-        HISTÓRIA 
+        NOSSA 
         <meshBasicMaterial depthTest={false} />
       </Text>
       <Text
@@ -29,7 +29,7 @@ export const OpenerText = ({ py }: OpenerText) => {
         anchorX="center"
         anchorY="middle"
       >
-        3 FÁBRICAS e 10 UNIDADES
+        HISTÓRIA
         <meshBasicMaterial depthTest={false} />
       </Text>
     </group>
