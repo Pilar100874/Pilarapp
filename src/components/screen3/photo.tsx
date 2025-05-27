@@ -1,4 +1,4 @@
-import { useScroll, useTexture, useThree } from '@react-three/fiber';
+import { useScroll, useTexture, useThree } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useRef, useState } from 'react';
 import { MathUtils, Mesh, PlaneGeometry } from 'three';

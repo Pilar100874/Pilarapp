@@ -39,4 +39,4 @@ export const Word = ({ index, value }: Word) => {
       <meshBasicMaterial transparent ref={refMaterial} side={DoubleSide} />
     </Text>
   );
-}
+};
