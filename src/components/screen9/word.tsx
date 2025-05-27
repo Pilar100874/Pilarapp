@@ -15,12 +15,15 @@ export const Word = ({ index, value }: Word) => {
   const refMaterial = useRef<MeshBasicMaterial>(null);
   const { viewport } = useThree();
 
-  // Calculate responsive font size
+  // Calculate responsive font size - reduced by 25%
   const isMobile = viewport.width < 5;
-  const baseFontSize = isMobile ? 0.3 : 0.4;
+  const baseFontSize = isMobile ? 0.225 : 0.3;
   
-  // Adjust vertical spacing for mobile
-  const verticalSpacing = isMobile ? 0.6 : 0.8;
+  // Adjust vertical spacing - reduced by 25%
+  const verticalSpacing = isMobile ? 0.45 : 0.6;
+
+  // Increase text width for better readability
+  const maxWidth = isMobile ? 6 : 10;
 
   return (
     <Text
@@ -32,7 +35,8 @@ export const Word = ({ index, value }: Word) => {
       font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
       anchorX="center"
       anchorY="middle"
-      maxWidth={isMobile ? 5 : 8}
+      maxWidth={maxWidth}
+      lineHeight={1.5}
     >
       {value}
       <meshBasicMaterial transparent ref={refMaterial} side={DoubleSide} opacity={1} />
