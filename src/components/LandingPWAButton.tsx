@@ -105,82 +105,8 @@ export const LandingPWAButton = () => {
   }
 
   return (
-    <button
-      onClick={handleInstallClick}
-      style={{
-        position: 'fixed',
-        bottom: isMobile ? '30px' : '40px',
-        right: isMobile ? '20px' : '30px',
-        zIndex: 1000,
-        width: isMobile ? '60px' : '70px',
-        height: isMobile ? '60px' : '70px',
-        borderRadius: '50%',
-        border: '3px solid rgba(255, 255, 255, 0.9)',
-        backgroundColor: 'rgba(0, 100, 200, 0.9)',
-        color: 'white',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: isMobile ? '14px' : '16px',
-        fontWeight: 'bold',
-        transition: 'all 0.3s ease',
-        backdropFilter: 'blur(15px)',
-        WebkitBackdropFilter: 'blur(15px)',
-        boxShadow: '0 6px 20px rgba(0, 100, 200, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2)',
-        outline: 'none',
-        WebkitTapHighlightColor: 'transparent',
-        touchAction: 'manipulation',
-        userSelect: 'none',
-        WebkitUserSelect: 'none',
-        backgroundImage: 'url(/ico.png)',
-        backgroundSize: '50%',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center',
-        animation: 'pulse 2s infinite',
-      }}
-      onTouchStart={(e) => e.preventDefault()}
-      onMouseEnter={(e) => {
-        if (!isMobile && !isTablet) {
-          e.currentTarget.style.transform = 'scale(1.1)';
-          e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 100, 200, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3)';
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!isMobile && !isTablet) {
-          e.currentTarget.style.transform = 'scale(1)';
-          e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 100, 200, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2)';
-        }
-      }}
-      title="Instalar App Pilar"
-      aria-label="Instalar aplicativo Pilar"
-    >
-      {/* Fallback icon and text */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        textAlign: 'center',
-        lineHeight: '1',
-      }}>
-        <span style={{ 
-          fontSize: isMobile ? '20px' : '24px',
-          marginBottom: '2px',
-        }}>
-          📱
-        </span>
-        <span style={{ 
-          fontSize: isMobile ? '8px' : '9px',
-          fontWeight: 'bold',
-          textShadow: '0 1px 2px rgba(0,0,0,0.5)',
-          opacity: 0.9,
-        }}>
-          INSTALAR
-        </span>
-      </div>
-      
-      <style jsx>{`
+    <>
+      <style>{`
         @keyframes pulse {
           0% {
             box-shadow: 0 6px 20px rgba(0, 100, 200, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
@@ -193,6 +119,81 @@ export const LandingPWAButton = () => {
           }
         }
       `}</style>
-    </button>
+      <button
+        onClick={handleInstallClick}
+        style={{
+          position: 'fixed',
+          bottom: isMobile ? '30px' : '40px',
+          right: isMobile ? '20px' : '30px',
+          zIndex: 1000,
+          width: isMobile ? '60px' : '70px',
+          height: isMobile ? '60px' : '70px',
+          borderRadius: '50%',
+          border: '3px solid rgba(255, 255, 255, 0.9)',
+          backgroundColor: 'rgba(0, 100, 200, 0.9)',
+          color: 'white',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: isMobile ? '14px' : '16px',
+          fontWeight: 'bold',
+          transition: 'all 0.3s ease',
+          backdropFilter: 'blur(15px)',
+          WebkitBackdropFilter: 'blur(15px)',
+          boxShadow: '0 6px 20px rgba(0, 100, 200, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2)',
+          outline: 'none',
+          WebkitTapHighlightColor: 'transparent',
+          touchAction: 'manipulation',
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+          backgroundImage: 'url(/ico.png)',
+          backgroundSize: '50%',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center',
+          animation: 'pulse 2s infinite',
+        }}
+        onTouchStart={(e) => e.preventDefault()}
+        onMouseEnter={(e) => {
+          if (!isMobile && !isTablet) {
+            e.currentTarget.style.transform = 'scale(1.1)';
+            e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 100, 200, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isMobile && !isTablet) {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 100, 200, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2)';
+          }
+        }}
+        title="Instalar App Pilar"
+        aria-label="Instalar aplicativo Pilar"
+      >
+        {/* Fallback icon and text */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+          lineHeight: '1',
+        }}>
+          <span style={{ 
+            fontSize: isMobile ? '20px' : '24px',
+            marginBottom: '2px',
+          }}>
+            📱
+          </span>
+          <span style={{ 
+            fontSize: isMobile ? '8px' : '9px',
+            fontWeight: 'bold',
+            textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+            opacity: 0.9,
+          }}>
+            INSTALAR
+          </span>
+        </div>
+      </button>
+    </>
   );
 };
