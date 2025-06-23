@@ -2,6 +2,7 @@ import { Text, useTexture, useScroll } from "@react-three/drei";
 import { useFrame, useThree } from '@react-three/fiber';
 import { useRef, useState } from "react";
 import { MeshBasicMaterial } from "three";
+import { useResponsiveText } from '@/utils/responsive';
 
 type OpenerText = {
   py: number;
@@ -18,14 +19,17 @@ export const OpenerText = ({ py }: OpenerText) => {
   const arrowRef = useRef<any>();
   const [startFade, setStartFade] = useState(false);
   const scroll = useScroll();
-  const { viewport } = useThree();
+  const { getFontSize, getSpacing, isMobile } = useResponsiveText();
 
-  // Calculate responsive sizes
-  const isMobile = viewport.width < 5;
-  const text1Size = isMobile ? 0.25 : 0.35;
-  const text2Size = isMobile ? 0.6 : 0.84;
-  const arrowScale = isMobile ? [0.35, 0.35, 1] as [number, number, number] : [0.5, 0.5, 1] as [number, number, number];
-  const arrowY = isMobile ? -2.4 : -3.4;
+  // Responsive font sizes
+  const text1Size = getFontSize(0.2, 0.28, 0.35);
+  const text2Size = getFontSize(0.45, 0.65, 0.84);
+  const arrowScale = [
+    getFontSize(0.3, 0.4, 0.5),
+    getFontSize(0.3, 0.4, 0.5),
+    1
+  ] as [number, number, number];
+  const arrowY = getSpacing(-2.0, -2.7, -3.4);
 
   useFrame((state) => {
     if (!logoRef.current?.material || !text1Ref.current?.material || 
@@ -71,8 +75,8 @@ export const OpenerText = ({ py }: OpenerText) => {
     <group position-y={py}>
       <mesh 
         ref={logoRef}
-        position-y={1.25} 
-        scale={[1.5, 1.5, 1]}
+        position-y={getSpacing(1.0, 1.15, 1.25)} 
+        scale={[getFontSize(1.2, 1.35, 1.5), getFontSize(1.2, 1.35, 1.5), 1]}
       >
         <planeGeometry args={[2, 1]} />
         <meshBasicMaterial 
@@ -106,7 +110,7 @@ export const OpenerText = ({ py }: OpenerText) => {
             fontSize={text2Size}
             letterSpacing={0.005}
             position-z={0.1}
-            position-y={-0.75}
+            position-y={getSpacing(-0.6, -0.7, -0.75)}
             textAlign={"left"}
             font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
             anchorX="center"
@@ -120,7 +124,7 @@ export const OpenerText = ({ py }: OpenerText) => {
             fontSize={text2Size}
             letterSpacing={0.005}
             position-z={0.1}
-            position-y={-1.5}
+            position-y={getSpacing(-1.2, -1.4, -1.5)}
             textAlign={"left"}
             font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
             anchorX="center"
@@ -134,7 +138,7 @@ export const OpenerText = ({ py }: OpenerText) => {
             fontSize={text2Size}
             letterSpacing={0.005}
             position-z={0.1}
-            position-y={-2.25}
+            position-y={getSpacing(-1.8, -2.1, -2.25)}
             textAlign={"left"}
             font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
             anchorX="center"
@@ -150,7 +154,7 @@ export const OpenerText = ({ py }: OpenerText) => {
           fontSize={text2Size}
           letterSpacing={0.005}
           position-z={0.1}
-          position-y={-0.75}
+          position-y={getSpacing(-0.6, -0.7, -0.75)}
           textAlign={"left"}
           font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
           anchorX="center"

@@ -3,7 +3,7 @@ import { SCREEN10_OFFSET_START_Y } from './constants';
 import { useRef } from 'react';
 import { DoubleSide, Mesh, MeshBasicMaterial } from 'three';
 import { dataScreen10 } from './data';
-import { useThree } from '@react-three/fiber';
+import { useResponsiveText } from '@/utils/responsive';
 
 type Word = {
   value: string;
@@ -13,17 +13,16 @@ type Word = {
 export const Word = ({ index, value }: Word) => {
   const ref = useRef<Mesh>(null);
   const refMaterial = useRef<MeshBasicMaterial>(null);
-  const { viewport } = useThree();
+  const { getFontSize, getSpacing } = useResponsiveText();
 
-  // Calculate responsive font size with 10% reduction
-  const isMobile = viewport.width < 5;
-  const baseFontSize = isMobile ? 0.54 : 0.765; // Base size reduced by 10%
+  // Responsive font sizes
+  const baseFontSize = getFontSize(0.45, 0.65, 0.765);
   const fontSize = value === 'ALGUNS' 
-    ? (isMobile ? 0.36 : 0.535) // 'ALGUNS' size reduced by 10%
+    ? getFontSize(0.3, 0.45, 0.535)
     : baseFontSize;
 
-  // Adjust vertical spacing for mobile
-  const verticalSpacing = isMobile ? 0.9 : 1.1;
+  // Responsive vertical spacing
+  const verticalSpacing = getSpacing(0.7, 0.9, 1.1);
 
   return (
     <Text

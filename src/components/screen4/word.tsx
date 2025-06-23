@@ -1,9 +1,10 @@
 import { Text, useScroll } from '@react-three/drei';
 import { SCREEN4_OFFSET_START_Y } from './constants';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
 import { DoubleSide, MathUtils, Mesh, MeshBasicMaterial } from 'three';
 import { dataScreen4 } from './data';
+import { useResponsiveText } from '@/utils/responsive';
 
 type Word = {
   value: string;
@@ -14,19 +15,16 @@ export const Word = ({ index, value }: Word) => {
   const scroll = useScroll();
   const ref = useRef<Mesh>(null);
   const refMaterial = useRef<MeshBasicMaterial>(null);
-  const { viewport } = useThree();
+  const { getFontSize, getSpacing } = useResponsiveText();
 
-  // Calculate responsive font size with additional 10% reduction
-  const isMobile = viewport.width < 5;
-  const baseFontSize = isMobile ? 0.54 : 0.765; // Reduced by 10% from previous values (0.6 and 0.85)
-  
-  // Special case for longer text, also reduced by 10%
+  // Responsive font sizes with special case for longer text
+  const baseFontSize = getFontSize(0.45, 0.65, 0.765);
   const fontSize = value === 'BOBINAS INDUSTRIAIS' 
-    ? (isMobile ? 0.405 : 0.585) // Reduced by 10% from previous values (0.45 and 0.65)
+    ? getFontSize(0.35, 0.5, 0.585)
     : baseFontSize;
   
-  // Adjust vertical spacing for mobile
-  const verticalSpacing = isMobile ? 0.9 : 1.1;
+  // Responsive vertical spacing
+  const verticalSpacing = getSpacing(0.7, 0.9, 1.1);
 
   useFrame(() => {
     if (!ref.current || !refMaterial.current) {

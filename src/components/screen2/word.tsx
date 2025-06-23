@@ -1,9 +1,10 @@
 import { Text, useScroll } from '@react-three/drei';
 import { SCREEN2_OFFSET_START_Y } from './constants';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
 import { DoubleSide, MathUtils, Mesh, MeshBasicMaterial } from 'three';
 import { dataScreen2 } from './data';
+import { useResponsiveText } from '@/utils/responsive';
 
 type Word = {
   value: string;
@@ -14,15 +15,14 @@ export const Word = ({ index, value }: Word) => {
   const scroll = useScroll();
   const ref = useRef<Mesh>(null);
   const refMaterial = useRef<MeshBasicMaterial>(null);
-  const { viewport } = useThree();
+  const { getFontSize, getSpacing } = useResponsiveText();
 
-  // Calculate responsive font size
-  const isMobile = viewport.width < 5;
-  const baseFontSize = isMobile ? 0.75 : 1.05;
+  // Responsive font sizes
+  const baseFontSize = getFontSize(0.6, 0.85, 1.05);
   const fontSize = value === '27' ? baseFontSize * 1.2 : baseFontSize;
   
-  // Adjust vertical spacing for mobile
-  const verticalSpacing = isMobile ? 0.9 : 1.1;
+  // Responsive vertical spacing
+  const verticalSpacing = getSpacing(0.7, 0.9, 1.1);
 
   useFrame(() => {
     if (!ref.current || !refMaterial.current) {

@@ -1,7 +1,8 @@
 import { Text } from '@react-three/drei';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { useRef, useState } from 'react';
 import { Shape, ShapeGeometry, Group } from 'three';
+import { useResponsiveText } from '@/utils/responsive';
 
 // Function to create rounded rectangle shape
 const createRoundedRectShape = (width: number, height: number, radius: number) => {
@@ -25,14 +26,13 @@ const createRoundedRectShape = (width: number, height: number, radius: number) =
 export const ShopButton = () => {
   const buttonRef = useRef<Group>(null);
   const [isHovered, setIsHovered] = useState(false);
-  const { viewport } = useThree();
+  const { getFontSize, getSpacing } = useResponsiveText();
 
   // Responsive configuration
-  const isMobile = viewport.width < 5;
-  const buttonWidth = isMobile ? 2.5 : 3.5;
-  const buttonHeight = isMobile ? 0.6 : 0.8;
-  const fontSize = isMobile ? 0.18 : 0.25;
-  const borderRadius = 0.12;
+  const buttonWidth = getFontSize(2.0, 2.8, 3.5);
+  const buttonHeight = getFontSize(0.5, 0.65, 0.8);
+  const fontSize = getFontSize(0.15, 0.2, 0.25);
+  const borderRadius = getFontSize(0.08, 0.1, 0.12);
 
   // Create rounded rectangle geometry for button
   const roundedShape = createRoundedRectShape(buttonWidth, buttonHeight, borderRadius);
@@ -46,9 +46,11 @@ export const ShopButton = () => {
     buttonRef.current.scale.x = buttonRef.current.scale.x + (targetScale - buttonRef.current.scale.x) * 0.1;
     buttonRef.current.scale.y = buttonRef.current.scale.y + (targetScale - buttonRef.current.scale.y) * 0.1;
 
-    // Subtle floating animation - moved down 32cm total (3.2 units)
+    // Subtle floating animation with responsive positioning
     const time = Date.now() * 0.001;
-    buttonRef.current.position.y = Math.sin(time) * 0.05 - 3.2;
+    const floatOffset = Math.sin(time) * 0.05;
+    const baseOffset = getSpacing(-2.5, -2.9, -3.2);
+    buttonRef.current.position.y = floatOffset + baseOffset;
   });
 
   const handleClick = () => {
