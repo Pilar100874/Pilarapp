@@ -19,21 +19,29 @@ export const Word = ({ index, value }: Word) => {
 
   // Responsive font sizes with special case for longer text and orientation
   const baseFontSize = getFontSize(0.45, 0.4, 0.55, 0.65, 0.765);
-  const fontSize = value === 'BOBINAS INDUSTRIAIS' 
+  const fontSize = value === 'BOBINAS INDUSTRIAIS' || value === 'INSUMOS GRÁFICOS'
     ? getFontSize(0.35, 0.3, 0.42, 0.5, 0.585)
     : baseFontSize;
   
-  // Responsive vertical spacing with orientation
-  const verticalSpacing = getSpacing(0.7, 0.6, 0.8, 0.9, 1.1);
+  // Responsive vertical spacing with orientation - increased spacing to prevent overlap
+  const verticalSpacing = getSpacing(0.8, 0.7, 0.9, 1.0, 1.2);
 
   useFrame(() => {
     if (!ref.current || !refMaterial.current) {
       return;
     }
 
-    const rotY = scroll.offset * 5 - Math.abs(dataScreen4.length - index) * 0.25 - Math.PI / 8;
+    // Adjusted animation parameters to ensure all texts appear
+    const scrollProgress = scroll.offset;
+    const itemProgress = (scrollProgress * 8) - (Math.abs(dataScreen4.length - index) * 0.2);
+    
+    // More forgiving opacity calculation to ensure visibility
+    const rotY = itemProgress - Math.PI / 8;
     ref.current.rotation.y = rotY;
-    refMaterial.current.opacity = MathUtils.clamp(Math.pow(rotY + 1, 20), -Infinity, 1);
+    
+    // Improved opacity calculation with better visibility range
+    const opacityFactor = Math.pow(Math.max(0, rotY + 1.2), 15);
+    refMaterial.current.opacity = MathUtils.clamp(opacityFactor, 0, 1);
   });
 
   return (

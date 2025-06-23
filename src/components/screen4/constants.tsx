@@ -1,1 +1,1 @@
-export const SCREEN4_OFFSET_START_Y = -25;
+export const SCREEN4_OFFSET_START_Y = -23; // Moved up by 2 units to give more space for all texts
