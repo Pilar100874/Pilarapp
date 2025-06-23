@@ -102,7 +102,7 @@ export const PWAInstallButton = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: '16px',
+        fontSize: '20px',
         transition: 'all 0.3s ease',
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
@@ -112,23 +112,12 @@ export const PWAInstallButton = () => {
         touchAction: 'manipulation',
         userSelect: 'none',
         WebkitUserSelect: 'none',
-        backgroundImage: 'url(/ico.png)',
-        backgroundSize: '60%',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center',
       }}
       onTouchStart={(e) => e.preventDefault()}
       title="Instalar App"
       aria-label="Instalar aplicativo"
     >
-      {/* Fallback icon if background image doesn't load */}
-      <span style={{ 
-        fontSize: '12px', 
-        opacity: 0.8,
-        textShadow: '0 1px 2px rgba(0,0,0,0.5)'
-      }}>
-        📱
-      </span>
+      📱
     </button>
   );
 };
