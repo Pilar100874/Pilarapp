@@ -5,7 +5,6 @@ import { AudioControls } from '@/components/AudioControls';
 
 function App() {
   const [started, setStarted] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const handleStart = () => {
     setStarted(true);

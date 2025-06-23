@@ -11,11 +11,13 @@ import { Screen8 } from '@/components/screen8';
 import { Screen9 } from '@/components/screen9';
 import { Screen10 } from '@/components/screen10';
 import { Screen11 } from '@/components/screen11';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 export const Scene = () => {
   const [aspectRatio, setAspectRatio] = useState(window.innerWidth / window.innerHeight);
   const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait');
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [musicStarted, setMusicStarted] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -37,6 +39,52 @@ export const Scene = () => {
       window.removeEventListener('orientationchange', handleOrientationChange);
     };
   }, []);
+
+  // Auto-start music when Scene component mounts
+  useEffect(() => {
+    if (!musicStarted) {
+      // Initialize audio
+      audioRef.current = new Audio('/musica.mp3');
+      audioRef.current.loop = true;
+      audioRef.current.volume = 0.7;
+      audioRef.current.preload = 'auto';
+
+      const startMusic = async () => {
+        if (audioRef.current) {
+          try {
+            console.log('Auto-starting music in opener...');
+            await audioRef.current.play();
+            console.log('Music started successfully in opener');
+            setMusicStarted(true);
+          } catch (error) {
+            console.warn('Failed to auto-start music:', error);
+            // Try again after a short delay
+            setTimeout(async () => {
+              try {
+                if (audioRef.current) {
+                  await audioRef.current.play();
+                  console.log('Music started on retry in opener');
+                  setMusicStarted(true);
+                }
+              } catch (retryError) {
+                console.error('Music start retry failed in opener:', retryError);
+              }
+            }, 500);
+          }
+        }
+      };
+
+      // Start music immediately
+      startMusic();
+    }
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+      }
+    };
+  }, [musicStarted]);
 
   // Adjust damping and distance based on aspect ratio and orientation
   const isLandscape = orientation === 'landscape';

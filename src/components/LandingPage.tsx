@@ -1,6 +1,6 @@
 import { Text, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { MeshBasicMaterial } from 'three';
 import { useResponsiveText } from '@/utils/responsive';
 
@@ -11,26 +11,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const textRef = useRef<any>();
   const materialRef = useRef<MeshBasicMaterial | null>(null);
   const [animationComplete, setAnimationComplete] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const { getFontSize, getSpacing, getScale, isMobile } = useResponsiveText();
-
-  // Initialize audio
-  useEffect(() => {
-    audioRef.current = new Audio('/musica.mp3');
-    audioRef.current.loop = true;
-    audioRef.current.volume = 0.7;
-    audioRef.current.preload = 'auto';
-    
-    // Load the audio
-    audioRef.current.load();
-
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = '';
-      }
-    };
-  }, []);
 
   // Responsive scaling with orientation consideration
   const logoScale = [
@@ -70,32 +51,9 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
     }
   }, [isMobile]);
 
-  const handleClick = useCallback(async (event: any) => {
+  const handleClick = useCallback((event: any) => {
     event.stopPropagation();
-    
-    // Start the music
-    if (audioRef.current) {
-      try {
-        console.log('Starting music...');
-        await audioRef.current.play();
-        console.log('Music started successfully');
-      } catch (error) {
-        console.warn('Failed to start music:', error);
-        // Try again after a short delay
-        setTimeout(async () => {
-          try {
-            if (audioRef.current) {
-              await audioRef.current.play();
-              console.log('Music started on retry');
-            }
-          } catch (retryError) {
-            console.error('Music start retry failed:', retryError);
-          }
-        }, 100);
-      }
-    }
-    
-    // Start the experience
+    // Just start the experience - music will start automatically in the opener
     onStart();
   }, [onStart]);
 
