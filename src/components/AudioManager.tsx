@@ -43,7 +43,6 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
       audioRef.current.loop = true;
       audioRef.current.volume = 0.7;
       audioRef.current.preload = isMobile ? 'none' : 'metadata'; // Don't preload on mobile
-      audioRef.current.playsInline = true; // Important for iOS
       audioRef.current.muted = false;
 
       const audio = audioRef.current;
