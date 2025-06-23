@@ -1,7 +1,8 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Scene } from '@/components/Scene';
 import { LandingScene } from '@/components/LandingScene';
 import { AudioControls } from '@/components/AudioControls';
+import { AudioProvider } from '@/components/AudioManager';
 
 function App() {
   const [started, setStarted] = useState(false);
@@ -11,7 +12,7 @@ function App() {
   };
 
   return (
-    <>
+    <AudioProvider>
       <a 
         href="https://www.pilar.com.br"
         style={{
@@ -42,7 +43,7 @@ function App() {
       ) : (
         <LandingScene onStart={handleStart} />
       )}
-    </>
+    </AudioProvider>
   );
 }
 

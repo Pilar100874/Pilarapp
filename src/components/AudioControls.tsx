@@ -1,14 +1,8 @@
-import { useCallback, useRef, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
+import { useAudio } from '@/components/AudioManager';
 
-interface AudioControlsProps {
-  audioRef?: React.MutableRefObject<HTMLAudioElement | null>;
-}
-
-export const AudioControls = ({ audioRef: externalAudioRef }: AudioControlsProps = {}) => {
-  const internalAudioRef = useRef<HTMLAudioElement | null>(null);
-  const audioRef = externalAudioRef || internalAudioRef;
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
+export const AudioControls = () => {
+  const { isPlaying, isLoaded, toggle } = useAudio();
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -20,131 +14,18 @@ export const AudioControls = ({ audioRef: externalAudioRef }: AudioControlsProps
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
-    // Only create audio if no external ref is provided
-    if (!externalAudioRef) {
-      audioRef.current = new Audio('/musica.mp3');
-      audioRef.current.loop = true;
-      audioRef.current.volume = 0.7;
-      audioRef.current.preload = 'auto';
-    }
-
-    if (audioRef.current) {
-      const audio = audioRef.current;
-
-      // Event listeners
-      const handleCanPlayThrough = () => {
-        console.log('Audio loaded successfully');
-        setIsLoaded(true);
-      };
-      
-      const handlePlay = () => {
-        console.log('Audio started playing');
-        setIsPlaying(true);
-      };
-      
-      const handlePause = () => {
-        console.log('Audio paused');
-        setIsPlaying(false);
-      };
-      
-      const handleEnded = () => {
-        console.log('Audio ended');
-        setIsPlaying(false);
-      };
-
-      const handleError = (e: Event) => {
-        console.error('Audio error:', e);
-      };
-
-      const handleLoadStart = () => {
-        console.log('Audio load started');
-      };
-
-      audio.addEventListener('canplaythrough', handleCanPlayThrough);
-      audio.addEventListener('play', handlePlay);
-      audio.addEventListener('pause', handlePause);
-      audio.addEventListener('ended', handleEnded);
-      audio.addEventListener('error', handleError);
-      audio.addEventListener('loadstart', handleLoadStart);
-
-      // Start loading audio if it's our internal audio
-      if (!externalAudioRef) {
-        audio.load();
-      }
-
-      // Check if audio is already playing (in case of external ref)
-      if (!audio.paused) {
-        setIsPlaying(true);
-      }
-
-      return () => {
-        window.removeEventListener('resize', checkMobile);
-        audio.removeEventListener('canplaythrough', handleCanPlayThrough);
-        audio.removeEventListener('play', handlePlay);
-        audio.removeEventListener('pause', handlePause);
-        audio.removeEventListener('ended', handleEnded);
-        audio.removeEventListener('error', handleError);
-        audio.removeEventListener('loadstart', handleLoadStart);
-        
-        // Only cleanup if it's our internal audio
-        if (!externalAudioRef) {
-          audio.pause();
-          audio.src = '';
-        }
-      };
-    }
-
     return () => {
       window.removeEventListener('resize', checkMobile);
     };
-  }, [externalAudioRef]);
+  }, []);
 
   const handleToggle = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
-    if (!audioRef.current) {
-      console.warn('Audio element not available');
-      return;
-    }
-
-    try {
-      if (isPlaying) {
-        console.log('Pausing audio...');
-        audioRef.current.pause();
-      } else {
-        console.log('Playing audio...');
-        // For mobile, we need to ensure the audio is ready
-        if (audioRef.current.readyState < 2) {
-          await new Promise((resolve) => {
-            const onCanPlay = () => {
-              audioRef.current?.removeEventListener('canplay', onCanPlay);
-              resolve(void 0);
-            };
-            audioRef.current?.addEventListener('canplay', onCanPlay);
-          });
-        }
-        await audioRef.current.play();
-      }
-    } catch (error) {
-      console.error('Audio toggle failed:', error);
-      // Try to reload and play again on mobile
-      if (isMobile && !isPlaying) {
-        try {
-          audioRef.current.load();
-          setTimeout(async () => {
-            try {
-              await audioRef.current?.play();
-            } catch (retryError) {
-              console.error('Retry failed:', retryError);
-            }
-          }, 500);
-        } catch (reloadError) {
-          console.error('Reload failed:', reloadError);
-        }
-      }
-    }
-  }, [isPlaying, isMobile]);
+    console.log('Audio control clicked, current state:', { isPlaying, isLoaded });
+    await toggle();
+  }, [toggle, isPlaying, isLoaded]);
 
   // Enhanced touch handling for mobile
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
