@@ -28,11 +28,11 @@ export const ShopButton = () => {
   const [isHovered, setIsHovered] = useState(false);
   const { getFontSize, getSpacing } = useResponsiveText();
 
-  // Responsive configuration
-  const buttonWidth = getFontSize(2.0, 2.8, 3.5);
-  const buttonHeight = getFontSize(0.5, 0.65, 0.8);
-  const fontSize = getFontSize(0.15, 0.2, 0.25);
-  const borderRadius = getFontSize(0.08, 0.1, 0.12);
+  // Responsive configuration with orientation consideration
+  const buttonWidth = getFontSize(2.0, 2.5, 2.4, 2.8, 3.5);
+  const buttonHeight = getFontSize(0.5, 0.45, 0.55, 0.65, 0.8);
+  const fontSize = getFontSize(0.15, 0.13, 0.17, 0.2, 0.25);
+  const borderRadius = getFontSize(0.08, 0.07, 0.09, 0.1, 0.12);
 
   // Create rounded rectangle geometry for button
   const roundedShape = createRoundedRectShape(buttonWidth, buttonHeight, borderRadius);
@@ -49,7 +49,7 @@ export const ShopButton = () => {
     // Subtle floating animation with responsive positioning
     const time = Date.now() * 0.001;
     const floatOffset = Math.sin(time) * 0.05;
-    const baseOffset = getSpacing(-2.5, -2.9, -3.2);
+    const baseOffset = getSpacing(-2.5, -2.0, -2.7, -2.9, -3.2);
     buttonRef.current.position.y = floatOffset + baseOffset;
   });
 

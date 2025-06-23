@@ -19,22 +19,26 @@ export const OpenerText = ({ py }: OpenerText) => {
   const arrowRef = useRef<any>();
   const [startFade, setStartFade] = useState(false);
   const scroll = useScroll();
-  const { getFontSize, getSpacing, isMobile } = useResponsiveText();
+  const { getFontSize, getSpacing, getScale, isMobileLandscape } = useResponsiveText();
 
-  // Responsive font sizes
-  const text1Size = getFontSize(0.2, 0.28, 0.35);
-  const text2Size = getFontSize(0.45, 0.65, 0.84);
+  // Responsive font sizes with orientation consideration
+  const text1Size = getFontSize(0.2, 0.18, 0.25, 0.28, 0.35);
+  const text2Size = getFontSize(0.45, 0.4, 0.55, 0.65, 0.84);
+  
+  // Arrow scale with orientation
   const arrowScale = [
-    getFontSize(0.3, 0.4, 0.5),
-    getFontSize(0.3, 0.4, 0.5),
+    getScale(0.3, 0.25, 0.35, 0.4, 0.5),
+    getScale(0.3, 0.25, 0.35, 0.4, 0.5),
     1
   ] as [number, number, number];
-  const arrowY = getSpacing(-2.0, -2.7, -3.4);
+  
+  // Arrow position with orientation
+  const arrowY = getSpacing(-2.0, -1.5, -2.4, -2.7, -3.4);
 
   useFrame((state) => {
     if (!logoRef.current?.material || !text1Ref.current?.material || 
         !text2Ref.current?.material || !arrowRef.current?.material ||
-        (isMobile && (!text3Ref.current?.material || !text4Ref.current?.material))) return;
+        (isMobileLandscape && (!text3Ref.current?.material || !text4Ref.current?.material))) return;
 
     if (state.clock.getElapsedTime() > 1 && !startFade) {
       setStartFade(true);
@@ -47,7 +51,7 @@ export const OpenerText = ({ py }: OpenerText) => {
       logoRef.current.material.opacity = opacity;
       text1Ref.current.material.opacity = opacity;
       text2Ref.current.material.opacity = opacity;
-      if (isMobile) {
+      if (isMobileLandscape) {
         text3Ref.current.material.opacity = opacity;
         text4Ref.current.material.opacity = opacity;
       }
@@ -56,7 +60,7 @@ export const OpenerText = ({ py }: OpenerText) => {
       logoRef.current.material.opacity = 0;
       text1Ref.current.material.opacity = 0;
       text2Ref.current.material.opacity = 0;
-      if (isMobile) {
+      if (isMobileLandscape) {
         text3Ref.current.material.opacity = 0;
         text4Ref.current.material.opacity = 0;
       }
@@ -75,8 +79,12 @@ export const OpenerText = ({ py }: OpenerText) => {
     <group position-y={py}>
       <mesh 
         ref={logoRef}
-        position-y={getSpacing(1.0, 1.15, 1.25)} 
-        scale={[getFontSize(1.2, 1.35, 1.5), getFontSize(1.2, 1.35, 1.5), 1]}
+        position-y={getSpacing(1.0, 0.8, 1.1, 1.15, 1.25)} 
+        scale={[
+          getScale(1.2, 1.0, 1.3, 1.35, 1.5), 
+          getScale(1.2, 1.0, 1.3, 1.35, 1.5), 
+          1
+        ]}
       >
         <planeGeometry args={[2, 1]} />
         <meshBasicMaterial 
@@ -103,14 +111,14 @@ export const OpenerText = ({ py }: OpenerText) => {
         <meshBasicMaterial transparent opacity={0} depthTest={false} />
       </Text>
 
-      {isMobile ? (
+      {isMobileLandscape ? (
         <>
           <Text
             ref={text2Ref}
             fontSize={text2Size}
             letterSpacing={0.005}
             position-z={0.1}
-            position-y={getSpacing(-0.6, -0.7, -0.75)}
+            position-y={getSpacing(-0.6, -0.4, -0.65, -0.7, -0.75)}
             textAlign={"left"}
             font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
             anchorX="center"
@@ -124,7 +132,7 @@ export const OpenerText = ({ py }: OpenerText) => {
             fontSize={text2Size}
             letterSpacing={0.005}
             position-z={0.1}
-            position-y={getSpacing(-1.2, -1.4, -1.5)}
+            position-y={getSpacing(-1.2, -0.8, -1.3, -1.4, -1.5)}
             textAlign={"left"}
             font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
             anchorX="center"
@@ -138,7 +146,7 @@ export const OpenerText = ({ py }: OpenerText) => {
             fontSize={text2Size}
             letterSpacing={0.005}
             position-z={0.1}
-            position-y={getSpacing(-1.8, -2.1, -2.25)}
+            position-y={getSpacing(-1.8, -1.2, -1.95, -2.1, -2.25)}
             textAlign={"left"}
             font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
             anchorX="center"
@@ -154,7 +162,7 @@ export const OpenerText = ({ py }: OpenerText) => {
           fontSize={text2Size}
           letterSpacing={0.005}
           position-z={0.1}
-          position-y={getSpacing(-0.6, -0.7, -0.75)}
+          position-y={getSpacing(-0.6, -0.5, -0.65, -0.7, -0.75)}
           textAlign={"left"}
           font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
           anchorX="center"

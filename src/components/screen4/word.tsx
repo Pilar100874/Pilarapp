@@ -17,14 +17,14 @@ export const Word = ({ index, value }: Word) => {
   const refMaterial = useRef<MeshBasicMaterial>(null);
   const { getFontSize, getSpacing } = useResponsiveText();
 
-  // Responsive font sizes with special case for longer text
-  const baseFontSize = getFontSize(0.45, 0.65, 0.765);
+  // Responsive font sizes with special case for longer text and orientation
+  const baseFontSize = getFontSize(0.45, 0.4, 0.55, 0.65, 0.765);
   const fontSize = value === 'BOBINAS INDUSTRIAIS' 
-    ? getFontSize(0.35, 0.5, 0.585)
+    ? getFontSize(0.35, 0.3, 0.42, 0.5, 0.585)
     : baseFontSize;
   
-  // Responsive vertical spacing
-  const verticalSpacing = getSpacing(0.7, 0.9, 1.1);
+  // Responsive vertical spacing with orientation
+  const verticalSpacing = getSpacing(0.7, 0.6, 0.8, 0.9, 1.1);
 
   useFrame(() => {
     if (!ref.current || !refMaterial.current) {

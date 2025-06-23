@@ -11,20 +11,30 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const textRef = useRef<any>();
   const materialRef = useRef<MeshBasicMaterial | null>(null);
   const [animationComplete, setAnimationComplete] = useState(false);
-  const { getFontSize, getSpacing, isMobile } = useResponsiveText();
+  const { getFontSize, getSpacing, getScale } = useResponsiveText();
 
-  // Responsive scaling
+  // Responsive scaling with orientation consideration
   const logoScale = [
-    getFontSize(0.8, 1.2, 1.5),
-    getFontSize(0.8, 1.2, 1.5),
+    getScale(0.8, 0.7, 1.0, 1.2, 1.5),
+    getScale(0.8, 0.7, 1.0, 1.2, 1.5),
     1
   ] as [number, number, number];
   
-  const fontSize = getFontSize(0.3, 0.45, 0.6);
+  // Font size with orientation adjustments
+  const fontSize = getFontSize(0.3, 0.25, 0.4, 0.45, 0.6);
   
+  // Button scale with hover and orientation
   const buttonScale = (isHovered 
-    ? [getFontSize(1.3, 1.8, 2.16), getFontSize(0.325, 0.45, 0.54), 1]
-    : [getFontSize(1.2, 1.65, 1.98), getFontSize(0.3, 0.4125, 0.495), 1]) as [number, number, number];
+    ? [
+        getFontSize(1.3, 1.1, 1.6, 1.8, 2.16), 
+        getFontSize(0.325, 0.275, 0.4, 0.45, 0.54), 
+        1
+      ]
+    : [
+        getFontSize(1.2, 1.0, 1.45, 1.65, 1.98), 
+        getFontSize(0.3, 0.25, 0.3625, 0.4125, 0.495), 
+        1
+      ]) as [number, number, number];
 
   useFrame((state) => {
     if (!textRef.current || animationComplete) return;
@@ -43,7 +53,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
   return (
     <group position-y={0}>
-      <mesh position-y={getSpacing(0.8, 1.2, 1.5)} scale={logoScale}>
+      <mesh position-y={getSpacing(0.8, 0.6, 1.0, 1.2, 1.5)} scale={logoScale}>
         <planeGeometry args={[2, 1]} />
         <meshBasicMaterial map={logoTexture} transparent opacity={1} />
       </mesh>
@@ -53,7 +63,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         fontSize={fontSize}
         letterSpacing={0.005}
         position-z={0.1}
-        position-y={getSpacing(-0.1, -0.05, 0)}
+        position-y={getSpacing(-0.1, -0.15, -0.05, 0, 0)}
         font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
         anchorX="center"
         anchorY="middle"
@@ -63,7 +73,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
       </Text>
 
       <mesh
-        position-y={getSpacing(-0.6, -0.8, -1.0)}
+        position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}
         scale={buttonScale}
         onClick={onStart}
         onPointerEnter={() => {

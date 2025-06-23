@@ -17,12 +17,12 @@ export const Word = ({ index, value }: Word) => {
   const refMaterial = useRef<MeshBasicMaterial>(null);
   const { getFontSize, getSpacing } = useResponsiveText();
 
-  // Responsive font sizes
-  const baseFontSize = getFontSize(0.6, 0.85, 1.05);
+  // Responsive font sizes with orientation consideration
+  const baseFontSize = getFontSize(0.6, 0.5, 0.75, 0.85, 1.05);
   const fontSize = value === '27' ? baseFontSize * 1.2 : baseFontSize;
   
-  // Responsive vertical spacing
-  const verticalSpacing = getSpacing(0.7, 0.9, 1.1);
+  // Responsive vertical spacing with orientation
+  const verticalSpacing = getSpacing(0.7, 0.6, 0.8, 0.9, 1.1);
 
   useFrame(() => {
     if (!ref.current || !refMaterial.current) {

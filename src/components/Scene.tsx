@@ -15,19 +15,41 @@ import { useEffect, useState } from 'react';
 
 export const Scene = () => {
   const [aspectRatio, setAspectRatio] = useState(window.innerWidth / window.innerHeight);
+  const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait');
 
   useEffect(() => {
     const handleResize = () => {
-      setAspectRatio(window.innerWidth / window.innerHeight);
+      const newAspectRatio = window.innerWidth / window.innerHeight;
+      setAspectRatio(newAspectRatio);
+      setOrientation(newAspectRatio > 1 ? 'landscape' : 'portrait');
+    };
+
+    const handleOrientationChange = () => {
+      // Small delay to ensure dimensions are updated after orientation change
+      setTimeout(handleResize, 100);
     };
 
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleOrientationChange);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleOrientationChange);
+    };
   }, []);
 
-  // Adjust damping and distance based on aspect ratio
-  const damping = aspectRatio < 1 ? 0.5 : 0.35; // More damping on mobile
-  const distance = aspectRatio < 1 ? 0.35 : 0.25; // More distance on mobile
+  // Adjust damping and distance based on aspect ratio and orientation
+  const isLandscape = orientation === 'landscape';
+  const isMobile = aspectRatio < 1.5; // More conservative mobile detection
+  
+  // Enhanced scroll controls based on device and orientation
+  const damping = isMobile 
+    ? (isLandscape ? 0.6 : 0.5) // More damping in mobile landscape
+    : 0.35;
+    
+  const distance = isMobile 
+    ? (isLandscape ? 0.4 : 0.35) // More distance in mobile landscape
+    : 0.25;
 
   return (
     <Canvas style={{ width: '100vw', height: '100vh' }}>

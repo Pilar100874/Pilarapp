@@ -15,14 +15,14 @@ export const Word = ({ index, value }: Word) => {
   const refMaterial = useRef<MeshBasicMaterial>(null);
   const { getFontSize, getSpacing } = useResponsiveText();
 
-  // Responsive font sizes
-  const baseFontSize = getFontSize(0.12, 0.16, 0.21);
+  // Responsive font sizes with orientation consideration
+  const baseFontSize = getFontSize(0.12, 0.1, 0.14, 0.16, 0.21);
   
-  // Responsive vertical spacing
-  const verticalSpacing = getSpacing(1.4, 1.8, 2.24);
+  // Responsive vertical spacing with orientation
+  const verticalSpacing = getSpacing(1.4, 1.2, 1.6, 1.8, 2.24);
   
-  // Responsive text width
-  const maxWidth = getFontSize(3.8, 6.0, 7.45);
+  // Responsive text width with orientation
+  const maxWidth = getFontSize(3.8, 5.5, 5.2, 6.0, 7.45);
 
   return (
     <Text
