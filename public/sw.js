@@ -2,6 +2,7 @@ const CACHE_NAME = 'pilar-v1';
 const urlsToCache = [
   '/',
   '/manifest.json',
+  '/ico.png',
   '/loja.png',
   '/musica.mp3',
   '/opener.mp4',
