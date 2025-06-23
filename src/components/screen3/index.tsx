@@ -111,8 +111,8 @@ export const Screen3 = () => {
   const buttonScale = isMobilePortrait ? 0.4 : 0.5;
   const buttonSpacing = isMobilePortrait ? 2.5 : 5;
 
-  // Mobile portrait navigation buttons (moved down 2cm and reduced by additional 10%)
-  const mobileNavButtonY = -3.5; // Moved down by 2cm (from -1.5 to -3.5)
+  // Mobile portrait navigation buttons (moved up 1cm from -3.5 to -3.4)
+  const mobileNavButtonY = -3.4; // Moved up by 1cm (0.1 units)
   const mobileNavButtonScale = 0.378; // Reduced by additional 10% (0.42 * 0.9 = 0.378)
   const mobileNavButtonSpacing = 1.134; // Reduced by additional 10% (1.26 * 0.9 = 1.134)
 
@@ -150,7 +150,7 @@ export const Screen3 = () => {
           </>
         )}
 
-        {/* Mobile Portrait Navigation Buttons (moved down 2cm and reduced additional 10%) */}
+        {/* Mobile Portrait Navigation Buttons (moved up 1cm) */}
         {isMobilePortrait && (
           <>
             {/* Previous Button */}
@@ -175,7 +175,7 @@ export const Screen3 = () => {
               <meshBasicMaterial map={arrowTexture} transparent opacity={0.9} />
             </mesh>
 
-            {/* Photo indicator dots (also moved down and reduced) */}
+            {/* Photo indicator dots (also moved up) */}
             {photoList.map((_, index) => (
               <mesh
                 key={`dot-${index}`}
