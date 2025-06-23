@@ -112,19 +112,14 @@ export const PWAInstallButton = () => {
         touchAction: 'manipulation',
         userSelect: 'none',
         WebkitUserSelect: 'none',
-        backgroundImage: 'url(/icopwa.png)',
-        backgroundSize: '60%',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center',
       }}
       onTouchStart={(e) => e.preventDefault()}
       title="Instalar App"
       aria-label="Instalar aplicativo"
     >
-      {/* Fallback text if background image doesn't load */}
+      {/* Emoji icon for PWA installation */}
       <span style={{ 
-        fontSize: '12px', 
-        opacity: 0.8,
+        fontSize: '20px', 
         textShadow: '0 1px 2px rgba(0,0,0,0.5)'
       }}>
         📱
