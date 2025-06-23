@@ -19,7 +19,7 @@ export const OpenerText = ({ py }: OpenerText) => {
   const arrowRef = useRef<any>();
   const [startFade, setStartFade] = useState(false);
   const scroll = useScroll();
-  const { getFontSize, getSpacing, getScale, isMobileLandscape } = useResponsiveText();
+  const { getFontSize, getSpacing, getScale, isMobile } = useResponsiveText();
 
   // Responsive font sizes with orientation consideration
   const text1Size = getFontSize(0.2, 0.18, 0.25, 0.28, 0.35);
@@ -38,7 +38,7 @@ export const OpenerText = ({ py }: OpenerText) => {
   useFrame((state) => {
     if (!logoRef.current?.material || !text1Ref.current?.material || 
         !text2Ref.current?.material || !arrowRef.current?.material ||
-        (isMobileLandscape && (!text3Ref.current?.material || !text4Ref.current?.material))) return;
+        (isMobile && (!text3Ref.current?.material || !text4Ref.current?.material))) return;
 
     if (state.clock.getElapsedTime() > 1 && !startFade) {
       setStartFade(true);
@@ -51,7 +51,7 @@ export const OpenerText = ({ py }: OpenerText) => {
       logoRef.current.material.opacity = opacity;
       text1Ref.current.material.opacity = opacity;
       text2Ref.current.material.opacity = opacity;
-      if (isMobileLandscape) {
+      if (isMobile) {
         text3Ref.current.material.opacity = opacity;
         text4Ref.current.material.opacity = opacity;
       }
@@ -60,7 +60,7 @@ export const OpenerText = ({ py }: OpenerText) => {
       logoRef.current.material.opacity = 0;
       text1Ref.current.material.opacity = 0;
       text2Ref.current.material.opacity = 0;
-      if (isMobileLandscape) {
+      if (isMobile) {
         text3Ref.current.material.opacity = 0;
         text4Ref.current.material.opacity = 0;
       }
@@ -111,7 +111,7 @@ export const OpenerText = ({ py }: OpenerText) => {
         <meshBasicMaterial transparent opacity={0} depthTest={false} />
       </Text>
 
-      {isMobileLandscape ? (
+      {isMobile ? (
         <>
           <Text
             ref={text2Ref}
@@ -152,7 +152,7 @@ export const OpenerText = ({ py }: OpenerText) => {
             anchorX="center"
             anchorY="middle"
           >
-            AQUI !!
+            AQUI !!!
             <meshBasicMaterial transparent opacity={0} depthTest={false} />
           </Text>
         </>
@@ -168,7 +168,7 @@ export const OpenerText = ({ py }: OpenerText) => {
           anchorX="center"
           anchorY="middle"
         >
-          VOCÊ ENCONTRA AQUI !!
+          VOCÊ ENCONTRA AQUI !!!
           <meshBasicMaterial transparent opacity={0} depthTest={false} />
         </Text>
       )}
