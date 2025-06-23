@@ -111,10 +111,10 @@ export const Screen3 = () => {
   const buttonScale = isMobilePortrait ? 0.4 : 0.5;
   const buttonSpacing = isMobilePortrait ? 2.5 : 5;
 
-  // Mobile portrait navigation buttons (positioned below photos)
-  const mobileNavButtonY = -4.5; // Position below the photos
-  const mobileNavButtonScale = 0.6; // Larger for easier touch
-  const mobileNavButtonSpacing = 1.8; // Closer together
+  // Mobile portrait navigation buttons (moved up 3cm and reduced by 30%)
+  const mobileNavButtonY = -1.5; // Moved up by 3cm (from -4.5 to -1.5)
+  const mobileNavButtonScale = 0.42; // Reduced by 30% (from 0.6 to 0.42)
+  const mobileNavButtonSpacing = 1.26; // Reduced by 30% (from 1.8 to 1.26)
 
   return (
     <Scroll>
@@ -150,7 +150,7 @@ export const Screen3 = () => {
           </>
         )}
 
-        {/* Mobile Portrait Navigation Buttons (below photos) */}
+        {/* Mobile Portrait Navigation Buttons (moved up 3cm and reduced 30%) */}
         {isMobilePortrait && (
           <>
             {/* Previous Button */}
@@ -175,16 +175,16 @@ export const Screen3 = () => {
               <meshBasicMaterial map={arrowTexture} transparent opacity={0.9} />
             </mesh>
 
-            {/* Photo indicator dots */}
+            {/* Photo indicator dots (also moved up and reduced) */}
             {photoList.map((_, index) => (
               <mesh
                 key={`dot-${index}`}
                 position={[
-                  (index - Math.floor(photoList.length / 2)) * 0.3,
-                  mobileNavButtonY - 0.8,
+                  (index - Math.floor(photoList.length / 2)) * 0.21, // Reduced spacing by 30%
+                  mobileNavButtonY - 0.56, // Reduced distance by 30% (from -0.8 to -0.56)
                   0.1
                 ]}
-                scale={[0.1, 0.1, 1]}
+                scale={[0.07, 0.07, 1]} // Reduced by 30% (from 0.1 to 0.07)
                 onClick={() => setActiveIndex(index)}
               >
                 <circleGeometry args={[1, 8]} />
