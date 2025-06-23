@@ -46,9 +46,9 @@ export const ShopButton = () => {
     buttonRef.current.scale.x = buttonRef.current.scale.x + (targetScale - buttonRef.current.scale.x) * 0.1;
     buttonRef.current.scale.y = buttonRef.current.scale.y + (targetScale - buttonRef.current.scale.y) * 0.1;
 
-    // Subtle floating animation - moved down 12cm total (1.2 units)
+    // Subtle floating animation - moved down 32cm total (3.2 units)
     const time = Date.now() * 0.001;
-    buttonRef.current.position.y = Math.sin(time) * 0.05 - 1.2;
+    buttonRef.current.position.y = Math.sin(time) * 0.05 - 3.2;
   });
 
   const handleClick = () => {
