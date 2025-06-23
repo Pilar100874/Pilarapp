@@ -1,5 +1,5 @@
 export const dataScreen9 = [
-"<h1>Pilar Comercial e Servi&ccedil;os</h1>
+`<h1>Pilar Comercial e Servi&ccedil;os</h1>
 
 <p>Tradi&ccedil;&atilde;o e Inova&ccedil;&atilde;o no Mercado Papeleiro</p>
 
@@ -27,5 +27,5 @@ export const dataScreen9 = [
 
 <p>A ideia de unir v&aacute;rios produtos fabricados, com base na mat&eacute;ria-prima papel, &eacute; o que motiva e impulsiona a empresa a continuar crescendo.</p>
 
-<p>&copy; 2025 Pilar Comercial e Servi&ccedil;os. Todos os direitos reservados.</p>"
+<p>&copy; 2025 Pilar Comercial e Servi&ccedil;os. Todos os direitos reservados.</p>`
 ];
