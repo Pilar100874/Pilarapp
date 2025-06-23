@@ -4,11 +4,13 @@ import { dataPhotos } from './dataPhotos';
 import { Photo } from './photo';
 import { useState } from 'react';
 import { useTexture } from '@react-three/drei';
+import { useResponsiveText } from '@/utils/responsive';
 
 export const Screen3 = () => {
   const photoList = Object.entries(dataPhotos);
   const [activeIndex, setActiveIndex] = useState(Math.floor(photoList.length / 2));
   const arrowTexture = useTexture('/seta_B.png');
+  const { isMobilePortrait } = useResponsiveText();
 
   const handlePhotoClick = (index: number) => {
     setActiveIndex(index);
@@ -22,13 +24,18 @@ export const Screen3 = () => {
     setActiveIndex((prev) => (prev < photoList.length - 1 ? prev + 1 : 0));
   };
 
+  // Button positioning based on orientation
+  const buttonY = isMobilePortrait ? -3.5 : 0; // Move buttons down 3.5 units in mobile portrait
+  const buttonScale = isMobilePortrait ? 0.4 : 0.5; // Slightly smaller buttons in mobile portrait
+  const buttonSpacing = isMobilePortrait ? 3 : 5; // Closer together in mobile portrait
+
   return (
     <Scroll>
       <group position-y={SCREEN3_OFFSET_START_Y} position-x={0}>
         {/* Previous Button */}
         <mesh
-          position={[-5, 0, 0]}
-          scale={[0.5, 0.5, 1]}
+          position={[-buttonSpacing, buttonY, 0]}
+          scale={[buttonScale, buttonScale, 1]}
           rotation={[0, 0, Math.PI / 2]}
           onClick={handlePrevious}
           onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
@@ -40,8 +47,8 @@ export const Screen3 = () => {
 
         {/* Next Button */}
         <mesh
-          position={[5, 0, 0]}
-          scale={[0.5, 0.5, 1]}
+          position={[buttonSpacing, buttonY, 0]}
+          scale={[buttonScale, buttonScale, 1]}
           rotation={[0, 0, -Math.PI / 2]}
           onClick={handleNext}
           onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
