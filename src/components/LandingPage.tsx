@@ -53,15 +53,6 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
   const handleClick = useCallback((event: any) => {
     event.stopPropagation();
-    
-    // Start music immediately when button is clicked
-    const audio = new Audio('/musica.mp3');
-    audio.loop = true;
-    audio.volume = 0.7;
-    audio.play().catch(error => {
-      console.warn('Audio autoplay failed:', error);
-    });
-    
     onStart();
   }, [onStart]);
 

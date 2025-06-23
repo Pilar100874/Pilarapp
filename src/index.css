@@ -87,6 +87,24 @@ canvas {
   perspective: 1000;
 }
 
+/* Enhanced mobile audio button styles */
+.audio-control-button {
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  touch-action: manipulation !important;
+  outline: none !important;
+}
+
+/* Ensure audio elements work properly on mobile */
+audio {
+  -webkit-playsinline: true;
+  playsinline: true;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -97,5 +115,22 @@ canvas {
   }
   button {
     background-color: #f9f9f9;
+  }
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+  body {
+    /* Prevent bounce scrolling on iOS */
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  /* Ensure buttons are properly sized for touch */
+  button {
+    min-height: 44px;
+    min-width: 44px;
   }
 }
