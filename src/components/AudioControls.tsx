@@ -32,7 +32,7 @@ export const AudioControls = ({ onMusicStart }: AudioControlsProps) => {
         position: 'fixed',
         top: '25px',
         left: '25px',
-        zIndex: 1000,
+        zIndex: 1000, // Same z-index as shopping cart
         width: '50px',
         height: '50px',
         borderRadius: '50%',
@@ -46,14 +46,18 @@ export const AudioControls = ({ onMusicStart }: AudioControlsProps) => {
         fontSize: '18px',
         transition: 'all 0.3s ease',
         backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)', // Safari support
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
         e.currentTarget.style.transform = 'scale(1.1)';
+        e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.4)';
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
         e.currentTarget.style.transform = 'scale(1)';
+        e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
       }}
       title={isPlaying ? 'Pausar música' : 'Tocar música'}
     >
