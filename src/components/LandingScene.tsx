@@ -40,14 +40,8 @@ const AssetPreloader = () => {
         };
       });
 
-      // Load 3D model
-      const modelPromise = new Promise((resolve) => {
-        const loader = new TextureLoader();
-        loader.load('pillar-ok-transformed.glb', resolve);
-      });
-
       // Wait for all assets to load
-      await Promise.all([...imagePromises, videoPromise, modelPromise]);
+      await Promise.all([...imagePromises, videoPromise]);
       setIsLoading(false);
     };
 
