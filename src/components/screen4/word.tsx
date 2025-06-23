@@ -31,12 +31,12 @@ export const Word = ({ index, value }: Word) => {
       return;
     }
 
-    // Adjusted animation parameters to ensure all texts appear
+    // Adjusted animation parameters with 30 degree delay (0.52 radians)
     const scrollProgress = scroll.offset;
     const itemProgress = (scrollProgress * 8) - (Math.abs(dataScreen4.length - index) * 0.2);
     
-    // More forgiving opacity calculation to ensure visibility
-    const rotY = itemProgress - Math.PI / 8;
+    // Add 30 degree delay (0.52 radians) to the rotation
+    const rotY = itemProgress - Math.PI / 8 - 0.52; // Added 30 degree delay
     ref.current.rotation.y = rotY;
     
     // Improved opacity calculation with better visibility range
