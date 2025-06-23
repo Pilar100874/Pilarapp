@@ -1,7 +1,7 @@
 import { useScroll, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useRef, useState } from 'react';
-import { MathUtils, Mesh, PlaneGeometry } from 'three';
+import { MathUtils, Mesh, PlaneGeometry, Shape, ShapeGeometry } from 'three';
 import { Plane, Text } from '@react-three/drei';
 
 type Photo = {
@@ -9,6 +9,25 @@ type Photo = {
   alternateSrc: string;
   index: number;
   totalPhotos: number;
+};
+
+// Function to create rounded rectangle shape
+const createRoundedRectShape = (width: number, height: number, radius: number) => {
+  const shape = new Shape();
+  const x = -width / 2;
+  const y = -height / 2;
+  
+  shape.moveTo(x, y + radius);
+  shape.lineTo(x, y + height - radius);
+  shape.quadraticCurveTo(x, y + height, x + radius, y + height);
+  shape.lineTo(x + width - radius, y + height);
+  shape.quadraticCurveTo(x + width, y + height, x + width, y + height - radius);
+  shape.lineTo(x + width, y + radius);
+  shape.quadraticCurveTo(x + width, y, x + width - radius, y);
+  shape.lineTo(x + radius, y);
+  shape.quadraticCurveTo(x, y, x, y + radius);
+  
+  return shape;
 };
 
 export const Photo = (props: Photo) => {
@@ -44,6 +63,13 @@ export const Photo = (props: Photo) => {
   const buttonFontSize = isMobile ? 0.12 : 0.15;
   const imageHeight = 4.5 * scale; // Image height with scale applied
   const buttonY = baseY - (imageHeight / 2) + 0.05 + 0.3; // Added 0.3 units (3cm) to move up
+
+  // Create rounded rectangle geometry for button
+  const buttonWidth = 1.5;
+  const buttonHeight = 0.4;
+  const borderRadius = 0.08; // Rounded corner radius
+  const roundedShape = createRoundedRectShape(buttonWidth, buttonHeight, borderRadius);
+  const roundedGeometry = new ShapeGeometry(roundedShape);
 
   useFrame((state) => {
     if (!ref.current) return;
@@ -134,7 +160,7 @@ export const Photo = (props: Photo) => {
         }}
       />
       
-      {/* Button - only show when alternate image is displayed, moved up 3cm */}
+      {/* Button - only show when alternate image is displayed, moved up 3cm with rounded borders */}
       {isAlternate && (
         <group
           ref={buttonRef}
@@ -148,9 +174,8 @@ export const Photo = (props: Photo) => {
             setIsButtonHovered(false);
           }}
         >
-          {/* Button background */}
-          <mesh position-z={0.01}>
-            <planeGeometry args={[1.5, 0.4]} />
+          {/* Button background with rounded corners */}
+          <mesh position-z={0.01} geometry={roundedGeometry}>
             <meshBasicMaterial 
               color={isButtonHovered ? "#ffffff" : "#f0f0f0"} 
               transparent 
