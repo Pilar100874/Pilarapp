@@ -46,9 +46,16 @@ export const Photo = (props: Photo) => {
   // Responsive configuration
   const isMobile = viewport.width < 5;
   const columns = isMobile ? 2 : 3;
-  // Further reduced spacing between images
-  const spacing = isMobile ? 2.2 : 2.8;
-  const verticalSpacing = isMobile ? 3.2 : 4.3;
+  
+  // Base spacing values
+  let spacing = isMobile ? 2.2 : 2.8;
+  let verticalSpacing = isMobile ? 3.2 : 4.3;
+  
+  // Reduce spacing by 20% for mobile portrait
+  if (isMobilePortrait) {
+    spacing = spacing * 0.8; // 20% reduction
+    verticalSpacing = verticalSpacing * 0.8; // 20% reduction
+  }
   
   const column = props.index % columns;
   const row = Math.floor(props.index / columns);
