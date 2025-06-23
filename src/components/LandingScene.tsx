@@ -6,7 +6,7 @@ import { TextureLoader, VideoTexture } from 'three';
 import { dataPhotos as screen3Photos } from '@/components/screen3/dataPhotos';
 import { dataPhotos as screen6Photos } from '@/components/screen6/dataPhotos';
 import { dataPhotos as screen8Photos } from '@/components/screen8/dataPhotos';
-import { PWAInstallButton } from './PWAInstallButton';
+import { LandingPWAButton } from './LandingPWAButton';
 
 const AssetPreloader = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -72,8 +72,8 @@ export const LandingScene = ({ onStart }: { onStart: () => void }) => {
         <directionalLight />
       </Canvas>
       
-      {/* PWA Install Button - positioned below shop icon for mobile/tablet */}
-      <PWAInstallButton />
+      {/* PWA Install Button - positioned in bottom right for mobile/tablet */}
+      <LandingPWAButton />
     </>
   );
 };
