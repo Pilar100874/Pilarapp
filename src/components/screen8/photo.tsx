@@ -1,6 +1,6 @@
 import { useScroll, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useRef, useState } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import { MathUtils, Mesh, PlaneGeometry, Shape, ShapeGeometry, Group } from 'three';
 import { Plane, Text } from '@react-three/drei';
 import { useResponsiveText } from '@/utils/responsive';
@@ -32,14 +32,17 @@ const createRoundedRectShape = (width: number, height: number, radius: number) =
 };
 
 export const Photo = (props: Photo) => {
+  // Pre-load both textures to prevent flicker
   const defaultTexture = useTexture(props.defaultSrc);
   const alternateTexture = useTexture(props.alternateSrc);
+  
   const ref = useRef<Mesh>(null);
   const buttonRef = useRef<Group>(null);
   const scroll = useScroll();
   const [isHovered, setIsHovered] = useState(false);
   const [isAlternate, setIsAlternate] = useState(false);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const { viewport } = useThree();
   const { isMobilePortrait } = useResponsiveText();
 
@@ -98,6 +101,19 @@ export const Photo = (props: Photo) => {
     return links[props.index] || 'https://www.pilar.com.br';
   };
 
+  // Smooth image toggle with transition
+  const handleImageToggle = useCallback(() => {
+    if (isTransitioning) return; // Prevent multiple clicks during transition
+    
+    setIsTransitioning(true);
+    setIsAlternate(!isAlternate);
+    
+    // Reset transition state after a short delay
+    setTimeout(() => {
+      setIsTransitioning(false);
+    }, 150);
+  }, [isAlternate, isTransitioning]);
+
   useFrame((state) => {
     if (!ref.current) return;
 
@@ -108,54 +124,32 @@ export const Photo = (props: Photo) => {
     const mouseX = state.mouse.x * (isMobile ? 0.3 : 0.5);
     const mouseY = state.mouse.y * (isMobile ? 0.3 : 0.5);
 
-    ref.current.position.x = MathUtils.lerp(
-      ref.current.position.x,
-      baseX + mouseX,
-      0.1
-    );
-    ref.current.position.y = MathUtils.lerp(
-      ref.current.position.y,
-      baseY + parallaxY + mouseY,
-      0.1
-    );
-    ref.current.position.z = MathUtils.lerp(
-      ref.current.position.z,
-      baseZ + (isHovered ? 1 : 0),
-      0.1
-    );
+    // Smooth position interpolation
+    const targetX = baseX + mouseX;
+    const targetY = baseY + parallaxY + mouseY;
+    const targetZ = baseZ + (isHovered ? 1 : 0);
 
+    ref.current.position.x = MathUtils.lerp(ref.current.position.x, targetX, 0.1);
+    ref.current.position.y = MathUtils.lerp(ref.current.position.y, targetY, 0.1);
+    ref.current.position.z = MathUtils.lerp(ref.current.position.z, targetZ, 0.1);
+
+    // Smooth scale interpolation
     const targetScale = (isHovered ? 1.1 : 1) * scale;
     ref.current.scale.x = MathUtils.lerp(ref.current.scale.x, targetScale, 0.1);
     ref.current.scale.y = MathUtils.lerp(ref.current.scale.y, targetScale, 0.1);
 
-    ref.current.rotation.x = MathUtils.lerp(
-      ref.current.rotation.x,
-      mouseY * (isMobile ? 0.1 : 0.2),
-      0.1
-    );
-    ref.current.rotation.y = MathUtils.lerp(
-      ref.current.rotation.y,
-      mouseX * (isMobile ? 0.1 : 0.2),
-      0.1
-    );
+    // Smooth rotation interpolation
+    const targetRotationX = mouseY * (isMobile ? 0.1 : 0.2);
+    const targetRotationY = mouseX * (isMobile ? 0.1 : 0.2);
+    
+    ref.current.rotation.x = MathUtils.lerp(ref.current.rotation.x, targetRotationX, 0.1);
+    ref.current.rotation.y = MathUtils.lerp(ref.current.rotation.y, targetRotationY, 0.1);
 
-    // Update button position to follow the image
+    // Update button position to follow the image smoothly
     if (buttonRef.current) {
-      buttonRef.current.position.x = MathUtils.lerp(
-        buttonRef.current.position.x,
-        baseX + mouseX,
-        0.1
-      );
-      buttonRef.current.position.y = MathUtils.lerp(
-        buttonRef.current.position.y,
-        buttonY + parallaxY + mouseY,
-        0.1
-      );
-      buttonRef.current.position.z = MathUtils.lerp(
-        buttonRef.current.position.z,
-        baseZ + (isHovered ? 1 : 0) + 0.1,
-        0.1
-      );
+      buttonRef.current.position.x = MathUtils.lerp(buttonRef.current.position.x, targetX, 0.1);
+      buttonRef.current.position.y = MathUtils.lerp(buttonRef.current.position.y, buttonY + parallaxY + mouseY, 0.1);
+      buttonRef.current.position.z = MathUtils.lerp(buttonRef.current.position.z, targetZ + 0.1, 0.1);
 
       // Button hover effect
       const buttonScale = isButtonHovered ? 1.1 : 1;
@@ -164,19 +158,24 @@ export const Photo = (props: Photo) => {
     }
   });
 
-  const handleButtonClick = () => {
+  const handleButtonClick = useCallback((e: any) => {
+    e.stopPropagation(); // Prevent image toggle when clicking button
     window.open(getButtonLink(), '_blank');
-  };
+  }, [props.index]);
+
+  // Get current texture without causing re-renders
+  const currentTexture = isAlternate ? alternateTexture : defaultTexture;
 
   return (
     <group>
       <Plane
         ref={ref}
         args={[3.25, 4.5]}
-        material-map={isAlternate ? alternateTexture : defaultTexture}
+        material-map={currentTexture}
         material-transparent
         material-alphaTest={0.1}
-        onClick={() => setIsAlternate(!isAlternate)}
+        material-depthWrite={false}
+        onClick={handleImageToggle}
         onPointerOver={() => {
           document.body.style.cursor = 'pointer';
           setIsHovered(true);
@@ -207,6 +206,7 @@ export const Photo = (props: Photo) => {
               color={isButtonHovered ? "#ffffff" : "#f0f0f0"} 
               transparent 
               opacity={0.9}
+              depthWrite={false}
             />
           </mesh>
           
