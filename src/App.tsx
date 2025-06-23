@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Scene } from '@/components/Scene';
 import { LandingScene } from '@/components/LandingScene';
 import { AudioControls } from '@/components/AudioControls';
 
 function App() {
   const [started, setStarted] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const handleStart = () => {
     setStarted(true);

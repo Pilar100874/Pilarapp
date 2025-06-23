@@ -1,7 +1,12 @@
 import { useCallback, useRef, useState, useEffect } from 'react';
 
-export const AudioControls = () => {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+interface AudioControlsProps {
+  audioRef?: React.MutableRefObject<HTMLAudioElement | null>;
+}
+
+export const AudioControls = ({ audioRef: externalAudioRef }: AudioControlsProps = {}) => {
+  const internalAudioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef = externalAudioRef || internalAudioRef;
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -15,75 +20,84 @@ export const AudioControls = () => {
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
-    // Create audio element
-    audioRef.current = new Audio('/musica.mp3');
-    audioRef.current.loop = true;
-    audioRef.current.volume = 0.7;
-    audioRef.current.preload = 'auto';
+    // Only create audio if no external ref is provided
+    if (!externalAudioRef) {
+      audioRef.current = new Audio('/musica.mp3');
+      audioRef.current.loop = true;
+      audioRef.current.volume = 0.7;
+      audioRef.current.preload = 'auto';
+    }
 
-    const audio = audioRef.current;
+    if (audioRef.current) {
+      const audio = audioRef.current;
 
-    // Event listeners
-    const handleCanPlayThrough = () => {
-      console.log('Audio loaded successfully');
-      setIsLoaded(true);
-    };
-    
-    const handlePlay = () => {
-      console.log('Audio started playing');
-      setIsPlaying(true);
-    };
-    
-    const handlePause = () => {
-      console.log('Audio paused');
-      setIsPlaying(false);
-    };
-    
-    const handleEnded = () => {
-      console.log('Audio ended');
-      setIsPlaying(false);
-    };
+      // Event listeners
+      const handleCanPlayThrough = () => {
+        console.log('Audio loaded successfully');
+        setIsLoaded(true);
+      };
+      
+      const handlePlay = () => {
+        console.log('Audio started playing');
+        setIsPlaying(true);
+      };
+      
+      const handlePause = () => {
+        console.log('Audio paused');
+        setIsPlaying(false);
+      };
+      
+      const handleEnded = () => {
+        console.log('Audio ended');
+        setIsPlaying(false);
+      };
 
-    const handleError = (e: Event) => {
-      console.error('Audio error:', e);
-    };
+      const handleError = (e: Event) => {
+        console.error('Audio error:', e);
+      };
 
-    const handleLoadStart = () => {
-      console.log('Audio load started');
-    };
+      const handleLoadStart = () => {
+        console.log('Audio load started');
+      };
 
-    audio.addEventListener('canplaythrough', handleCanPlayThrough);
-    audio.addEventListener('play', handlePlay);
-    audio.addEventListener('pause', handlePause);
-    audio.addEventListener('ended', handleEnded);
-    audio.addEventListener('error', handleError);
-    audio.addEventListener('loadstart', handleLoadStart);
+      audio.addEventListener('canplaythrough', handleCanPlayThrough);
+      audio.addEventListener('play', handlePlay);
+      audio.addEventListener('pause', handlePause);
+      audio.addEventListener('ended', handleEnded);
+      audio.addEventListener('error', handleError);
+      audio.addEventListener('loadstart', handleLoadStart);
 
-    // Start loading audio
-    audio.load();
-
-    // Auto-start music after a short delay (helps with mobile autoplay policies)
-    const autoStartTimer = setTimeout(() => {
-      if (audio && isLoaded) {
-        audio.play().catch(error => {
-          console.warn('Auto-play failed, user interaction required:', error);
-        });
+      // Start loading audio if it's our internal audio
+      if (!externalAudioRef) {
+        audio.load();
       }
-    }, 1000);
+
+      // Check if audio is already playing (in case of external ref)
+      if (!audio.paused) {
+        setIsPlaying(true);
+      }
+
+      return () => {
+        window.removeEventListener('resize', checkMobile);
+        audio.removeEventListener('canplaythrough', handleCanPlayThrough);
+        audio.removeEventListener('play', handlePlay);
+        audio.removeEventListener('pause', handlePause);
+        audio.removeEventListener('ended', handleEnded);
+        audio.removeEventListener('error', handleError);
+        audio.removeEventListener('loadstart', handleLoadStart);
+        
+        // Only cleanup if it's our internal audio
+        if (!externalAudioRef) {
+          audio.pause();
+          audio.src = '';
+        }
+      };
+    }
 
     return () => {
-      clearTimeout(autoStartTimer);
       window.removeEventListener('resize', checkMobile);
-      audio.removeEventListener('canplaythrough', handleCanPlayThrough);
-      audio.removeEventListener('play', handlePlay);
-      audio.removeEventListener('pause', handlePause);
-      audio.removeEventListener('ended', handleEnded);
-      audio.removeEventListener('error', handleError);
-      audio.removeEventListener('loadstart', handleLoadStart);
-      audio.pause();
-      audio.src = '';
     };
-  }, []);
+  }, [externalAudioRef]);
 
   const handleToggle = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
