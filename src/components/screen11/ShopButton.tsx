@@ -1,6 +1,6 @@
 import { Text } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { useRef, useState } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import { Shape, ShapeGeometry, Group } from 'three';
 import { useResponsiveText } from '@/utils/responsive';
 
@@ -26,7 +26,7 @@ const createRoundedRectShape = (width: number, height: number, radius: number) =
 export const ShopButton = () => {
   const buttonRef = useRef<Group>(null);
   const [isHovered, setIsHovered] = useState(false);
-  const { getFontSize, getSpacing } = useResponsiveText();
+  const { getFontSize, getSpacing, isMobile } = useResponsiveText();
 
   // Responsive configuration with orientation consideration
   const buttonWidth = getFontSize(2.0, 2.5, 2.4, 2.8, 3.5);
@@ -38,37 +38,47 @@ export const ShopButton = () => {
   const roundedShape = createRoundedRectShape(buttonWidth, buttonHeight, borderRadius);
   const roundedGeometry = new ShapeGeometry(roundedShape);
 
+  // Smooth handlers to prevent flicker
+  const handlePointerOver = useCallback(() => {
+    if (!isMobile) {
+      document.body.style.cursor = 'pointer';
+    }
+    setIsHovered(true);
+  }, [isMobile]);
+
+  const handlePointerOut = useCallback(() => {
+    if (!isMobile) {
+      document.body.style.cursor = 'default';
+    }
+    setIsHovered(false);
+  }, [isMobile]);
+
+  const handleClick = useCallback((event: any) => {
+    event.stopPropagation();
+    window.open('https://loja.pilar.com.br/', '_blank');
+  }, []);
+
   useFrame(() => {
     if (!buttonRef.current) return;
 
-    // Button hover animation
-    const targetScale = isHovered ? 1.1 : 1;
-    buttonRef.current.scale.x = buttonRef.current.scale.x + (targetScale - buttonRef.current.scale.x) * 0.1;
-    buttonRef.current.scale.y = buttonRef.current.scale.y + (targetScale - buttonRef.current.scale.y) * 0.1;
+    // Smoother button hover animation
+    const targetScale = isHovered ? 1.05 : 1; // Reduced scale to prevent flicker
+    buttonRef.current.scale.x = buttonRef.current.scale.x + (targetScale - buttonRef.current.scale.x) * 0.08;
+    buttonRef.current.scale.y = buttonRef.current.scale.y + (targetScale - buttonRef.current.scale.y) * 0.08;
 
     // Subtle floating animation with responsive positioning
     const time = Date.now() * 0.001;
-    const floatOffset = Math.sin(time) * 0.05;
+    const floatOffset = Math.sin(time) * 0.03; // Reduced float amplitude
     const baseOffset = getSpacing(-2.5, -2.0, -2.7, -2.9, -3.2);
     buttonRef.current.position.y = floatOffset + baseOffset;
   });
-
-  const handleClick = () => {
-    window.open('https://loja.pilar.com.br/', '_blank');
-  };
 
   return (
     <group
       ref={buttonRef}
       onClick={handleClick}
-      onPointerOver={() => {
-        document.body.style.cursor = 'pointer';
-        setIsHovered(true);
-      }}
-      onPointerOut={() => {
-        document.body.style.cursor = 'default';
-        setIsHovered(false);
-      }}
+      onPointerOver={handlePointerOver}
+      onPointerOut={handlePointerOut}
     >
       {/* Button background with rounded corners */}
       <mesh position-z={0.01} geometry={roundedGeometry}>
@@ -76,6 +86,7 @@ export const ShopButton = () => {
           color={isHovered ? "#ffffff" : "#f0f0f0"} 
           transparent 
           opacity={0.95}
+          depthWrite={false}
         />
       </mesh>
       
@@ -85,6 +96,7 @@ export const ShopButton = () => {
           color={isHovered ? "#333333" : "#666666"} 
           transparent 
           opacity={0.3}
+          depthWrite={false}
         />
       </mesh>
       

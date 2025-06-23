@@ -1,6 +1,6 @@
 import { Text, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { MeshBasicMaterial } from 'three';
 import { useResponsiveText } from '@/utils/responsive';
 
@@ -11,7 +11,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const textRef = useRef<any>();
   const materialRef = useRef<MeshBasicMaterial | null>(null);
   const [animationComplete, setAnimationComplete] = useState(false);
-  const { getFontSize, getSpacing, getScale } = useResponsiveText();
+  const { getFontSize, getSpacing, getScale, isMobile } = useResponsiveText();
 
   // Responsive scaling with orientation consideration
   const logoScale = [
@@ -36,6 +36,26 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         1
       ]) as [number, number, number];
 
+  // Smooth handlers to prevent flicker
+  const handlePointerEnter = useCallback(() => {
+    setIsHovered(true);
+    if (!isMobile) {
+      document.body.style.cursor = 'pointer';
+    }
+  }, [isMobile]);
+
+  const handlePointerLeave = useCallback(() => {
+    setIsHovered(false);
+    if (!isMobile) {
+      document.body.style.cursor = 'default';
+    }
+  }, [isMobile]);
+
+  const handleClick = useCallback((event: any) => {
+    event.stopPropagation();
+    onStart();
+  }, [onStart]);
+
   useFrame((state) => {
     if (!textRef.current || animationComplete) return;
 
@@ -55,7 +75,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
     <group position-y={0}>
       <mesh position-y={getSpacing(0.8, 0.6, 1.0, 1.2, 1.5)} scale={logoScale}>
         <planeGeometry args={[2, 1]} />
-        <meshBasicMaterial map={logoTexture} transparent opacity={1} />
+        <meshBasicMaterial map={logoTexture} transparent opacity={1} depthWrite={false} />
       </mesh>
 
       <Text
@@ -69,21 +89,15 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         anchorY="middle"
       >
         PILAR APRESENTA
-        <meshBasicMaterial ref={materialRef as any} transparent depthTest={false} />
+        <meshBasicMaterial ref={materialRef as any} transparent depthTest={false} depthWrite={false} />
       </Text>
 
       <mesh
         position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}
         scale={buttonScale}
-        onClick={onStart}
-        onPointerEnter={() => {
-          setIsHovered(true);
-          document.body.style.cursor = 'pointer';
-        }}
-        onPointerLeave={() => {
-          setIsHovered(false);
-          document.body.style.cursor = 'default';
-        }}
+        onClick={handleClick}
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave}
       >
         <planeGeometry args={[1, 1]} />
         <meshBasicMaterial
@@ -91,6 +105,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
           transparent
           opacity={1}
           depthTest={false}
+          depthWrite={false}
         />
       </mesh>
     </group>

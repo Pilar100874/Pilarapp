@@ -1,6 +1,6 @@
 import { useScroll, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useRef, useState } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import { MathUtils, Mesh } from 'three';
 import { Plane } from '@react-three/drei';
 
@@ -29,6 +29,44 @@ export const Photo = (props: Photo) => {
   const perspective = isMobile ? 1 : 1.5;
   const baseScale = isMobile ? 0.7 : 1;
 
+  // Smooth click handler to prevent flicker
+  const handleClick = useCallback((event: any) => {
+    event.stopPropagation();
+    
+    const locationUrls: { [key: string]: string } = {
+      '/sp.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=Rua+Jardim+Suspenso+126+Embu+das+Artes+SP',
+      '/rs.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=Rua+Frederico+Groehs+Neto+755+Novo+Hamburgo+RS',
+      '/es.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=RUA+OCIDENTAL+16+vila+velha+es',
+      '/to.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=Q+1012+SUL+ALAMEDA+3+8+palmas+to',
+      '/ba.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=AVENIDA+DUQUE+DE+CAXIAS+30+Bauru+SP',
+      '/pr.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=ESTRADA+PROGRESSO+968+maringa+pr',
+      '/go.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=Rua+250+933+Goiania+GO'
+    };
+
+    if (locationUrls[props.src]) {
+      window.open(locationUrls[props.src], '_blank');
+    }
+
+    if (props.onClick) {
+      props.onClick();
+    }
+  }, [props.src, props.onClick]);
+
+  // Smooth hover handlers
+  const handlePointerEnter = useCallback(() => {
+    setIsHovered(true);
+    if (!isMobile) {
+      document.body.style.cursor = 'pointer';
+    }
+  }, [isMobile]);
+
+  const handlePointerLeave = useCallback(() => {
+    setIsHovered(false);
+    if (!isMobile) {
+      document.body.style.cursor = 'default';
+    }
+  }, [isMobile]);
+
   useFrame(() => {
     if (!ref.current) return;
 
@@ -43,37 +81,16 @@ export const Photo = (props: Photo) => {
 
     const targetRotationY = -relativeIndex * rotationFactor;
 
-    const hoverScale = isHovered ? 1.1 : 1;
+    const hoverScale = isHovered ? 1.05 : 1; // Reduced hover effect to prevent flicker
     const targetScale = props.isActive ? hoverScale * baseScale : hoverScale * baseScale * 0.85;
 
-    ref.current.position.x = MathUtils.lerp(ref.current.position.x, targetX, 0.1);
-    ref.current.position.z = MathUtils.lerp(ref.current.position.z, targetZ, 0.1);
-    ref.current.rotation.y = MathUtils.lerp(ref.current.rotation.y, targetRotationY, 0.1);
-    ref.current.scale.x = MathUtils.lerp(ref.current.scale.x, targetScale, 0.1);
-    ref.current.scale.y = MathUtils.lerp(ref.current.scale.y, targetScale, 0.1);
+    // Smoother interpolation to prevent flicker
+    ref.current.position.x = MathUtils.lerp(ref.current.position.x, targetX, 0.08);
+    ref.current.position.z = MathUtils.lerp(ref.current.position.z, targetZ, 0.08);
+    ref.current.rotation.y = MathUtils.lerp(ref.current.rotation.y, targetRotationY, 0.08);
+    ref.current.scale.x = MathUtils.lerp(ref.current.scale.x, targetScale, 0.08);
+    ref.current.scale.y = MathUtils.lerp(ref.current.scale.y, targetScale, 0.08);
   });
-
-  const handleClick = () => {
-    const locationUrls: { [key: string]: string } = {
-      'sp.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=Rua+Jardim+Suspenso+126+Embu+das+Artes+SP',
-      'rs.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=Rua+Frederico+Groehs+Neto+755+Novo+Hamburgo+RS',
-      'es.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=RUA+OCIDENTAL+16+vila+velha+es',
-      'to.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=Q+1012+SUL+ALAMEDA+3+8+palmas+to',
-      'ba.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=AVENIDA+DUQUE+DE+CAXIAS+30+Bauru+SP',
-      'pr.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=ESTRADA+PROGRESSO+968+maringa+pr',
-      'go.png': 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=Rua+250+933+Goiania+GO'
-    };
-
-    // Extract filename from src path
-    const filename = props.src.split('/').pop();
-    if (filename && locationUrls[filename]) {
-      window.open(locationUrls[filename], '_blank');
-    }
-
-    if (props.onClick) {
-      props.onClick();
-    }
-  };
 
   return (
     <Plane
@@ -82,15 +99,10 @@ export const Photo = (props: Photo) => {
       material-map={photo}
       material-transparent
       material-alphaTest={0.1}
+      material-depthWrite={false}
       onClick={handleClick}
-      onPointerEnter={() => {
-        setIsHovered(true);
-        document.body.style.cursor = 'pointer';
-      }}
-      onPointerLeave={() => {
-        setIsHovered(false);
-        document.body.style.cursor = 'default';
-      }}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
     />
   );
 };

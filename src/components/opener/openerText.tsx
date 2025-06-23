@@ -1,6 +1,6 @@
 import { Text, useTexture, useScroll } from "@react-three/drei";
 import { useFrame, useThree } from '@react-three/fiber';
-import { useRef, useState } from "react";
+import { useRef, useState, useCallback } from "react";
 import { MeshBasicMaterial } from "three";
 import { useResponsiveText } from '@/utils/responsive';
 
@@ -35,6 +35,28 @@ export const OpenerText = ({ py }: OpenerText) => {
   // Arrow position with orientation - moved down by 8cm total (0.8 units)
   const arrowY = getSpacing(-2.8, -2.3, -3.2, -3.5, -4.2);
 
+  // Smooth arrow click handler
+  const handleArrowClick = useCallback((event: any) => {
+    event.stopPropagation();
+    scroll.el.scrollTo({
+      top: scroll.el.scrollHeight * 0.10,
+      behavior: 'smooth'
+    });
+  }, [scroll]);
+
+  // Smooth hover handlers
+  const handlePointerOver = useCallback(() => {
+    if (!isMobile) {
+      document.body.style.cursor = 'pointer';
+    }
+  }, [isMobile]);
+
+  const handlePointerOut = useCallback(() => {
+    if (!isMobile) {
+      document.body.style.cursor = 'default';
+    }
+  }, [isMobile]);
+
   useFrame((state) => {
     if (!logoRef.current?.material || !text1Ref.current?.material || 
         !text2Ref.current?.material || !arrowRef.current?.material ||
@@ -67,13 +89,6 @@ export const OpenerText = ({ py }: OpenerText) => {
       arrowRef.current.material.opacity = 0;
     }
   });
-
-  const handleArrowClick = () => {
-    scroll.el.scrollTo({
-      top: scroll.el.scrollHeight * 0.10,
-      behavior: 'smooth'
-    });
-  };
 
   return (
     <group position-y={py}>
@@ -108,7 +123,7 @@ export const OpenerText = ({ py }: OpenerText) => {
         anchorY="middle"
       >
         PROCURANDO PAPÉIS ??
-        <meshBasicMaterial transparent opacity={0} depthTest={false} />
+        <meshBasicMaterial transparent opacity={0} depthTest={false} depthWrite={false} />
       </Text>
 
       {isMobile ? (
@@ -125,7 +140,7 @@ export const OpenerText = ({ py }: OpenerText) => {
             anchorY="middle"
           >
             VOCÊ
-            <meshBasicMaterial transparent opacity={0} depthTest={false} />
+            <meshBasicMaterial transparent opacity={0} depthTest={false} depthWrite={false} />
           </Text>
           <Text
             ref={text3Ref}
@@ -139,7 +154,7 @@ export const OpenerText = ({ py }: OpenerText) => {
             anchorY="middle"
           >
             ENCONTRA
-            <meshBasicMaterial transparent opacity={0} depthTest={false} />
+            <meshBasicMaterial transparent opacity={0} depthTest={false} depthWrite={false} />
           </Text>
           <Text
             ref={text4Ref}
@@ -153,7 +168,7 @@ export const OpenerText = ({ py }: OpenerText) => {
             anchorY="middle"
           >
             AQUI !!!
-            <meshBasicMaterial transparent opacity={0} depthTest={false} />
+            <meshBasicMaterial transparent opacity={0} depthTest={false} depthWrite={false} />
           </Text>
         </>
       ) : (
@@ -169,7 +184,7 @@ export const OpenerText = ({ py }: OpenerText) => {
           anchorY="middle"
         >
           VOCÊ ENCONTRA AQUI !!!
-          <meshBasicMaterial transparent opacity={0} depthTest={false} />
+          <meshBasicMaterial transparent opacity={0} depthTest={false} depthWrite={false} />
         </Text>
       )}
 
@@ -178,8 +193,8 @@ export const OpenerText = ({ py }: OpenerText) => {
         position-y={arrowY}
         scale={arrowScale}
         onClick={handleArrowClick}
-        onPointerOver={() => document.body.style.cursor = 'pointer'}
-        onPointerOut={() => document.body.style.cursor = 'default'}
+        onPointerOver={handlePointerOver}
+        onPointerOut={handlePointerOut}
       >
         <planeGeometry args={[1, 1]} />
         <meshBasicMaterial 

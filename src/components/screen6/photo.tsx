@@ -1,6 +1,6 @@
 import { useScroll, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { MathUtils, Mesh, PlaneGeometry } from 'three';
 import { Plane } from '@react-three/drei';
 
@@ -28,9 +28,17 @@ export const Photo = (props: Photo) => {
   const isMobile = viewport.width < 5;
   const baseWidth = (3.25 * 1.1) * (isMobile ? 0.7 : 1);
   const baseHeight = (4.5 * 1.1) * (isMobile ? 0.7 : 1);
-  const rotationSpeed = isMobile ? 0.198 : 0.264; // Increased by 10% from 0.18 and 0.24
+  const rotationSpeed = isMobile ? 0.198 : 0.264;
   const radius = isMobile ? 2 : 3;
-  const xOffset = 1; // Add 1cm offset to the right
+  const xOffset = 1;
+
+  // Smooth click handler
+  const handleClick = useCallback((event: any) => {
+    event.stopPropagation();
+    if (props.onClick) {
+      props.onClick();
+    }
+  }, [props.onClick]);
 
   useFrame((state) => {
     if (!ref.current) return;
@@ -49,8 +57,9 @@ export const Photo = (props: Photo) => {
       lastPosition.current.rotation = baseAngle;
     }
 
-    lastPosition.current.x = MathUtils.lerp(lastPosition.current.x, targetX, 0.1);
-    lastPosition.current.z = MathUtils.lerp(lastPosition.current.z, targetZ, 0.1);
+    // Smoother interpolation to prevent flicker
+    lastPosition.current.x = MathUtils.lerp(lastPosition.current.x, targetX, 0.08);
+    lastPosition.current.z = MathUtils.lerp(lastPosition.current.z, targetZ, 0.08);
 
     ref.current.position.x = lastPosition.current.x;
     ref.current.position.z = lastPosition.current.z;
@@ -73,6 +82,8 @@ export const Photo = (props: Photo) => {
       material-map={photo}
       material-transparent
       material-alphaTest={0.1}
+      material-depthWrite={false}
+      onClick={handleClick}
     />
   );
 };

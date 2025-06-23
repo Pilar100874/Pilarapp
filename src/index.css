@@ -30,6 +30,17 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  /* Prevent mobile flicker and improve touch performance */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  /* Improve scrolling performance */
+  -webkit-overflow-scrolling: touch;
+  /* Prevent zoom on double tap */
+  touch-action: manipulation;
 }
 
 h1 {
@@ -47,6 +58,9 @@ button {
   background-color: #1a1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
+  /* Prevent mobile flicker */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 button:hover {
   border-color: #646cff;
@@ -54,6 +68,23 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* Prevent flicker on all interactive elements */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Improve canvas performance */
+canvas {
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000;
+  -moz-perspective: 1000;
+  -ms-perspective: 1000;
+  perspective: 1000;
 }
 
 @media (prefers-color-scheme: light) {
