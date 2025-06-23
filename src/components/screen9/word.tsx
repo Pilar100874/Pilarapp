@@ -15,15 +15,15 @@ export const Word = ({ index, value }: Word) => {
   const refMaterial = useRef<MeshBasicMaterial>(null);
   const { viewport } = useThree();
 
-  // Calculate responsive font size (reduced by 30%)
+  // Calculate responsive font size (increased by 2 sizes from previous values)
   const isMobile = viewport.width < 5;
-  const baseFontSize = isMobile ? 0.11 : 0.147; // Original sizes (0.157 and 0.21) reduced by 30%
+  const baseFontSize = isMobile ? 0.19 : 0.25; // Increased from 0.11 and 0.147
   
   // Adjust vertical spacing proportionally
-  const verticalSpacing = isMobile ? 1.26 : 1.68; // Original spacing (1.8 and 2.4) reduced by 30%
-
+  const verticalSpacing = isMobile ? 2.1 : 2.8; // Increased from 1.26 and 1.68
+  
   // Adjust text width for better readability
-  const maxWidth = isMobile ? 3.5 : 5.6; // Original widths (5 and 8) reduced by 30%
+  const maxWidth = isMobile ? 5.8 : 9.3; // Increased from 3.5 and 5.6
 
   return (
     <Text
