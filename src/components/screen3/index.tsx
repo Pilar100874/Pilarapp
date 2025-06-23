@@ -25,9 +25,9 @@ export const Screen3 = () => {
   };
 
   // Button positioning based on orientation
-  const buttonY = isMobilePortrait ? -3.5 : 0; // Move buttons down 3.5 units in mobile portrait
+  const buttonY = isMobilePortrait ? -3.0 : 0; // Move buttons down 3 units in mobile portrait
   const buttonScale = isMobilePortrait ? 0.4 : 0.5; // Slightly smaller buttons in mobile portrait
-  const buttonSpacing = isMobilePortrait ? 3 : 5; // Closer together in mobile portrait
+  const buttonSpacing = isMobilePortrait ? 2.5 : 5; // Closer together in mobile portrait
 
   return (
     <Scroll>
