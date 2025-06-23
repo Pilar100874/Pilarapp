@@ -1,5 +1,4 @@
 import { Text } from '@react-three/drei';
-import { SCREEN9_OFFSET_START_Y } from './constants';
 import { useRef } from 'react';
 import { DoubleSide, Mesh, MeshBasicMaterial } from 'three';
 import { dataScreen9 } from './data';
@@ -29,7 +28,7 @@ export const Word = ({ index, value }: Word) => {
       ref={ref}
       fontSize={baseFontSize}
       letterSpacing={0.005}
-      position-y={SCREEN9_OFFSET_START_Y - 1 * -index * verticalSpacing}
+      position-y={-1 * -index * verticalSpacing}
       textAlign={'left'}
       font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
       anchorX="center"
