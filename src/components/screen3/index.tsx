@@ -111,34 +111,92 @@ export const Screen3 = () => {
   const buttonScale = isMobilePortrait ? 0.4 : 0.5;
   const buttonSpacing = isMobilePortrait ? 2.5 : 5;
 
+  // Mobile portrait navigation buttons (positioned below photos)
+  const mobileNavButtonY = -4.5; // Position below the photos
+  const mobileNavButtonScale = 0.6; // Larger for easier touch
+  const mobileNavButtonSpacing = 1.8; // Closer together
+
   return (
     <Scroll>
       <group position-y={SCREEN3_OFFSET_START_Y} position-x={0}>
-        {/* Previous Button */}
-        <mesh
-          position={[-buttonSpacing, buttonY, 0]}
-          scale={[buttonScale, buttonScale, 1]}
-          rotation={[0, 0, Math.PI / 2]}
-          onClick={handlePrevious}
-          onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
-          onPointerOut={() => { document.body.style.cursor = 'default'; }}
-        >
-          <planeGeometry args={[1, 1]} />
-          <meshBasicMaterial map={arrowTexture} transparent opacity={1} />
-        </mesh>
+        {/* Desktop/Tablet Navigation Buttons */}
+        {!isMobilePortrait && (
+          <>
+            {/* Previous Button */}
+            <mesh
+              position={[-buttonSpacing, buttonY, 0]}
+              scale={[buttonScale, buttonScale, 1]}
+              rotation={[0, 0, Math.PI / 2]}
+              onClick={handlePrevious}
+              onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
+              onPointerOut={() => { document.body.style.cursor = 'default'; }}
+            >
+              <planeGeometry args={[1, 1]} />
+              <meshBasicMaterial map={arrowTexture} transparent opacity={1} />
+            </mesh>
 
-        {/* Next Button */}
-        <mesh
-          position={[buttonSpacing, buttonY, 0]}
-          scale={[buttonScale, buttonScale, 1]}
-          rotation={[0, 0, -Math.PI / 2]}
-          onClick={handleNext}
-          onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
-          onPointerOut={() => { document.body.style.cursor = 'default'; }}
-        >
-          <planeGeometry args={[1, 1]} />
-          <meshBasicMaterial map={arrowTexture} transparent opacity={1} />
-        </mesh>
+            {/* Next Button */}
+            <mesh
+              position={[buttonSpacing, buttonY, 0]}
+              scale={[buttonScale, buttonScale, 1]}
+              rotation={[0, 0, -Math.PI / 2]}
+              onClick={handleNext}
+              onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
+              onPointerOut={() => { document.body.style.cursor = 'default'; }}
+            >
+              <planeGeometry args={[1, 1]} />
+              <meshBasicMaterial map={arrowTexture} transparent opacity={1} />
+            </mesh>
+          </>
+        )}
+
+        {/* Mobile Portrait Navigation Buttons (below photos) */}
+        {isMobilePortrait && (
+          <>
+            {/* Previous Button */}
+            <mesh
+              position={[-mobileNavButtonSpacing, mobileNavButtonY, 0.1]}
+              scale={[mobileNavButtonScale, mobileNavButtonScale, 1]}
+              rotation={[0, 0, Math.PI / 2]}
+              onClick={handlePrevious}
+            >
+              <planeGeometry args={[1, 1]} />
+              <meshBasicMaterial map={arrowTexture} transparent opacity={0.9} />
+            </mesh>
+
+            {/* Next Button */}
+            <mesh
+              position={[mobileNavButtonSpacing, mobileNavButtonY, 0.1]}
+              scale={[mobileNavButtonScale, mobileNavButtonScale, 1]}
+              rotation={[0, 0, -Math.PI / 2]}
+              onClick={handleNext}
+            >
+              <planeGeometry args={[1, 1]} />
+              <meshBasicMaterial map={arrowTexture} transparent opacity={0.9} />
+            </mesh>
+
+            {/* Photo indicator dots */}
+            {photoList.map((_, index) => (
+              <mesh
+                key={`dot-${index}`}
+                position={[
+                  (index - Math.floor(photoList.length / 2)) * 0.3,
+                  mobileNavButtonY - 0.8,
+                  0.1
+                ]}
+                scale={[0.1, 0.1, 1]}
+                onClick={() => setActiveIndex(index)}
+              >
+                <circleGeometry args={[1, 8]} />
+                <meshBasicMaterial 
+                  color={index === activeIndex ? "#ffffff" : "#666666"} 
+                  transparent 
+                  opacity={index === activeIndex ? 1 : 0.5} 
+                />
+              </mesh>
+            ))}
+          </>
+        )}
 
         {photoList.map(([name, src], index) => (
           <Photo
