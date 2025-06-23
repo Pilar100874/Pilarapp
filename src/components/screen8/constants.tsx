@@ -1,1 +1,1 @@
-export const SCREEN8_OFFSET_START_Y = -27.5;
+export const SCREEN8_OFFSET_START_Y = -27.7; // Moved down by 2cm (0.2 units)
