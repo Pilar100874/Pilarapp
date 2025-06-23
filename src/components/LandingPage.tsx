@@ -1,18 +1,62 @@
 import { Text, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { MeshBasicMaterial } from 'three';
 import { useResponsiveText } from '@/utils/responsive';
-import { PWAInstallButton } from './PWAInstallButton';
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
 
 export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isPWAHovered, setIsPWAHovered] = useState(false);
   const logoTexture = useTexture('/logo_branco.png');
   const startButtonTexture = useTexture('/iniciar.png');
   const textRef = useRef<any>();
   const materialRef = useRef<MeshBasicMaterial | null>(null);
   const [animationComplete, setAnimationComplete] = useState(false);
-  const { getFontSize, getSpacing, getScale, isMobile } = useResponsiveText();
+  const { getFontSize, getSpacing, getScale, isMobile, isTablet } = useResponsiveText();
+  
+  // PWA state
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isInstallable, setIsInstallable] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(false);
+
+  // PWA setup
+  useEffect(() => {
+    // Check if already installed
+    const checkInstalled = () => {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      const isFullscreenMode = window.matchMedia('(display-mode: fullscreen)').matches;
+      setIsInstalled(isStandalone || isFullscreenMode);
+    };
+
+    checkInstalled();
+
+    // Listen for beforeinstallprompt event
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+      setIsInstallable(true);
+    };
+
+    // Listen for app installed event
+    const handleAppInstalled = () => {
+      setIsInstalled(true);
+      setIsInstallable(false);
+      setDeferredPrompt(null);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
+  }, []);
 
   // Responsive scaling with orientation consideration
   const logoScale = [
@@ -37,6 +81,17 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         1
       ]) as [number, number, number];
 
+  // PWA button scale and position
+  const pwaButtonScale = isPWAHovered 
+    ? [getScale(0.35, 0.3, 0.4, 0.45, 0.55), getScale(0.35, 0.3, 0.4, 0.45, 0.55), 1]
+    : [getScale(0.3, 0.25, 0.35, 0.4, 0.5), getScale(0.3, 0.25, 0.35, 0.4, 0.5), 1] as [number, number, number];
+  
+  const pwaButtonPosition = [
+    getSpacing(2.2, 1.8, 2.5, 2.8, 3.2), // X position (right side)
+    getSpacing(0.6, 0.4, 0.7, 0.8, 1.0),  // Y position (top)
+    0.1 // Z position (slightly forward)
+  ] as [number, number, number];
+
   // Smooth handlers to prevent flicker
   const handlePointerEnter = useCallback(() => {
     setIsHovered(true);
@@ -54,9 +109,45 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
   const handleClick = useCallback((event: any) => {
     event.stopPropagation();
-    // Just start the experience - music will start automatically in the opener
     onStart();
   }, [onStart]);
+
+  // PWA button handlers
+  const handlePWAPointerEnter = useCallback(() => {
+    setIsPWAHovered(true);
+    if (!isMobile) {
+      document.body.style.cursor = 'pointer';
+    }
+  }, [isMobile]);
+
+  const handlePWAPointerLeave = useCallback(() => {
+    setIsPWAHovered(false);
+    if (!isMobile) {
+      document.body.style.cursor = 'default';
+    }
+  }, [isMobile]);
+
+  const handlePWAClick = useCallback(async (event: any) => {
+    event.stopPropagation();
+    
+    if (!deferredPrompt) return;
+
+    try {
+      await deferredPrompt.prompt();
+      const choiceResult = await deferredPrompt.userChoice;
+      
+      if (choiceResult.outcome === 'accepted') {
+        console.log('PWA installation accepted');
+      } else {
+        console.log('PWA installation dismissed');
+      }
+      
+      setDeferredPrompt(null);
+      setIsInstallable(false);
+    } catch (error) {
+      console.error('Error during PWA installation:', error);
+    }
+  }, [deferredPrompt]);
 
   useFrame((state) => {
     if (!textRef.current || animationComplete) return;
@@ -73,48 +164,91 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
     }
   });
 
+  // Show PWA button only on mobile/tablet when installable and not installed
+  const showPWAButton = (isMobile || isTablet) && isInstallable && !isInstalled;
+
   return (
-    <>
-      <group position-y={0}>
-        <mesh position-y={getSpacing(0.8, 0.6, 1.0, 1.2, 1.5)} scale={logoScale}>
-          <planeGeometry args={[2, 1]} />
-          <meshBasicMaterial map={logoTexture} transparent opacity={1} depthWrite={false} />
-        </mesh>
+    <group position-y={0}>
+      <mesh position-y={getSpacing(0.8, 0.6, 1.0, 1.2, 1.5)} scale={logoScale}>
+        <planeGeometry args={[2, 1]} />
+        <meshBasicMaterial map={logoTexture} transparent opacity={1} depthWrite={false} />
+      </mesh>
 
-        <Text
-          ref={textRef}
-          fontSize={fontSize}
-          letterSpacing={0.005}
-          position-z={0.1}
-          position-y={getSpacing(-0.1, -0.15, -0.05, 0, 0)}
-          font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
-          anchorX="center"
-          anchorY="middle"
+      <Text
+        ref={textRef}
+        fontSize={fontSize}
+        letterSpacing={0.005}
+        position-z={0.1}
+        position-y={getSpacing(-0.1, -0.15, -0.05, 0, 0)}
+        font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
+        anchorX="center"
+        anchorY="middle"
+      >
+        PILAR APRESENTA
+        <meshBasicMaterial ref={materialRef as any} transparent depthTest={false} depthWrite={false} />
+      </Text>
+
+      <mesh
+        position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}
+        scale={buttonScale}
+        onClick={handleClick}
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave}
+      >
+        <planeGeometry args={[1, 1]} />
+        <meshBasicMaterial
+          map={startButtonTexture}
+          transparent
+          opacity={1}
+          depthTest={false}
+          depthWrite={false}
+        />
+      </mesh>
+
+      {/* PWA Install Button - 3D integrated */}
+      {showPWAButton && (
+        <group
+          position={pwaButtonPosition}
+          scale={pwaButtonScale}
+          onClick={handlePWAClick}
+          onPointerEnter={handlePWAPointerEnter}
+          onPointerLeave={handlePWAPointerLeave}
         >
-          PILAR APRESENTA
-          <meshBasicMaterial ref={materialRef as any} transparent depthTest={false} depthWrite={false} />
-        </Text>
-
-        <mesh
-          position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}
-          scale={buttonScale}
-          onClick={handleClick}
-          onPointerEnter={handlePointerEnter}
-          onPointerLeave={handlePointerLeave}
-        >
-          <planeGeometry args={[1, 1]} />
-          <meshBasicMaterial
-            map={startButtonTexture}
-            transparent
-            opacity={1}
-            depthTest={false}
-            depthWrite={false}
-          />
-        </mesh>
-      </group>
-
-      {/* PWA Install Button - positioned in the landing page */}
-      <PWAInstallButton />
-    </>
+          {/* Button background circle */}
+          <mesh position-z={0.01}>
+            <circleGeometry args={[1, 32]} />
+            <meshBasicMaterial 
+              color={isPWAHovered ? "#0066cc" : "#0080ff"} 
+              transparent 
+              opacity={0.9}
+              depthWrite={false}
+            />
+          </mesh>
+          
+          {/* Button border */}
+          <mesh position-z={0.005} scale={[1.05, 1.05, 1]}>
+            <circleGeometry args={[1, 32]} />
+            <meshBasicMaterial 
+              color="white" 
+              transparent 
+              opacity={0.8}
+              depthWrite={false}
+            />
+          </mesh>
+          
+          {/* PWA Icon Text */}
+          <Text
+            fontSize={0.4}
+            color="white"
+            position-z={0.02}
+            font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
+            anchorX="center"
+            anchorY="middle"
+          >
+            📱
+          </Text>
+        </group>
+      )}
+    </group>
   );
 };
