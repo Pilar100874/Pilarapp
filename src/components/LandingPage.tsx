@@ -1,17 +1,41 @@
 import { Text, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { MeshBasicMaterial } from 'three';
 import { useResponsiveText } from '@/utils/responsive';
 
 export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const logoTexture = useTexture('/logo_branco.png');
-  const startButtonTexture = useTexture('/iniciar.png');
+  const [texturesLoaded, setTexturesLoaded] = useState(false);
+  const [logoTexture, setLogoTexture] = useState<any>(null);
+  const [startButtonTexture, setStartButtonTexture] = useState<any>(null);
+  
   const textRef = useRef<any>();
   const materialRef = useRef<MeshBasicMaterial | null>(null);
   const [animationComplete, setAnimationComplete] = useState(false);
   const { getFontSize, getSpacing, getScale, isMobile } = useResponsiveText();
+
+  // Load textures with error handling
+  useEffect(() => {
+    const loadTextures = async () => {
+      try {
+        const [logo, button] = await Promise.all([
+          useTexture.preload('/logo_branco.png'),
+          useTexture.preload('/iniciar.png')
+        ]);
+        
+        setLogoTexture(logo);
+        setStartButtonTexture(button);
+        setTexturesLoaded(true);
+      } catch (error) {
+        console.warn('Texture loading failed:', error);
+        // Continue without textures
+        setTexturesLoaded(true);
+      }
+    };
+
+    loadTextures();
+  }, []);
 
   // Responsive scaling with orientation consideration
   const logoScale = [
@@ -72,12 +96,18 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
     }
   });
 
+  if (!texturesLoaded) {
+    return null; // Don't render until textures are loaded
+  }
+
   return (
     <group position-y={0}>
-      <mesh position-y={getSpacing(0.8, 0.6, 1.0, 1.2, 1.5)} scale={logoScale}>
-        <planeGeometry args={[2, 1]} />
-        <meshBasicMaterial map={logoTexture} transparent opacity={1} depthWrite={false} />
-      </mesh>
+      {logoTexture && (
+        <mesh position-y={getSpacing(0.8, 0.6, 1.0, 1.2, 1.5)} scale={logoScale}>
+          <planeGeometry args={[2, 1]} />
+          <meshBasicMaterial map={logoTexture} transparent opacity={1} depthWrite={false} />
+        </mesh>
+      )}
 
       <Text
         ref={textRef}
@@ -93,22 +123,42 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         <meshBasicMaterial ref={materialRef as any} transparent depthTest={false} depthWrite={false} />
       </Text>
 
-      <mesh
-        position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}
-        scale={buttonScale}
-        onClick={handleClick}
-        onPointerEnter={handlePointerEnter}
-        onPointerLeave={handlePointerLeave}
-      >
-        <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial
-          map={startButtonTexture}
-          transparent
-          opacity={1}
-          depthTest={false}
-          depthWrite={false}
-        />
-      </mesh>
+      {startButtonTexture ? (
+        <mesh
+          position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}
+          scale={buttonScale}
+          onClick={handleClick}
+          onPointerEnter={handlePointerEnter}
+          onPointerLeave={handlePointerLeave}
+        >
+          <planeGeometry args={[1, 1]} />
+          <meshBasicMaterial
+            map={startButtonTexture}
+            transparent
+            opacity={1}
+            depthTest={false}
+            depthWrite={false}
+          />
+        </mesh>
+      ) : (
+        // Fallback button without texture
+        <mesh
+          position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}
+          scale={buttonScale}
+          onClick={handleClick}
+          onPointerEnter={handlePointerEnter}
+          onPointerLeave={handlePointerLeave}
+        >
+          <planeGeometry args={[2, 0.5]} />
+          <meshBasicMaterial
+            color="white"
+            transparent
+            opacity={0.8}
+            depthTest={false}
+            depthWrite={false}
+          />
+        </mesh>
+      )}
     </group>
   );
 };
