@@ -1,7 +1,7 @@
 import { Text } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useRef, useState } from 'react';
-import { Shape, ShapeGeometry, Mesh } from 'three';
+import { Shape, ShapeGeometry, Group } from 'three';
 
 // Function to create rounded rectangle shape
 const createRoundedRectShape = (width: number, height: number, radius: number) => {
@@ -23,7 +23,7 @@ const createRoundedRectShape = (width: number, height: number, radius: number) =
 };
 
 export const ShopButton = () => {
-  const buttonRef = useRef<Mesh>(null);
+  const buttonRef = useRef<Group>(null);
   const [isHovered, setIsHovered] = useState(false);
   const { viewport } = useThree();
 
@@ -94,7 +94,7 @@ export const ShopButton = () => {
         font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
         anchorX="center"
         anchorY="middle"
-        fontWeight="bold"
+        fontWeight={700}
       >
         Conhecer mais..
       </Text>
