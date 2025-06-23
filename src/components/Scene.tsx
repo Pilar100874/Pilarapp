@@ -10,6 +10,7 @@ import { Screen7 } from '@/components/screen7';
 import { Screen8 } from '@/components/screen8';
 import { Screen9 } from '@/components/screen9';
 import { Screen10 } from '@/components/screen10';
+import { Screen11 } from '@/components/screen11';
 import { useEffect, useState } from 'react';
 
 export const Scene = () => {
@@ -31,7 +32,7 @@ export const Scene = () => {
   return (
     <Canvas style={{ width: '100vw', height: '100vh' }}>
       <color attach="background" args={[new Color('black')]} />
-      <ScrollControls pages={10} damping={damping} distance={distance}>
+      <ScrollControls pages={11} damping={damping} distance={distance}>
         <Opener />
         <Screen2 />
         <Screen3 />
@@ -41,6 +42,7 @@ export const Scene = () => {
         <Screen7 />
         <Screen9 />
         <Screen10 />
+        <Screen11 />
       </ScrollControls>
       <ambientLight />
       <directionalLight />

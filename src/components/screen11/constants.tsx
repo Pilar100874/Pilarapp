@@ -1,0 +1,1 @@
+export const SCREEN11_OFFSET_START_Y = -70;
