@@ -32,8 +32,8 @@ export const OpenerText = ({ py }: OpenerText) => {
     1
   ] as [number, number, number];
   
-  // Arrow position with orientation - moved down by 2cm (0.2 units)
-  const arrowY = getSpacing(-2.2, -1.7, -2.6, -2.9, -3.6);
+  // Arrow position with orientation - moved down by 8cm total (0.8 units)
+  const arrowY = getSpacing(-2.8, -2.3, -3.2, -3.5, -4.2);
 
   useFrame((state) => {
     if (!logoRef.current?.material || !text1Ref.current?.material || 
