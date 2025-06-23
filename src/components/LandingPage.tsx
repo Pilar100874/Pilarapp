@@ -82,9 +82,9 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
       ]) as [number, number, number];
 
   // PWA button scale and position
-  const pwaButtonScale = isPWAHovered 
+  const pwaButtonScale = (isPWAHovered 
     ? [getScale(0.35, 0.3, 0.4, 0.45, 0.55), getScale(0.35, 0.3, 0.4, 0.45, 0.55), 1]
-    : [getScale(0.3, 0.25, 0.35, 0.4, 0.5), getScale(0.3, 0.25, 0.35, 0.4, 0.5), 1] as [number, number, number];
+    : [getScale(0.3, 0.25, 0.35, 0.4, 0.5), getScale(0.3, 0.25, 0.35, 0.4, 0.5), 1]) as [number, number, number];
   
   const pwaButtonPosition = [
     getSpacing(2.2, 1.8, 2.5, 2.8, 3.2), // X position (right side)
