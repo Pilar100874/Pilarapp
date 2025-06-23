@@ -40,9 +40,10 @@ export const Photo = (props: Photo) => {
   const baseScale = 0.8; // 20% reduction from 1
   const scale = isMobile ? (baseScale * 0.7) : baseScale;
 
-  // Button configuration
+  // Button configuration - positioned on top of image, 0.5cm from the end
   const buttonFontSize = isMobile ? 0.12 : 0.15;
-  const buttonY = baseY - 2.8; // Position button below the image
+  const imageHeight = 4.5 * scale; // Image height with scale applied
+  const buttonY = baseY + (imageHeight / 2) - 0.5; // 0.5cm from top of image
 
   useFrame((state) => {
     if (!ref.current) return;
@@ -133,7 +134,7 @@ export const Photo = (props: Photo) => {
         }}
       />
       
-      {/* Button - only show when alternate image is displayed */}
+      {/* Button - only show when alternate image is displayed, positioned on top of image */}
       {isAlternate && (
         <group
           ref={buttonRef}
