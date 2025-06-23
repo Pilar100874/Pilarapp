@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useState, useRef, useCallback } from 'react';
 import { MeshBasicMaterial } from 'three';
 import { useResponsiveText } from '@/utils/responsive';
+import { PWAInstallButton } from './PWAInstallButton';
 
 export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -73,42 +74,47 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   });
 
   return (
-    <group position-y={0}>
-      <mesh position-y={getSpacing(0.8, 0.6, 1.0, 1.2, 1.5)} scale={logoScale}>
-        <planeGeometry args={[2, 1]} />
-        <meshBasicMaterial map={logoTexture} transparent opacity={1} depthWrite={false} />
-      </mesh>
+    <>
+      <group position-y={0}>
+        <mesh position-y={getSpacing(0.8, 0.6, 1.0, 1.2, 1.5)} scale={logoScale}>
+          <planeGeometry args={[2, 1]} />
+          <meshBasicMaterial map={logoTexture} transparent opacity={1} depthWrite={false} />
+        </mesh>
 
-      <Text
-        ref={textRef}
-        fontSize={fontSize}
-        letterSpacing={0.005}
-        position-z={0.1}
-        position-y={getSpacing(-0.1, -0.15, -0.05, 0, 0)}
-        font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
-        anchorX="center"
-        anchorY="middle"
-      >
-        PILAR APRESENTA
-        <meshBasicMaterial ref={materialRef as any} transparent depthTest={false} depthWrite={false} />
-      </Text>
+        <Text
+          ref={textRef}
+          fontSize={fontSize}
+          letterSpacing={0.005}
+          position-z={0.1}
+          position-y={getSpacing(-0.1, -0.15, -0.05, 0, 0)}
+          font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
+          anchorX="center"
+          anchorY="middle"
+        >
+          PILAR APRESENTA
+          <meshBasicMaterial ref={materialRef as any} transparent depthTest={false} depthWrite={false} />
+        </Text>
 
-      <mesh
-        position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}
-        scale={buttonScale}
-        onClick={handleClick}
-        onPointerEnter={handlePointerEnter}
-        onPointerLeave={handlePointerLeave}
-      >
-        <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial
-          map={startButtonTexture}
-          transparent
-          opacity={1}
-          depthTest={false}
-          depthWrite={false}
-        />
-      </mesh>
-    </group>
+        <mesh
+          position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}
+          scale={buttonScale}
+          onClick={handleClick}
+          onPointerEnter={handlePointerEnter}
+          onPointerLeave={handlePointerLeave}
+        >
+          <planeGeometry args={[1, 1]} />
+          <meshBasicMaterial
+            map={startButtonTexture}
+            transparent
+            opacity={1}
+            depthTest={false}
+            depthWrite={false}
+          />
+        </mesh>
+      </group>
+
+      {/* PWA Install Button - positioned in the landing page */}
+      <PWAInstallButton />
+    </>
   );
 };

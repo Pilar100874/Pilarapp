@@ -89,7 +89,7 @@ export const PWAInstallButton = () => {
       onClick={handleInstallClick}
       style={{
         position: 'fixed',
-        top: '85px', // Below the shop icon
+        top: '85px', // Positioned below the shop icon
         right: '25px',
         zIndex: 1000,
         width: '50px',
