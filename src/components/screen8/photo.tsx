@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useRef, useState } from 'react';
 import { MathUtils, Mesh, PlaneGeometry, Shape, ShapeGeometry, Group } from 'three';
 import { Plane, Text } from '@react-three/drei';
+import { useResponsiveText } from '@/utils/responsive';
 
 type Photo = {
   defaultSrc: string;
@@ -40,6 +41,7 @@ export const Photo = (props: Photo) => {
   const [isAlternate, setIsAlternate] = useState(false);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const { viewport } = useThree();
+  const { isMobilePortrait } = useResponsiveText();
 
   // Responsive configuration
   const isMobile = viewport.width < 5;
@@ -55,9 +57,14 @@ export const Photo = (props: Photo) => {
   const baseY = -row * verticalSpacing;
   const baseZ = 0;
 
-  // Apply 20% reduction to the base scale
+  // Apply 20% reduction to the base scale, plus additional 10% for mobile portrait
   const baseScale = 0.8; // 20% reduction from 1
-  const scale = isMobile ? (baseScale * 0.7) : baseScale;
+  let scale = isMobile ? (baseScale * 0.7) : baseScale;
+  
+  // Additional 10% reduction for mobile portrait
+  if (isMobilePortrait) {
+    scale = scale * 0.9; // Additional 10% reduction
+  }
 
   // Button configuration - moved up 3cm (0.3 units) from previous position
   const buttonFontSize = isMobile ? 0.12 : 0.15;
