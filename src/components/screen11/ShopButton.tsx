@@ -94,7 +94,6 @@ export const ShopButton = () => {
         font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
         anchorX="center"
         anchorY="middle"
-        fontWeight={700}
       >
         Conhecer mais..
       </Text>
