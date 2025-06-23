@@ -27,8 +27,8 @@ export const Screen6 = () => {
   // Responsive button positioning - centered below the images
   // Reduced by 10%: multiply each value by 0.9
   const buttonScale = getFontSize(0.36, 0.315, 0.405, 0.45, 0.495);
-  // Moved up by 1cm (0.1 units): subtract 0.1 from each value
-  const buttonY = getSpacing(-3.6, -3.1, -3.9, -4.1, -4.6);
+  // Moved up by 3cm total (0.3 units): subtract 0.3 from each value
+  const buttonY = getSpacing(-3.4, -2.9, -3.7, -3.9, -4.4);
 
   return (
     <Scroll>
@@ -48,7 +48,7 @@ export const Screen6 = () => {
           );
         })}
 
-        {/* Play/Pause Button - centered below images, reduced by 10% and moved up 1cm */}
+        {/* Play/Pause Button - centered below images, reduced by 10% and moved up 3cm total */}
         <mesh
           position={[0, buttonY, 1]}
           scale={[buttonScale, buttonScale, 1]}
