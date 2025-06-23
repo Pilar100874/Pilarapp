@@ -1,9 +1,15 @@
 import { useState } from 'react';
 import { Scene } from '@/components/Scene';
 import { LandingScene } from '@/components/LandingScene';
+import { AudioControls } from '@/components/AudioControls';
 
 function App() {
   const [started, setStarted] = useState(false);
+  const [musicStarted, setMusicStarted] = useState(false);
+
+  const handleMusicStart = () => {
+    setMusicStarted(true);
+  };
 
   return (
     <>
@@ -11,8 +17,8 @@ function App() {
         href="https://www.pilar.com.br"
         style={{
           position: 'fixed',
-          top: '25px', // Moved down by 0.5cm (5px)
-          right: '25px', // Moved left by 0.5cm (5px)
+          top: '25px',
+          right: '25px',
           zIndex: 1000,
           width: '50px',
           height: '50px',
@@ -28,7 +34,15 @@ function App() {
           }}
         />
       </a>
-      {started ? <Scene /> : <LandingScene onStart={() => setStarted(true)} />}
+      
+      {/* Audio Controls - only show after music has started */}
+      {musicStarted && <AudioControls onMusicStart={handleMusicStart} />}
+      
+      {started ? (
+        <Scene />
+      ) : (
+        <LandingScene onStart={() => setStarted(true)} onMusicStart={handleMusicStart} />
+      )}
     </>
   );
 }

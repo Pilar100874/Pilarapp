@@ -4,7 +4,12 @@ import { useState, useRef, useCallback } from 'react';
 import { MeshBasicMaterial } from 'three';
 import { useResponsiveText } from '@/utils/responsive';
 
-export const LandingPage = ({ onStart }: { onStart: () => void }) => {
+interface LandingPageProps {
+  onStart: () => void;
+  onMusicStart: () => void;
+}
+
+export const LandingPage = ({ onStart, onMusicStart }: LandingPageProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const logoTexture = useTexture('/logo_branco.png');
   const startButtonTexture = useTexture('/iniciar.png');
@@ -53,8 +58,9 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
   const handleClick = useCallback((event: any) => {
     event.stopPropagation();
-    onStart();
-  }, [onStart]);
+    onMusicStart(); // Start music first
+    onStart(); // Then start the experience
+  }, [onStart, onMusicStart]);
 
   useFrame((state) => {
     if (!textRef.current || animationComplete) return;

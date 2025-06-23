@@ -40,8 +40,15 @@ const AssetPreloader = () => {
         };
       });
 
+      // Preload audio
+      const audioPromise = new Promise((resolve) => {
+        const audio = new Audio('/musica.mp3');
+        audio.addEventListener('canplaythrough', () => resolve(null), { once: true });
+        audio.load();
+      });
+
       // Wait for all assets to load
-      await Promise.all([...imagePromises, videoPromise]);
+      await Promise.all([...imagePromises, videoPromise, audioPromise]);
       setIsLoading(false);
     };
 
@@ -51,13 +58,18 @@ const AssetPreloader = () => {
   return null;
 };
 
-export const LandingScene = ({ onStart }: { onStart: () => void }) => {
+interface LandingSceneProps {
+  onStart: () => void;
+  onMusicStart: () => void;
+}
+
+export const LandingScene = ({ onStart, onMusicStart }: LandingSceneProps) => {
   return (
     <Canvas style={{ width: '100vw', height: '100vh' }}>
       <color attach="background" args={[new Color('black')]} />
       <Suspense fallback={null}>
         <AssetPreloader />
-        <LandingPage onStart={onStart} />
+        <LandingPage onStart={onStart} onMusicStart={onMusicStart} />
       </Suspense>
       <ambientLight />
       <directionalLight />
