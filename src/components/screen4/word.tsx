@@ -23,8 +23,8 @@ export const Word = ({ index, value }: Word) => {
     ? getFontSize(0.35, 0.3, 0.42, 0.5, 0.585)
     : baseFontSize;
   
-  // Responsive vertical spacing with orientation - increased spacing to prevent overlap
-  const verticalSpacing = getSpacing(0.8, 0.7, 0.9, 1.0, 1.2);
+  // Responsive vertical spacing with orientation - reduced by 0.5cm (0.05 units)
+  const verticalSpacing = getSpacing(0.75, 0.65, 0.85, 0.95, 1.15);
 
   useFrame(() => {
     if (!ref.current || !refMaterial.current) {
