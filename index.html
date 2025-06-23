@@ -1,10 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/png" href="/ico.png" />
+    <link rel="apple-touch-icon" href="/ico.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="Pilar Comercial e Serviços - 27 anos no mercado papeleiro" />
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Pilar" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Pilar Comercial e Serviços" />
+    <meta property="og:description" content="27 anos no mercado papeleiro - 9 unidades pelo Brasil" />
+    <meta property="og:image" content="/ico.png" />
+    <meta property="og:type" content="website" />
+    
+    <title>Pilar Comercial e Serviços</title>
+    
+    <!-- Register Service Worker -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -3,6 +3,7 @@ import { Scene } from '@/components/Scene';
 import { LandingScene } from '@/components/LandingScene';
 import { AudioControls } from '@/components/AudioControls';
 import { AudioProvider } from '@/components/AudioManager';
+import { PWAInstallButton } from '@/components/PWAInstallButton';
 
 function App() {
   const [started, setStarted] = useState(false);
@@ -34,6 +35,9 @@ function App() {
           }}
         />
       </a>
+      
+      {/* PWA Install Button */}
+      <PWAInstallButton />
       
       {/* Audio Controls - show when experience starts */}
       {started && <AudioControls />}

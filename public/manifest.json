@@ -3,7 +3,7 @@
   "short_name": "Pilar",
   "description": "Pilar Comercial e Serviços - 27 anos no mercado papeleiro",
   "start_url": "/",
-  "display": "fullscreen",
+  "display": "standalone",
   "orientation": "any",
   "theme_color": "#000000",
   "background_color": "#000000",
