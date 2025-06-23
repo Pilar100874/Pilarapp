@@ -6,6 +6,7 @@ import { TextureLoader, VideoTexture } from 'three';
 import { dataPhotos as screen3Photos } from '@/components/screen3/dataPhotos';
 import { dataPhotos as screen6Photos } from '@/components/screen6/dataPhotos';
 import { dataPhotos as screen8Photos } from '@/components/screen8/dataPhotos';
+import { PWAInstallButton } from './PWAInstallButton';
 
 const AssetPreloader = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -60,14 +61,19 @@ const AssetPreloader = () => {
 
 export const LandingScene = ({ onStart }: { onStart: () => void }) => {
   return (
-    <Canvas style={{ width: '100vw', height: '100vh' }}>
-      <color attach="background" args={[new Color('black')]} />
-      <Suspense fallback={null}>
-        <AssetPreloader />
-        <LandingPage onStart={onStart} />
-      </Suspense>
-      <ambientLight />
-      <directionalLight />
-    </Canvas>
+    <>
+      <Canvas style={{ width: '100vw', height: '100vh' }}>
+        <color attach="background" args={[new Color('black')]} />
+        <Suspense fallback={null}>
+          <AssetPreloader />
+          <LandingPage onStart={onStart} />
+        </Suspense>
+        <ambientLight />
+        <directionalLight />
+      </Canvas>
+      
+      {/* PWA Install Button - positioned below shop icon for mobile/tablet */}
+      <PWAInstallButton />
+    </>
   );
 };

@@ -10,15 +10,21 @@ export const PWAInstallButton = () => {
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
 
   useEffect(() => {
-    // Detect mobile device
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+    // Detect device type
+    const checkDevice = () => {
+      const width = window.innerWidth;
+      const userAgent = navigator.userAgent;
+      const isMobileDevice = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+      
+      setIsMobile(width <= 768 && isMobileDevice);
+      setIsTablet(width > 768 && width <= 1024 && isMobileDevice);
     };
     
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
+    checkDevice();
+    window.addEventListener('resize', checkDevice);
 
     // Check if already installed
     const checkInstalled = () => {
@@ -47,7 +53,7 @@ export const PWAInstallButton = () => {
     window.addEventListener('appinstalled', handleAppInstalled);
 
     return () => {
-      window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('resize', checkDevice);
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
     };
@@ -73,8 +79,8 @@ export const PWAInstallButton = () => {
     }
   }, [deferredPrompt]);
 
-  // Only show on mobile and when installable but not installed
-  if (!isMobile || !isInstallable || isInstalled) {
+  // Only show on mobile/tablet and when installable but not installed
+  if ((!isMobile && !isTablet) || !isInstallable || isInstalled) {
     return null;
   }
 
@@ -115,7 +121,7 @@ export const PWAInstallButton = () => {
       title="Instalar App"
       aria-label="Instalar aplicativo"
     >
-      {/* Fallback text if background image doesn't load */}
+      {/* Fallback icon if background image doesn't load */}
       <span style={{ 
         fontSize: '12px', 
         opacity: 0.8,
