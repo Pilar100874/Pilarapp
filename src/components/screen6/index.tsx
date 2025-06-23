@@ -11,7 +11,7 @@ export const Screen6 = () => {
   const [order, setOrder] = useState(photoList.map((_, i) => i));
   const [isAnimationPaused, setIsAnimationPaused] = useState(false);
   const playTexture = useTexture('/play.png');
-  const { getFontSize, getSpacing } = useResponsiveText();
+  const { isMobilePortrait } = useResponsiveText();
 
   const rotatePhotos = (clickedIndex: number) => {
     const newOrder = [...order];
@@ -24,32 +24,16 @@ export const Screen6 = () => {
     setOrder(newOrder);
   };
 
-  // Responsive button positioning - centered below the images
-  const buttonScale = getFontSize(0.4, 0.35, 0.45, 0.5, 0.55);
-  const buttonY = getSpacing(-3.5, -3.0, -3.8, -4.0, -4.5);
+  // Button position - move up 2cm (0.2 units) in mobile portrait
+  const buttonY = isMobilePortrait ? 0.2 : 0; // Moved up by 2cm in mobile portrait
 
   return (
     <Scroll>
       <group position-y={SCREEN6_OFFSET_START_Y} rotation-y={Math.PI * -0.05}>
-        {order.map((originalIndex, displayIndex) => {
-          const [name, src] = photoList[originalIndex];
-          return (
-            <Photo
-              key={name}
-              src={src}
-              z={-displayIndex * 0.35}
-              index={displayIndex}
-              totalPhotos={photoList.length}
-              onClick={() => rotatePhotos(originalIndex)}
-              isPaused={isAnimationPaused}
-            />
-          );
-        })}
-
-        {/* Play/Pause Button - centered below images */}
+        {/* Play/Pause Button */}
         <mesh
-          position={[0, buttonY, 1]}
-          scale={[buttonScale, buttonScale, 1]}
+          position={[-2, buttonY, 2]}
+          scale={[0.45, 0.45, 1]}
           rotation={[0, 0, isAnimationPaused ? Math.PI : 0]}
           onClick={() => setIsAnimationPaused(!isAnimationPaused)}
           onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
@@ -64,6 +48,21 @@ export const Screen6 = () => {
             alphaTest={0.1}
           />
         </mesh>
+
+        {order.map((originalIndex, displayIndex) => {
+          const [name, src] = photoList[originalIndex];
+          return (
+            <Photo
+              key={name}
+              src={src}
+              z={-displayIndex * 0.35}
+              index={displayIndex}
+              totalPhotos={photoList.length}
+              onClick={() => rotatePhotos(originalIndex)}
+              isPaused={isAnimationPaused}
+            />
+          );
+        })}
       </group>
     </Scroll>
   );
