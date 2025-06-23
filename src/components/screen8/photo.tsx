@@ -1,7 +1,7 @@
 import { useScroll, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useRef, useState } from 'react';
-import { MathUtils, Mesh, PlaneGeometry, Shape, ShapeGeometry } from 'three';
+import { MathUtils, Mesh, PlaneGeometry, Shape, ShapeGeometry, Group } from 'three';
 import { Plane, Text } from '@react-three/drei';
 
 type Photo = {
@@ -34,7 +34,7 @@ export const Photo = (props: Photo) => {
   const defaultTexture = useTexture(props.defaultSrc);
   const alternateTexture = useTexture(props.alternateSrc);
   const ref = useRef<Mesh>(null);
-  const buttonRef = useRef<Mesh>(null);
+  const buttonRef = useRef<Group>(null);
   const scroll = useScroll();
   const [isHovered, setIsHovered] = useState(false);
   const [isAlternate, setIsAlternate] = useState(false);
