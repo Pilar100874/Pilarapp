@@ -1,25 +1,72 @@
-import { useCallback } from 'react';
-import { useAudio } from '@/hooks/useAudio';
+import { useCallback, useRef, useState, useEffect } from 'react';
 
-interface AudioControlsProps {
-  onMusicStart: () => void;
-}
+export const AudioControls = () => {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-export const AudioControls = ({ onMusicStart }: AudioControlsProps) => {
-  const { isPlaying, isLoaded, play, pause, toggle } = useAudio('/musica.mp3');
+  useEffect(() => {
+    // Create audio element
+    audioRef.current = new Audio('/musica.mp3');
+    audioRef.current.loop = true;
+    audioRef.current.volume = 0.7;
 
-  const handlePlay = useCallback(async () => {
-    await play();
-    onMusicStart();
-  }, [play, onMusicStart]);
+    const audio = audioRef.current;
 
-  const handleToggle = useCallback(() => {
-    if (!isPlaying) {
-      handlePlay();
-    } else {
-      pause();
+    // Event listeners
+    const handleCanPlayThrough = () => setIsLoaded(true);
+    const handlePlay = () => setIsPlaying(true);
+    const handlePause = () => setIsPlaying(false);
+    const handleEnded = () => setIsPlaying(false);
+
+    audio.addEventListener('canplaythrough', handleCanPlayThrough);
+    audio.addEventListener('play', handlePlay);
+    audio.addEventListener('pause', handlePause);
+    audio.addEventListener('ended', handleEnded);
+
+    // Preload audio
+    audio.load();
+
+    // Check if music is already playing (started from landing page)
+    const checkExistingAudio = () => {
+      const existingAudios = document.querySelectorAll('audio');
+      existingAudios.forEach(existingAudio => {
+        if (existingAudio.src.includes('musica.mp3') && !existingAudio.paused) {
+          setIsPlaying(true);
+          // Replace the existing audio with our controlled one
+          existingAudio.pause();
+          audio.currentTime = existingAudio.currentTime;
+          audio.play();
+        }
+      });
+    };
+
+    // Small delay to check for existing audio
+    setTimeout(checkExistingAudio, 100);
+
+    return () => {
+      audio.removeEventListener('canplaythrough', handleCanPlayThrough);
+      audio.removeEventListener('play', handlePlay);
+      audio.removeEventListener('pause', handlePause);
+      audio.removeEventListener('ended', handleEnded);
+      audio.pause();
+      audio.src = '';
+    };
+  }, []);
+
+  const handleToggle = useCallback(async () => {
+    if (!audioRef.current || !isLoaded) return;
+
+    try {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        await audioRef.current.play();
+      }
+    } catch (error) {
+      console.warn('Audio toggle failed:', error);
     }
-  }, [isPlaying, handlePlay, pause]);
+  }, [isPlaying, isLoaded]);
 
   if (!isLoaded) {
     return null;

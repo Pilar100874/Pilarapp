@@ -4,12 +4,7 @@ import { useState, useRef, useCallback } from 'react';
 import { MeshBasicMaterial } from 'three';
 import { useResponsiveText } from '@/utils/responsive';
 
-interface LandingPageProps {
-  onStart: () => void;
-  onMusicStart: () => void;
-}
-
-export const LandingPage = ({ onStart, onMusicStart }: LandingPageProps) => {
+export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isHovered, setIsHovered] = useState(false);
   const logoTexture = useTexture('/logo_branco.png');
   const startButtonTexture = useTexture('/iniciar.png');
@@ -58,9 +53,17 @@ export const LandingPage = ({ onStart, onMusicStart }: LandingPageProps) => {
 
   const handleClick = useCallback((event: any) => {
     event.stopPropagation();
-    onMusicStart(); // Start music first
-    onStart(); // Then start the experience
-  }, [onStart, onMusicStart]);
+    
+    // Start music immediately when button is clicked
+    const audio = new Audio('/musica.mp3');
+    audio.loop = true;
+    audio.volume = 0.7;
+    audio.play().catch(error => {
+      console.warn('Audio autoplay failed:', error);
+    });
+    
+    onStart();
+  }, [onStart]);
 
   useFrame((state) => {
     if (!textRef.current || animationComplete) return;

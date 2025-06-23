@@ -58,18 +58,13 @@ const AssetPreloader = () => {
   return null;
 };
 
-interface LandingSceneProps {
-  onStart: () => void;
-  onMusicStart: () => void;
-}
-
-export const LandingScene = ({ onStart, onMusicStart }: LandingSceneProps) => {
+export const LandingScene = ({ onStart }: { onStart: () => void }) => {
   return (
     <Canvas style={{ width: '100vw', height: '100vh' }}>
       <color attach="background" args={[new Color('black')]} />
       <Suspense fallback={null}>
         <AssetPreloader />
-        <LandingPage onStart={onStart} onMusicStart={onMusicStart} />
+        <LandingPage onStart={onStart} />
       </Suspense>
       <ambientLight />
       <directionalLight />

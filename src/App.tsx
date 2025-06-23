@@ -5,10 +5,9 @@ import { AudioControls } from '@/components/AudioControls';
 
 function App() {
   const [started, setStarted] = useState(false);
-  const [musicStarted, setMusicStarted] = useState(false);
 
-  const handleMusicStart = () => {
-    setMusicStarted(true);
+  const handleStart = () => {
+    setStarted(true);
   };
 
   return (
@@ -35,13 +34,13 @@ function App() {
         />
       </a>
       
-      {/* Audio Controls - only show after music has started */}
-      {musicStarted && <AudioControls onMusicStart={handleMusicStart} />}
+      {/* Audio Controls - show when experience starts */}
+      {started && <AudioControls />}
       
       {started ? (
         <Scene />
       ) : (
-        <LandingScene onStart={() => setStarted(true)} onMusicStart={handleMusicStart} />
+        <LandingScene onStart={handleStart} />
       )}
     </>
   );
