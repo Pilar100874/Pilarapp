@@ -2,7 +2,7 @@ import { useScroll, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useRef, useState } from 'react';
 import { MathUtils, Mesh, PlaneGeometry } from 'three';
-import { Plane } from '@react-three/drei';
+import { Plane, Text } from '@react-three/drei';
 
 type Photo = {
   defaultSrc: string;
@@ -15,9 +15,11 @@ export const Photo = (props: Photo) => {
   const defaultTexture = useTexture(props.defaultSrc);
   const alternateTexture = useTexture(props.alternateSrc);
   const ref = useRef<Mesh>(null);
+  const buttonRef = useRef<Mesh>(null);
   const scroll = useScroll();
   const [isHovered, setIsHovered] = useState(false);
   const [isAlternate, setIsAlternate] = useState(false);
+  const [isButtonHovered, setIsButtonHovered] = useState(false);
   const { viewport } = useThree();
 
   // Responsive configuration
@@ -37,6 +39,10 @@ export const Photo = (props: Photo) => {
   // Apply 20% reduction to the base scale
   const baseScale = 0.8; // 20% reduction from 1
   const scale = isMobile ? (baseScale * 0.7) : baseScale;
+
+  // Button configuration
+  const buttonFontSize = isMobile ? 0.12 : 0.15;
+  const buttonY = baseY - 2.8; // Position button below the image
 
   useFrame((state) => {
     if (!ref.current) return;
@@ -78,24 +84,92 @@ export const Photo = (props: Photo) => {
       mouseX * (isMobile ? 0.1 : 0.2),
       0.1
     );
+
+    // Update button position to follow the image
+    if (buttonRef.current) {
+      buttonRef.current.position.x = MathUtils.lerp(
+        buttonRef.current.position.x,
+        baseX + mouseX,
+        0.1
+      );
+      buttonRef.current.position.y = MathUtils.lerp(
+        buttonRef.current.position.y,
+        buttonY + parallaxY + mouseY,
+        0.1
+      );
+      buttonRef.current.position.z = MathUtils.lerp(
+        buttonRef.current.position.z,
+        baseZ + (isHovered ? 1 : 0) + 0.1,
+        0.1
+      );
+
+      // Button hover effect
+      const buttonScale = isButtonHovered ? 1.1 : 1;
+      buttonRef.current.scale.x = MathUtils.lerp(buttonRef.current.scale.x, buttonScale, 0.1);
+      buttonRef.current.scale.y = MathUtils.lerp(buttonRef.current.scale.y, buttonScale, 0.1);
+    }
   });
 
+  const handleButtonClick = () => {
+    window.open('https://www.pilar.com.br', '_blank');
+  };
+
   return (
-    <Plane
-      ref={ref}
-      args={[3.25, 4.5]}
-      material-map={isAlternate ? alternateTexture : defaultTexture}
-      material-transparent
-      material-alphaTest={0.1}
-      onClick={() => setIsAlternate(!isAlternate)}
-      onPointerOver={() => {
-        document.body.style.cursor = 'pointer';
-        setIsHovered(true);
-      }}
-      onPointerOut={() => {
-        document.body.style.cursor = 'default';
-        setIsHovered(false);
-      }}
-    />
+    <group>
+      <Plane
+        ref={ref}
+        args={[3.25, 4.5]}
+        material-map={isAlternate ? alternateTexture : defaultTexture}
+        material-transparent
+        material-alphaTest={0.1}
+        onClick={() => setIsAlternate(!isAlternate)}
+        onPointerOver={() => {
+          document.body.style.cursor = 'pointer';
+          setIsHovered(true);
+        }}
+        onPointerOut={() => {
+          document.body.style.cursor = 'default';
+          setIsHovered(false);
+        }}
+      />
+      
+      {/* Button - only show when alternate image is displayed */}
+      {isAlternate && (
+        <group
+          ref={buttonRef}
+          onClick={handleButtonClick}
+          onPointerOver={() => {
+            document.body.style.cursor = 'pointer';
+            setIsButtonHovered(true);
+          }}
+          onPointerOut={() => {
+            document.body.style.cursor = 'default';
+            setIsButtonHovered(false);
+          }}
+        >
+          {/* Button background */}
+          <mesh position-z={0.01}>
+            <planeGeometry args={[1.5, 0.4]} />
+            <meshBasicMaterial 
+              color={isButtonHovered ? "#ffffff" : "#f0f0f0"} 
+              transparent 
+              opacity={0.9}
+            />
+          </mesh>
+          
+          {/* Button text */}
+          <Text
+            fontSize={buttonFontSize}
+            color={isButtonHovered ? "#000000" : "#333333"}
+            position-z={0.02}
+            font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
+            anchorX="center"
+            anchorY="middle"
+          >
+            Conhecer ..
+          </Text>
+        </group>
+      )}
+    </group>
   );
 };
