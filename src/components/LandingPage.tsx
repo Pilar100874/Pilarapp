@@ -1,32 +1,17 @@
 import { Text, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useState, useRef, useCallback } from 'react';
-import { MeshBasicMaterial, Texture } from 'three';
+import { MeshBasicMaterial } from 'three';
 import { useResponsiveText } from '@/utils/responsive';
 
 export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [logoTexture, setLogoTexture] = useState<Texture | null>(null);
-  const [startButtonTexture, setStartButtonTexture] = useState<Texture | null>(null);
+  const logoTexture = useTexture('/logo_branco.png');
+  const startButtonTexture = useTexture('/iniciar.png');
   const textRef = useRef<any>();
   const materialRef = useRef<MeshBasicMaterial | null>(null);
   const [animationComplete, setAnimationComplete] = useState(false);
   const { getFontSize, getSpacing, getScale, isMobile } = useResponsiveText();
-
-  // Load textures with error handling
-  try {
-    const logo = useTexture('/logo_branco.png');
-    if (!logoTexture) setLogoTexture(logo);
-  } catch (error) {
-    console.warn('Failed to load logo texture:', error);
-  }
-
-  try {
-    const startButton = useTexture('/iniciar.png');
-    if (!startButtonTexture) setStartButtonTexture(startButton);
-  } catch (error) {
-    console.warn('Failed to load start button texture:', error);
-  }
 
   // Responsive scaling with orientation consideration
   const logoScale = [
@@ -89,29 +74,10 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
   return (
     <group position-y={0}>
-      {/* Only render logo if texture loaded successfully */}
-      {logoTexture && (
-        <mesh position-y={getSpacing(0.8, 0.6, 1.0, 1.2, 1.5)} scale={logoScale}>
-          <planeGeometry args={[2, 1]} />
-          <meshBasicMaterial map={logoTexture} transparent opacity={1} depthWrite={false} />
-        </mesh>
-      )}
-
-      {/* Fallback text logo if image fails to load */}
-      {!logoTexture && (
-        <Text
-          fontSize={getFontSize(0.4, 0.35, 0.5, 0.55, 0.7)}
-          letterSpacing={0.02}
-          position-y={getSpacing(0.8, 0.6, 1.0, 1.2, 1.5)}
-          position-z={0.1}
-          font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
-          anchorX="center"
-          anchorY="middle"
-          color="white"
-        >
-          PILAR
-        </Text>
-      )}
+      <mesh position-y={getSpacing(0.8, 0.6, 1.0, 1.2, 1.5)} scale={logoScale}>
+        <planeGeometry args={[2, 1]} />
+        <meshBasicMaterial map={logoTexture} transparent opacity={1} depthWrite={false} />
+      </mesh>
 
       <Text
         ref={textRef}
@@ -127,7 +93,6 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         <meshBasicMaterial ref={materialRef as any} transparent depthTest={false} depthWrite={false} />
       </Text>
 
-      {/* Start button - render with or without texture */}
       <mesh
         position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}
         scale={buttonScale}
@@ -136,39 +101,14 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         onPointerLeave={handlePointerLeave}
       >
         <planeGeometry args={[1, 1]} />
-        {startButtonTexture ? (
-          <meshBasicMaterial
-            map={startButtonTexture}
-            transparent
-            opacity={1}
-            depthTest={false}
-            depthWrite={false}
-          />
-        ) : (
-          <meshBasicMaterial
-            color="white"
-            transparent
-            opacity={0.8}
-            depthTest={false}
-            depthWrite={false}
-          />
-        )}
+        <meshBasicMaterial
+          map={startButtonTexture}
+          transparent
+          opacity={1}
+          depthTest={false}
+          depthWrite={false}
+        />
       </mesh>
-
-      {/* Fallback text for start button if texture fails */}
-      {!startButtonTexture && (
-        <Text
-          fontSize={getFontSize(0.15, 0.12, 0.18, 0.2, 0.25)}
-          position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}
-          position-z={0.1}
-          font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
-          anchorX="center"
-          anchorY="middle"
-          color="black"
-        >
-          INICIAR
-        </Text>
-      )}
     </group>
   );
 };
