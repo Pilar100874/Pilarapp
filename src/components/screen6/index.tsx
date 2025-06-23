@@ -9,7 +9,7 @@ import { useResponsiveText } from '@/utils/responsive';
 export const Screen6 = () => {
   const photoList = Object.entries(dataPhotos);
   const [order, setOrder] = useState(photoList.map((_, i) => i));
-  const [isAnimationPaused, setIsAnimationPaused] = useState(false);
+  const [isAnimationPaused, setIsAnimationPaused] = useState(true); // Start paused (showing play button)
   const playTexture = useTexture('/play.png');
   const { isMobilePortrait } = useResponsiveText();
 
@@ -30,11 +30,11 @@ export const Screen6 = () => {
   return (
     <Scroll>
       <group position-y={SCREEN6_OFFSET_START_Y} rotation-y={Math.PI * -0.05}>
-        {/* Play/Pause Button */}
+        {/* Play/Pause Button - starts with play (paused state) */}
         <mesh
           position={[-2, buttonY, 2]}
           scale={[0.45, 0.45, 1]}
-          rotation={[0, 0, isAnimationPaused ? Math.PI : 0]}
+          rotation={[0, 0, isAnimationPaused ? 0 : Math.PI]} // Play icon when paused, pause icon when playing
           onClick={() => setIsAnimationPaused(!isAnimationPaused)}
           onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
           onPointerOut={() => { document.body.style.cursor = 'default'; }}
