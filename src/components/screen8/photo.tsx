@@ -65,6 +65,12 @@ export const Photo = (props: Photo) => {
     verticalSpacing = verticalSpacing * 0.8; // 20% reduction
   }
   
+  // Additional 50% reduction in spacing specifically for tablet portrait
+  if (isTabletPortrait) {
+    spacing = spacing * 0.5; // Additional 50% reduction for tablet portrait
+    verticalSpacing = verticalSpacing * 0.5; // Additional 50% reduction for tablet portrait
+  }
+  
   const column = props.index % columns;
   const row = Math.floor(props.index / columns);
   
