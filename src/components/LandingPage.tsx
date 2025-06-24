@@ -33,6 +33,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isPWAButtonHovered, setIsPWAButtonHovered] = useState(false);
   const logoTexture = useTexture('/logo_branco.png');
   const startButtonTexture = useTexture('/iniciar.png');
+  const pilarIconTexture = useTexture('/icone_pilar.png');
   const textRef = useRef<any>();
   const materialRef = useRef<MeshBasicMaterial | null>(null);
   const [animationComplete, setAnimationComplete] = useState(false);
@@ -122,15 +123,16 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         1
       ]) as [number, number, number];
 
-  // PWA Button configuration
-  const pwaButtonWidth = getFontSize(1.8, 1.6, 2.0, 2.2, 2.5);
-  const pwaButtonHeight = getFontSize(0.4, 0.35, 0.45, 0.5, 0.6);
-  const pwaButtonFontSize = getFontSize(0.12, 0.1, 0.14, 0.16, 0.18);
-  const pwaButtonRadius = getFontSize(0.08, 0.07, 0.09, 0.1, 0.12);
+  // PWA Button configuration - positioned in bottom right
+  const pwaButtonWidth = getFontSize(2.2, 2.0, 2.4, 2.6, 3.0);
+  const pwaButtonHeight = getFontSize(0.5, 0.45, 0.55, 0.6, 0.7);
+  const pwaButtonFontSize = getFontSize(0.14, 0.12, 0.16, 0.18, 0.2);
+  const pwaButtonRadius = getFontSize(0.1, 0.08, 0.11, 0.12, 0.14);
+  const pwaIconSize = getFontSize(0.3, 0.25, 0.35, 0.4, 0.45);
 
-  // Position PWA button in bottom right corner
-  const pwaButtonX = viewport.width / 2 - pwaButtonWidth / 2 - 0.3;
-  const pwaButtonY = -viewport.height / 2 + pwaButtonHeight / 2 + 0.3;
+  // Position PWA button in bottom right corner with proper margins
+  const pwaButtonX = viewport.width / 2 - pwaButtonWidth / 2 - getFontSize(0.4, 0.3, 0.5, 0.6, 0.7);
+  const pwaButtonY = -viewport.height / 2 + pwaButtonHeight / 2 + getFontSize(0.4, 0.3, 0.5, 0.6, 0.7);
 
   // Create rounded rectangle geometry for PWA button
   const pwaRoundedShape = createRoundedRectShape(pwaButtonWidth, pwaButtonHeight, pwaButtonRadius);
@@ -252,11 +254,25 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
             />
           </mesh>
           
+          {/* Pilar Icon */}
+          <mesh 
+            position={[-pwaButtonWidth / 2 + pwaIconSize / 2 + 0.15, 0, 0.02]}
+            scale={[pwaIconSize, pwaIconSize, 1]}
+          >
+            <planeGeometry args={[1, 1]} />
+            <meshBasicMaterial 
+              map={pilarIconTexture} 
+              transparent 
+              opacity={1}
+              depthWrite={false}
+            />
+          </mesh>
+          
           {/* Button text */}
           <Text
             fontSize={pwaButtonFontSize}
             color={isPWAButtonHovered ? "#000000" : "#333333"}
-            position-z={0.02}
+            position={[0.2, 0, 0.02]}
             font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
             anchorX="center"
             anchorY="middle"
