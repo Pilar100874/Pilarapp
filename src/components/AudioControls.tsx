@@ -37,9 +37,9 @@ export const AudioControls = () => {
     handleToggle(e as any);
   }, [handleToggle]);
 
-  // Windows-style speaker icon with sound waves
+  // Windows-style speaker icon with sound waves - increased size to 42px (50% larger than 28px)
   const SpeakerWithSound = () => (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+    <svg width="42" height="42" viewBox="0 0 24 24" fill="white">
       {/* Speaker cone */}
       <path d="M3 9v6h4l5 5V4L7 9H3z"/>
       {/* Sound waves */}
@@ -48,9 +48,9 @@ export const AudioControls = () => {
     </svg>
   );
 
-  // Windows-style muted speaker icon with X
+  // Windows-style muted speaker icon with X - increased size to 42px (50% larger than 28px)
   const SpeakerMuted = () => (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+    <svg width="42" height="42" viewBox="0 0 24 24" fill="white">
       {/* Speaker cone */}
       <path d="M3 9v6h4l5 5V4L7 9H3z"/>
       {/* X mark */}
@@ -58,9 +58,9 @@ export const AudioControls = () => {
     </svg>
   );
 
-  // Loading icon
+  // Loading icon - increased size to 42px (50% larger than 28px)
   const LoadingIcon = () => (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+    <svg width="42" height="42" viewBox="0 0 24 24" fill="white">
       <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="2" fill="none" strokeDasharray="31.416" strokeDashoffset="31.416">
         <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
         <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
@@ -88,8 +88,8 @@ export const AudioControls = () => {
         top: '25px',
         left: '25px',
         zIndex: 1000,
-        width: '50px',
-        height: '50px',
+        width: '75px', // Increased from 50px to 75px (50% larger)
+        height: '75px', // Increased from 50px to 75px (50% larger)
         border: 'none',
         backgroundColor: 'transparent',
         cursor: 'pointer',
