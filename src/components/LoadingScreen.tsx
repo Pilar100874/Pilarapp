@@ -9,10 +9,13 @@ interface LoadingScreenProps {
 }
 
 const LoadingText = ({ progress }: { progress: number }) => {
-  const { getFontSize, getSpacing } = useResponsiveText();
+  const { getFontSize } = useResponsiveText();
   
   const titleFontSize = getFontSize(0.4, 0.35, 0.5, 0.55, 0.7);
-  const progressFontSize = getFontSize(0.25, 0.22, 0.3, 0.35, 0.45);
+  
+  // Calculate color based on progress - from gray to white
+  const grayValue = 0.3 + (progress / 100) * 0.7; // From 0.3 to 1.0
+  const textColor = `rgb(${Math.round(grayValue * 255)}, ${Math.round(grayValue * 255)}, ${Math.round(grayValue * 255)})`;
   
   return (
     <group>
@@ -23,40 +26,11 @@ const LoadingText = ({ progress }: { progress: number }) => {
         font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
         anchorX="center"
         anchorY="middle"
+        color={textColor}
       >
         PILAR APRESENTA
         <meshBasicMaterial transparent depthTest={false} depthWrite={false} />
       </Text>
-      
-      <Text
-        fontSize={progressFontSize}
-        letterSpacing={0.005}
-        position-z={0.1}
-        position-y={getSpacing(-0.8, -0.6, -0.9, -1.0, -1.2)}
-        font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
-        anchorX="center"
-        anchorY="middle"
-      >
-        {Math.round(progress)}%
-        <meshBasicMaterial transparent depthTest={false} depthWrite={false} />
-      </Text>
-      
-      {/* Progress Bar Background */}
-      <mesh position-y={getSpacing(-1.4, -1.1, -1.5, -1.6, -1.8)} position-z={0.05}>
-        <planeGeometry args={[4, 0.05]} />
-        <meshBasicMaterial color="#333333" transparent opacity={0.3} />
-      </mesh>
-      
-      {/* Progress Bar Fill */}
-      <mesh 
-        position-y={getSpacing(-1.4, -1.1, -1.5, -1.6, -1.8)} 
-        position-z={0.06}
-        position-x={-2 + (progress / 100) * 2}
-        scale-x={progress / 100}
-      >
-        <planeGeometry args={[4, 0.05]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.8} />
-      </mesh>
     </group>
   );
 };
@@ -64,6 +38,7 @@ const LoadingText = ({ progress }: { progress: number }) => {
 export const LoadingScreen = ({ onLoadingComplete }: LoadingScreenProps) => {
   const [progress, setProgress] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
+  const [shouldHide, setShouldHide] = useState(false);
   const startTimeRef = useRef(Date.now());
   const assetsLoadedRef = useRef(false);
 
@@ -170,9 +145,11 @@ export const LoadingScreen = ({ onLoadingComplete }: LoadingScreenProps) => {
         setProgress(100);
         setTimeout(() => {
           setIsComplete(true);
+          // Hide the loading screen but keep the text visible
           setTimeout(() => {
+            setShouldHide(true);
             onLoadingComplete();
-          }, 500);
+          }, 1000); // Wait 1 second after reaching 100%
         }, 500);
         return;
       }
@@ -202,9 +179,9 @@ export const LoadingScreen = ({ onLoadingComplete }: LoadingScreenProps) => {
         height: '100vh', 
         backgroundColor: 'black',
         zIndex: 1000,
-        opacity: isComplete ? 0 : 1,
+        opacity: shouldHide ? 0 : 1,
         transition: 'opacity 0.5s ease-out',
-        pointerEvents: isComplete ? 'none' : 'all'
+        pointerEvents: shouldHide ? 'none' : 'all'
       }}
     >
       <Canvas style={{ width: '100%', height: '100%' }}>
