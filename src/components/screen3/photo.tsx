@@ -36,9 +36,9 @@ export const Photo = (props: Photo) => {
       return {
         // Stack layout for mobile
         spacing: 0,
-        baseScale: 0.8,
-        activeScale: 1.0,
-        inactiveScale: 0.7,
+        baseScale: 0.64, // Reduced by 20% from 0.8
+        activeScale: 0.8, // Reduced by 20% from 1.0
+        inactiveScale: 0.56, // Reduced by 20% from 0.7
         zSpacing: 0.5,
         rotationIntensity: 0.1,
         parallaxStrength: 0.3,
@@ -48,9 +48,9 @@ export const Photo = (props: Photo) => {
       return {
         // Modern 3D carousel for desktop
         spacing: 3.5,
-        baseScale: 0.9,
-        activeScale: 1.2,
-        inactiveScale: 0.7,
+        baseScale: 0.72, // Reduced by 20% from 0.9
+        activeScale: 0.96, // Reduced by 20% from 1.2
+        inactiveScale: 0.56, // Reduced by 20% from 0.7
         zSpacing: 2.5,
         rotationIntensity: 0.4,
         parallaxStrength: 0.8,
@@ -193,12 +193,16 @@ export const Photo = (props: Photo) => {
   const position = getModernPosition();
   if (!position.visible) return null;
 
+  // Reduced image dimensions by 20%
+  const imageWidth = 3.25 * 0.8; // 2.6
+  const imageHeight = 4.5 * 0.8; // 3.6
+
   return (
     <group>
-      {/* Glow effect for active photo */}
+      {/* Glow effect for active photo - removed background rectangle */}
       <Plane
         ref={glowRef}
-        args={[3.8, 5.2]}
+        args={[imageWidth * 1.2, imageHeight * 1.2]}
         position-z={-0.1}
       >
         <meshBasicMaterial 
@@ -209,10 +213,10 @@ export const Photo = (props: Photo) => {
         />
       </Plane>
       
-      {/* Main photo with modern effects */}
+      {/* Main photo with modern effects - reduced size by 20% */}
       <Plane
         ref={ref}
-        args={[3.25, 4.5]}
+        args={[imageWidth, imageHeight]}
         material-map={photo}
         material-transparent
         material-alphaTest={0.1}
@@ -222,10 +226,10 @@ export const Photo = (props: Photo) => {
         onPointerLeave={handlePointerLeave}
       />
       
-      {/* Reflection effect for active photo */}
+      {/* Reflection effect for active photo - reduced size by 20% */}
       {props.isActive && !props.useMobileLayout && (
         <Plane
-          args={[3.25, 4.5]}
+          args={[imageWidth, imageHeight]}
           position-y={-5.5}
           rotation-x={Math.PI}
           scale-y={-0.3}
