@@ -1,17 +1,103 @@
 import { Text, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useState, useRef, useCallback } from 'react';
-import { MeshBasicMaterial } from 'three';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { MeshBasicMaterial, Shape, ShapeGeometry } from 'three';
 import { useResponsiveText } from '@/utils/responsive';
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
+// Function to create rounded rectangle shape
+const createRoundedRectShape = (width: number, height: number, radius: number) => {
+  const shape = new Shape();
+  const x = -width / 2;
+  const y = -height / 2;
+  
+  shape.moveTo(x, y + radius);
+  shape.lineTo(x, y + height - radius);
+  shape.quadraticCurveTo(x, y + height, x + radius, y + height);
+  shape.lineTo(x + width - radius, y + height);
+  shape.quadraticCurveTo(x + width, y + height, x + width, y + height - radius);
+  shape.lineTo(x + width, y + radius);
+  shape.quadraticCurveTo(x + width, y, x + width - radius, y);
+  shape.lineTo(x + radius, y);
+  shape.quadraticCurveTo(x, y, x, y + radius);
+  
+  return shape;
+};
 
 export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isPWAButtonHovered, setIsPWAButtonHovered] = useState(false);
   const logoTexture = useTexture('/logo_branco.png');
   const startButtonTexture = useTexture('/iniciar.png');
   const textRef = useRef<any>();
   const materialRef = useRef<MeshBasicMaterial | null>(null);
   const [animationComplete, setAnimationComplete] = useState(false);
   const { getFontSize, getSpacing, getScale, isMobile } = useResponsiveText();
+  const { viewport } = useThree();
+
+  // PWA Install functionality
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isInstallable, setIsInstallable] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(false);
+
+  useEffect(() => {
+    // Check if already installed
+    const checkInstalled = () => {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      const isFullscreenMode = window.matchMedia('(display-mode: fullscreen)').matches;
+      setIsInstalled(isStandalone || isFullscreenMode);
+    };
+
+    checkInstalled();
+
+    // Listen for beforeinstallprompt event
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+      setIsInstallable(true);
+    };
+
+    // Listen for app installed event
+    const handleAppInstalled = () => {
+      setIsInstalled(true);
+      setIsInstallable(false);
+      setDeferredPrompt(null);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
+  }, []);
+
+  const handlePWAInstallClick = useCallback(async (event: any) => {
+    event.stopPropagation();
+    
+    if (!deferredPrompt) return;
+
+    try {
+      await deferredPrompt.prompt();
+      const choiceResult = await deferredPrompt.userChoice;
+      
+      if (choiceResult.outcome === 'accepted') {
+        console.log('PWA installation accepted');
+      } else {
+        console.log('PWA installation dismissed');
+      }
+      
+      setDeferredPrompt(null);
+      setIsInstallable(false);
+    } catch (error) {
+      console.error('Error during PWA installation:', error);
+    }
+  }, [deferredPrompt]);
 
   // Responsive scaling with orientation consideration
   const logoScale = [
@@ -36,6 +122,20 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         1
       ]) as [number, number, number];
 
+  // PWA Button configuration
+  const pwaButtonWidth = getFontSize(1.8, 1.6, 2.0, 2.2, 2.5);
+  const pwaButtonHeight = getFontSize(0.4, 0.35, 0.45, 0.5, 0.6);
+  const pwaButtonFontSize = getFontSize(0.12, 0.1, 0.14, 0.16, 0.18);
+  const pwaButtonRadius = getFontSize(0.08, 0.07, 0.09, 0.1, 0.12);
+
+  // Position PWA button in bottom right corner
+  const pwaButtonX = viewport.width / 2 - pwaButtonWidth / 2 - 0.3;
+  const pwaButtonY = -viewport.height / 2 + pwaButtonHeight / 2 + 0.3;
+
+  // Create rounded rectangle geometry for PWA button
+  const pwaRoundedShape = createRoundedRectShape(pwaButtonWidth, pwaButtonHeight, pwaButtonRadius);
+  const pwaRoundedGeometry = new ShapeGeometry(pwaRoundedShape);
+
   // Smooth handlers to prevent flicker
   const handlePointerEnter = useCallback(() => {
     setIsHovered(true);
@@ -46,6 +146,20 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
   const handlePointerLeave = useCallback(() => {
     setIsHovered(false);
+    if (!isMobile) {
+      document.body.style.cursor = 'default';
+    }
+  }, [isMobile]);
+
+  const handlePWAPointerEnter = useCallback(() => {
+    setIsPWAButtonHovered(true);
+    if (!isMobile) {
+      document.body.style.cursor = 'pointer';
+    }
+  }, [isMobile]);
+
+  const handlePWAPointerLeave = useCallback(() => {
+    setIsPWAButtonHovered(false);
     if (!isMobile) {
       document.body.style.cursor = 'default';
     }
@@ -109,6 +223,48 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
           depthWrite={false}
         />
       </mesh>
+
+      {/* PWA Install Button - only show when installable but not installed */}
+      {isInstallable && !isInstalled && (
+        <group
+          position={[pwaButtonX, pwaButtonY, 0.1]}
+          onClick={handlePWAInstallClick}
+          onPointerEnter={handlePWAPointerEnter}
+          onPointerLeave={handlePWAPointerLeave}
+        >
+          {/* Button background with rounded corners */}
+          <mesh position-z={0.01} geometry={pwaRoundedGeometry}>
+            <meshBasicMaterial 
+              color={isPWAButtonHovered ? "#ffffff" : "#f0f0f0"} 
+              transparent 
+              opacity={0.95}
+              depthWrite={false}
+            />
+          </mesh>
+          
+          {/* Button border */}
+          <mesh position-z={0.005} geometry={pwaRoundedGeometry} scale={[1.02, 1.02, 1]}>
+            <meshBasicMaterial 
+              color={isPWAButtonHovered ? "#333333" : "#666666"} 
+              transparent 
+              opacity={0.3}
+              depthWrite={false}
+            />
+          </mesh>
+          
+          {/* Button text */}
+          <Text
+            fontSize={pwaButtonFontSize}
+            color={isPWAButtonHovered ? "#000000" : "#333333"}
+            position-z={0.02}
+            font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
+            anchorX="center"
+            anchorY="middle"
+          >
+            Instalar App
+          </Text>
+        </group>
+      )}
     </group>
   );
 };
