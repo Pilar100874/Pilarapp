@@ -80,6 +80,11 @@ export const Photo = (props: Photo) => {
   if (useMobileLayout) {
     scale = scale * 0.9; // Additional 10% reduction
   }
+  
+  // Additional 15% reduction specifically for tablet portrait
+  if (isTabletPortrait) {
+    scale = scale * 0.85; // Additional 15% reduction for tablet portrait
+  }
 
   // Button configuration - moved up 3cm (0.3 units) from previous position
   const buttonFontSize = isMobile ? 0.12 : 0.15;
