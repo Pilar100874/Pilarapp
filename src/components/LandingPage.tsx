@@ -112,14 +112,15 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
     }
   });
 
-  // Create progress ring geometry
+  // Create progress ring geometry with correct parameters
   const createProgressRing = (progress: number) => {
-    const radius = 0.15;
-    const thickness = 0.02;
-    const segments = 64;
-    const angle = (progress / 100) * Math.PI * 2;
+    const innerRadius = 0.13;
+    const outerRadius = 0.17;
+    const thetaStart = -Math.PI / 2; // Start from top
+    const thetaLength = (progress / 100) * Math.PI * 2; // Progress angle
+    const segments = 64; // High segment count for smooth circle
     
-    return new RingGeometry(radius - thickness, radius + thickness, 0, angle, segments);
+    return new RingGeometry(innerRadius, outerRadius, thetaStart, thetaLength, segments);
   };
 
   return (
@@ -152,7 +153,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         >
           {/* Background circle */}
           <mesh>
-            <ringGeometry args={[0.13, 0.17, 64]} />
+            <ringGeometry args={[0.13, 0.17, 0, Math.PI * 2, 64]} />
             <meshBasicMaterial color="#333333" transparent opacity={0.3} />
           </mesh>
           
