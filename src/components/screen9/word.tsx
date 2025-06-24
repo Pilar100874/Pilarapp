@@ -12,7 +12,7 @@ type Word = {
 export const Word = ({ index, value }: Word) => {
   const ref = useRef<Mesh>(null);
   const refMaterial = useRef<MeshBasicMaterial>(null);
-  const { getFontSize, getSpacing, isTabletPortrait } = useResponsiveText();
+  const { getFontSize, getSpacing } = useResponsiveText();
 
   // Responsive font sizes with orientation consideration
   const baseFontSize = getFontSize(0.12, 0.1, 0.14, 0.16, 0.21);
@@ -23,15 +23,11 @@ export const Word = ({ index, value }: Word) => {
   // Responsive text width with orientation
   const maxWidth = getFontSize(3.8, 5.5, 5.2, 6.0, 7.45);
 
-  // Move text 2cm (0.2 units) to the left for tablet portrait
-  const textPositionX = isTabletPortrait ? -0.2 : 0;
-
   return (
     <Text
       ref={ref}
       fontSize={baseFontSize}
       letterSpacing={0.005}
-      position-x={textPositionX}
       position-y={-1 * -index * verticalSpacing}
       textAlign={'left'}
       font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
