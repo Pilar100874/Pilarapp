@@ -37,6 +37,19 @@ export const AudioControls = () => {
     handleToggle(e as any);
   }, [handleToggle]);
 
+  // Windows-style speaker icons
+  const getSpeakerIcon = () => {
+    if (!isLoaded) return '⏳';
+    
+    if (isPlaying) {
+      // Speaker with sound waves (playing)
+      return '🔊';
+    } else {
+      // Muted speaker
+      return '🔇';
+    }
+  };
+
   return (
     <button
       onClick={handleToggle}
@@ -49,19 +62,23 @@ export const AudioControls = () => {
         zIndex: 1000,
         width: '50px',
         height: '50px',
-        borderRadius: '50%',
-        border: '2px solid rgba(255, 255, 255, 0.8)',
-        backgroundColor: isPlaying ? 'rgba(0, 150, 0, 0.8)' : 'rgba(150, 0, 0, 0.8)',
+        borderRadius: '8px', // Less rounded for Windows style
+        border: '1px solid rgba(255, 255, 255, 0.3)',
+        backgroundColor: isPlaying 
+          ? 'rgba(0, 120, 215, 0.9)' // Windows blue when playing
+          : 'rgba(60, 60, 60, 0.9)', // Dark gray when muted
         color: 'white',
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: isMobile ? '16px' : '18px',
-        transition: 'all 0.3s ease',
+        fontSize: isMobile ? '18px' : '20px',
+        transition: 'all 0.2s ease',
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+        boxShadow: isPlaying 
+          ? '0 2px 8px rgba(0, 120, 215, 0.3)' 
+          : '0 2px 8px rgba(0, 0, 0, 0.3)',
         outline: 'none',
         WebkitTapHighlightColor: 'transparent',
         touchAction: 'manipulation',
@@ -70,20 +87,24 @@ export const AudioControls = () => {
       }}
       onMouseEnter={(e) => {
         if (!isMobile) {
-          e.currentTarget.style.transform = 'scale(1.1)';
-          e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.4)';
+          e.currentTarget.style.transform = 'scale(1.05)';
+          e.currentTarget.style.backgroundColor = isPlaying 
+            ? 'rgba(0, 120, 215, 1)' 
+            : 'rgba(80, 80, 80, 0.9)';
         }
       }}
       onMouseLeave={(e) => {
         if (!isMobile) {
           e.currentTarget.style.transform = 'scale(1)';
-          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+          e.currentTarget.style.backgroundColor = isPlaying 
+            ? 'rgba(0, 120, 215, 0.9)' 
+            : 'rgba(60, 60, 60, 0.9)';
         }
       }}
-      title={isPlaying ? 'Pausar música' : 'Tocar música'}
-      aria-label={isPlaying ? 'Pausar música' : 'Tocar música'}
+      title={isPlaying ? 'Silenciar áudio' : 'Ativar áudio'}
+      aria-label={isPlaying ? 'Silenciar áudio' : 'Ativar áudio'}
     >
-      {isLoaded ? (isPlaying ? '⏸️' : '▶️') : '⏳'}
+      {getSpeakerIcon()}
     </button>
   );
 };
