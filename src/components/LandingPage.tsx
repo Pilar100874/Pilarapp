@@ -79,6 +79,20 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         <meshBasicMaterial map={logoTexture} transparent opacity={1} depthWrite={false} />
       </mesh>
 
+      <Text
+        ref={textRef}
+        fontSize={fontSize}
+        letterSpacing={0.005}
+        position-z={0.1}
+        position-y={getSpacing(-0.1, -0.15, -0.05, 0, 0)}
+        font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
+        anchorX="center"
+        anchorY="middle"
+      >
+        PILAR APRESENTA
+        <meshBasicMaterial ref={materialRef as any} transparent depthTest={false} depthWrite={false} />
+      </Text>
+
       <mesh
         position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}
         scale={buttonScale}

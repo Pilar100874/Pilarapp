@@ -1,17 +1,11 @@
 import { useState } from 'react';
 import { Scene } from '@/components/Scene';
 import { LandingScene } from '@/components/LandingScene';
-import { LoadingScreen } from '@/components/LoadingScreen';
 import { AudioControls } from '@/components/AudioControls';
 import { AudioProvider } from '@/components/AudioManager';
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
   const [started, setStarted] = useState(false);
-
-  const handleLoadingComplete = () => {
-    setIsLoading(false);
-  };
 
   const handleStart = () => {
     setStarted(true);
@@ -44,16 +38,10 @@ function App() {
       {/* Audio Controls - show when experience starts */}
       {started && <AudioControls />}
       
-      {/* Loading Screen */}
-      {isLoading && <LoadingScreen onLoadingComplete={handleLoadingComplete} />}
-      
-      {/* Main Content */}
-      {!isLoading && (
-        started ? (
-          <Scene />
-        ) : (
-          <LandingScene onStart={handleStart} />
-        )
+      {started ? (
+        <Scene />
+      ) : (
+        <LandingScene onStart={handleStart} />
       )}
     </AudioProvider>
   );
