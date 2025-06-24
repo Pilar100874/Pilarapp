@@ -1,7 +1,7 @@
 import { Text, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { MeshBasicMaterial, RingGeometry, Group } from 'three';
+import { MeshBasicMaterial } from 'three';
 import { useResponsiveText } from '@/utils/responsive';
 
 export const LandingPage = ({ onStart }: { onStart: () => void }) => {
@@ -12,7 +12,6 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const startButtonTexture = useTexture('/iniciar.png');
   const textRef = useRef<any>();
   const materialRef = useRef<MeshBasicMaterial | null>(null);
-  const progressRingRef = useRef<Group>(null);
   const [animationComplete, setAnimationComplete] = useState(false);
   const { getFontSize, getSpacing, getScale, isMobile } = useResponsiveText();
 
@@ -39,8 +38,9 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         1
       ]) as [number, number, number];
 
-  // Progress circle scale
-  const progressScale = getScale(0.8, 0.7, 1.0, 1.2, 1.5);
+  // Progress bar dimensions - responsive
+  const progressBarWidth = getFontSize(2.0, 1.8, 2.2, 2.5, 3.0);
+  const progressBarHeight = getFontSize(0.08, 0.07, 0.09, 0.1, 0.12);
 
   // Background loading simulation
   useEffect(() => {
@@ -55,7 +55,8 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         setLoadingProgress(progress);
 
         if (progress >= 100) {
-          setIsLoaded(true);
+          // Small delay before showing button
+          setTimeout(() => setIsLoaded(true), 300);
         } else {
           // Random delay between 100-300ms to simulate real loading
           setTimeout(updateProgress, Math.random() * 200 + 100);
@@ -105,23 +106,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
     if (opacity >= 1) {
       setAnimationComplete(true);
     }
-
-    // Animate progress ring rotation
-    if (progressRingRef.current && !isLoaded) {
-      progressRingRef.current.rotation.z = elapsed * 2;
-    }
   });
-
-  // Create progress ring geometry with correct parameters
-  const createProgressRing = (progress: number) => {
-    const innerRadius = 0.13;
-    const outerRadius = 0.17;
-    const thetaStart = -Math.PI / 2; // Start from top
-    const thetaLength = (progress / 100) * Math.PI * 2; // Progress angle
-    const segments = 64; // High segment count for smooth circle
-    
-    return new RingGeometry(innerRadius, outerRadius, thetaStart, thetaLength, segments);
-  };
 
   return (
     <group position-y={0}>
@@ -144,35 +129,41 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         <meshBasicMaterial ref={materialRef as any} transparent depthTest={false} depthWrite={false} />
       </Text>
 
-      {/* Loading Progress Circle or Start Button */}
+      {/* Loading Progress Bar or Start Button */}
       {!isLoaded ? (
-        <group 
-          ref={progressRingRef}
-          position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}
-          scale={[progressScale, progressScale, 1]}
-        >
-          {/* Background circle */}
-          <mesh>
-            <ringGeometry args={[0.13, 0.17, 0, Math.PI * 2, 64]} />
-            <meshBasicMaterial color="#333333" transparent opacity={0.3} />
+        <group position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}>
+          {/* Progress bar background */}
+          <mesh position-z={0.01}>
+            <planeGeometry args={[progressBarWidth, progressBarHeight]} />
+            <meshBasicMaterial 
+              color="#333333" 
+              transparent 
+              opacity={0.4} 
+              depthWrite={false}
+            />
           </mesh>
           
-          {/* Progress circle */}
-          <mesh geometry={createProgressRing(loadingProgress)}>
-            <meshBasicMaterial color="#ffffff" transparent opacity={0.9} />
-          </mesh>
-          
-          {/* Center circle with percentage */}
-          <mesh>
-            <circleGeometry args={[0.12, 32]} />
-            <meshBasicMaterial color="#000000" transparent opacity={0.7} />
+          {/* Progress bar fill */}
+          <mesh 
+            position-z={0.02}
+            position-x={-(progressBarWidth / 2) + (progressBarWidth * loadingProgress / 100) / 2}
+            scale-x={loadingProgress / 100}
+          >
+            <planeGeometry args={[progressBarWidth, progressBarHeight]} />
+            <meshBasicMaterial 
+              color="#ffffff" 
+              transparent 
+              opacity={0.9} 
+              depthWrite={false}
+            />
           </mesh>
           
           {/* Percentage text */}
           <Text
-            fontSize={getFontSize(0.08, 0.07, 0.09, 0.1, 0.12)}
+            fontSize={getFontSize(0.12, 0.1, 0.14, 0.16, 0.18)}
             color="#ffffff"
-            position-z={0.01}
+            position-z={0.03}
+            position-y={getSpacing(-0.25, -0.2, -0.28, -0.3, -0.35)}
             font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
             anchorX="center"
             anchorY="middle"
