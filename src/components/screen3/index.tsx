@@ -109,20 +109,20 @@ export const Screen3 = () => {
   // Use mobile portrait layout for both mobile portrait AND tablet portrait
   const useMobileLayout = isMobilePortrait || isTabletPortrait;
 
-  // Button positioning based on layout
-  const buttonY = useMobileLayout ? -3.0 : 0;
-  const buttonScale = useMobileLayout ? 0.4 : 0.5;
-  const buttonSpacing = useMobileLayout ? 2.5 : 5;
+  // Button positioning based on layout - only show for carousel mode (desktop/tablet landscape)
+  const buttonY = 0;
+  const buttonScale = 0.5;
+  const buttonSpacing = 5;
 
-  // Mobile-style navigation buttons for both mobile portrait and tablet portrait
-  const mobileNavButtonY = -3.4; // Moved up by 1cm (0.1 units)
-  const mobileNavButtonScale = 0.378; // Reduced by additional 10% (0.42 * 0.9 = 0.378)
-  const mobileNavButtonSpacing = 1.134; // Reduced by additional 10% (1.26 * 0.9 = 1.134)
+  // Mobile-style navigation buttons for grid layout
+  const mobileNavButtonY = -3.4;
+  const mobileNavButtonScale = 0.378;
+  const mobileNavButtonSpacing = 1.134;
 
   return (
     <Scroll>
       <group position-y={SCREEN3_OFFSET_START_Y} position-x={0}>
-        {/* Desktop/Tablet Landscape Navigation Buttons */}
+        {/* Desktop/Tablet Landscape Navigation Buttons - only for carousel mode */}
         {!useMobileLayout && (
           <>
             {/* Previous Button */}
@@ -153,7 +153,7 @@ export const Screen3 = () => {
           </>
         )}
 
-        {/* Mobile-style Navigation Buttons (for both mobile portrait and tablet portrait) */}
+        {/* Mobile-style Navigation Buttons (for grid layout) */}
         {useMobileLayout && (
           <>
             {/* Previous Button */}
@@ -183,11 +183,11 @@ export const Screen3 = () => {
               <mesh
                 key={`dot-${index}`}
                 position={[
-                  (index - Math.floor(photoList.length / 2)) * 0.189, // Reduced spacing by additional 10% (0.21 * 0.9 = 0.189)
-                  mobileNavButtonY - 0.504, // Reduced distance by additional 10% (0.56 * 0.9 = 0.504)
+                  (index - Math.floor(photoList.length / 2)) * 0.189,
+                  mobileNavButtonY - 0.504,
                   0.1
                 ]}
-                scale={[0.063, 0.063, 1]} // Reduced by additional 10% (0.07 * 0.9 = 0.063)
+                scale={[0.063, 0.063, 1]}
                 onClick={() => setActiveIndex(index)}
               >
                 <circleGeometry args={[1, 8]} />
@@ -201,6 +201,7 @@ export const Screen3 = () => {
           </>
         )}
 
+        {/* Render all photos */}
         {photoList.map(([name, src], index) => (
           <Photo
             key={name}

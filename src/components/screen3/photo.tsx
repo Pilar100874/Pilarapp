@@ -24,7 +24,31 @@ export const Photo = (props: Photo) => {
 
   // Responsive configuration
   const isMobile = viewport.width < 5;
-  const spacing = isMobile ? 1.75 : 2.5;
+  
+  // Use mobile portrait layout for both mobile portrait AND tablet portrait
+  const useMobileLayout = isMobilePortrait || isTabletPortrait;
+
+  // Layout configuration - organize in rows to prevent overlap
+  const columns = useMobileLayout ? 2 : 3; // 2 columns for mobile, 3 for desktop
+  const rows = Math.ceil(props.totalPhotos / columns);
+  
+  // Calculate position in grid
+  const column = props.index % columns;
+  const row = Math.floor(props.index / columns);
+  
+  // Spacing configuration with proper separation
+  const horizontalSpacing = useMobileLayout ? 3.5 : 4.5; // Increased horizontal spacing
+  const verticalSpacing = useMobileLayout ? 5.5 : 6.5; // Increased vertical spacing for clear separation
+  
+  // Calculate base position in grid layout
+  const baseX = (column - (columns - 1) / 2) * horizontalSpacing;
+  const baseY = -row * verticalSpacing; // Negative to stack downward
+  
+  // Only show active photo in carousel mode, or show all in grid mode
+  const shouldShow = props.isActive || useMobileLayout;
+  
+  // For carousel mode (desktop/tablet landscape), use original carousel logic
+  const carouselSpacing = isMobile ? 1.75 : 2.5;
   const centerZ = 0;
   const sideZ = isMobile ? -1.5 : -2;
   const rotationFactor = isMobile ? 0.25 : 0.35;
@@ -77,27 +101,47 @@ export const Photo = (props: Photo) => {
   useFrame(() => {
     if (!ref.current) return;
 
-    const relativeIndex = props.index - props.activeIndex;
-    
-    const targetX = relativeIndex * spacing;
-    
-    let targetZ = centerZ;
-    if (relativeIndex !== 0) {
-      targetZ = sideZ - Math.abs(relativeIndex) * perspective;
+    if (useMobileLayout) {
+      // Grid layout for mobile - static positioning
+      ref.current.position.x = baseX;
+      ref.current.position.y = baseY;
+      ref.current.position.z = 0;
+      ref.current.rotation.y = 0;
+      
+      const hoverScale = isHovered ? 1.05 : 1;
+      const targetScale = hoverScale * baseScale;
+      
+      ref.current.scale.x = MathUtils.lerp(ref.current.scale.x, targetScale, 0.08);
+      ref.current.scale.y = MathUtils.lerp(ref.current.scale.y, targetScale, 0.08);
+    } else {
+      // Carousel layout for desktop/tablet landscape
+      const relativeIndex = props.index - props.activeIndex;
+      
+      const targetX = relativeIndex * carouselSpacing;
+      
+      let targetZ = centerZ;
+      if (relativeIndex !== 0) {
+        targetZ = sideZ - Math.abs(relativeIndex) * perspective;
+      }
+
+      const targetRotationY = -relativeIndex * rotationFactor;
+
+      const hoverScale = isHovered ? 1.05 : 1;
+      const targetScale = props.isActive ? hoverScale * baseScale : hoverScale * baseScale * 0.85;
+
+      // Smoother interpolation to prevent flicker
+      ref.current.position.x = MathUtils.lerp(ref.current.position.x, targetX, 0.08);
+      ref.current.position.z = MathUtils.lerp(ref.current.position.z, targetZ, 0.08);
+      ref.current.rotation.y = MathUtils.lerp(ref.current.rotation.y, targetRotationY, 0.08);
+      ref.current.scale.x = MathUtils.lerp(ref.current.scale.x, targetScale, 0.08);
+      ref.current.scale.y = MathUtils.lerp(ref.current.scale.y, targetScale, 0.08);
     }
-
-    const targetRotationY = -relativeIndex * rotationFactor;
-
-    const hoverScale = isHovered ? 1.05 : 1; // Reduced hover effect to prevent flicker
-    const targetScale = props.isActive ? hoverScale * baseScale : hoverScale * baseScale * 0.85;
-
-    // Smoother interpolation to prevent flicker
-    ref.current.position.x = MathUtils.lerp(ref.current.position.x, targetX, 0.08);
-    ref.current.position.z = MathUtils.lerp(ref.current.position.z, targetZ, 0.08);
-    ref.current.rotation.y = MathUtils.lerp(ref.current.rotation.y, targetRotationY, 0.08);
-    ref.current.scale.x = MathUtils.lerp(ref.current.scale.x, targetScale, 0.08);
-    ref.current.scale.y = MathUtils.lerp(ref.current.scale.y, targetScale, 0.08);
   });
+
+  // Don't render if not visible in carousel mode
+  if (!shouldShow && !useMobileLayout) {
+    return null;
+  }
 
   return (
     <Plane
