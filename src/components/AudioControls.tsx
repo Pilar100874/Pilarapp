@@ -85,8 +85,8 @@ export const AudioControls = () => {
       onTouchEnd={handleTouchEnd}
       style={{
         position: 'fixed',
-        top: '21px', // Moved up by 4px (from 25px to 21px)
-        left: '25px',
+        top: '11px', // Moved up by 1cm (10px) from 21px to 11px
+        left: '15px', // Moved left by 1cm (10px) from 25px to 15px
         zIndex: 1000,
         width: '75px', // Increased from 50px to 75px (50% larger)
         height: '75px', // Increased from 50px to 75px (50% larger)
