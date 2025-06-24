@@ -4,16 +4,59 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { MeshBasicMaterial } from 'three';
 import { useResponsiveText } from '@/utils/responsive';
 
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
 export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [loadingProgress, setLoadingProgress] = useState(0);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isPWAHovered, setIsPWAHovered] = useState(false);
   const logoTexture = useTexture('/logo_branco.png');
   const startButtonTexture = useTexture('/iniciar.png');
   const textRef = useRef<any>();
   const materialRef = useRef<MeshBasicMaterial | null>(null);
   const [animationComplete, setAnimationComplete] = useState(false);
-  const { getFontSize, getSpacing, getScale, isMobile } = useResponsiveText();
+  const { getFontSize, getSpacing, getScale, isMobile, isTablet } = useResponsiveText();
+  
+  // PWA state
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isInstallable, setIsInstallable] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(false);
+
+  // PWA setup
+  useEffect(() => {
+    // Check if already installed
+    const checkInstalled = () => {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      const isFullscreenMode = window.matchMedia('(display-mode: fullscreen)').matches;
+      setIsInstalled(isStandalone || isFullscreenMode);
+    };
+
+    checkInstalled();
+
+    // Listen for beforeinstallprompt event
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+      setIsInstallable(true);
+    };
+
+    // Listen for app installed event
+    const handleAppInstalled = () => {
+      setIsInstalled(true);
+      setIsInstallable(false);
+      setDeferredPrompt(null);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
+  }, []);
 
   // Responsive scaling with orientation consideration
   const logoScale = [
@@ -38,47 +81,24 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         1
       ]) as [number, number, number];
 
-  // Progress bar dimensions - responsive
-  const progressBarWidth = getFontSize(2.0, 1.8, 2.2, 2.5, 3.0);
-  const progressBarHeight = getFontSize(0.08, 0.07, 0.09, 0.1, 0.12);
-
-  // Background loading simulation
-  useEffect(() => {
-    const loadAssets = async () => {
-      // Simulate loading various assets
-      const totalSteps = 20;
-      let currentStep = 0;
-
-      const updateProgress = () => {
-        currentStep++;
-        const progress = (currentStep / totalSteps) * 100;
-        setLoadingProgress(progress);
-
-        if (progress >= 100) {
-          // Small delay before showing button
-          setTimeout(() => setIsLoaded(true), 300);
-        } else {
-          // Random delay between 100-300ms to simulate real loading
-          setTimeout(updateProgress, Math.random() * 200 + 100);
-        }
-      };
-
-      // Start loading after a small delay
-      setTimeout(updateProgress, 500);
-    };
-
-    loadAssets();
-  }, []);
+  // PWA button scale and position
+  const pwaButtonScale = (isPWAHovered 
+    ? [getScale(0.35, 0.3, 0.4, 0.45, 0.55), getScale(0.35, 0.3, 0.4, 0.45, 0.55), 1]
+    : [getScale(0.3, 0.25, 0.35, 0.4, 0.5), getScale(0.3, 0.25, 0.35, 0.4, 0.5), 1]) as [number, number, number];
+  
+  const pwaButtonPosition = [
+    getSpacing(2.2, 1.8, 2.5, 2.8, 3.2), // X position (right side)
+    getSpacing(0.6, 0.4, 0.7, 0.8, 1.0),  // Y position (top)
+    0.1 // Z position (slightly forward)
+  ] as [number, number, number];
 
   // Smooth handlers to prevent flicker
   const handlePointerEnter = useCallback(() => {
-    if (isLoaded) {
-      setIsHovered(true);
-      if (!isMobile) {
-        document.body.style.cursor = 'pointer';
-      }
+    setIsHovered(true);
+    if (!isMobile) {
+      document.body.style.cursor = 'pointer';
     }
-  }, [isMobile, isLoaded]);
+  }, [isMobile]);
 
   const handlePointerLeave = useCallback(() => {
     setIsHovered(false);
@@ -88,10 +108,46 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   }, [isMobile]);
 
   const handleClick = useCallback((event: any) => {
-    if (!isLoaded) return;
     event.stopPropagation();
     onStart();
-  }, [onStart, isLoaded]);
+  }, [onStart]);
+
+  // PWA button handlers
+  const handlePWAPointerEnter = useCallback(() => {
+    setIsPWAHovered(true);
+    if (!isMobile) {
+      document.body.style.cursor = 'pointer';
+    }
+  }, [isMobile]);
+
+  const handlePWAPointerLeave = useCallback(() => {
+    setIsPWAHovered(false);
+    if (!isMobile) {
+      document.body.style.cursor = 'default';
+    }
+  }, [isMobile]);
+
+  const handlePWAClick = useCallback(async (event: any) => {
+    event.stopPropagation();
+    
+    if (!deferredPrompt) return;
+
+    try {
+      await deferredPrompt.prompt();
+      const choiceResult = await deferredPrompt.userChoice;
+      
+      if (choiceResult.outcome === 'accepted') {
+        console.log('PWA installation accepted');
+      } else {
+        console.log('PWA installation dismissed');
+      }
+      
+      setDeferredPrompt(null);
+      setIsInstallable(false);
+    } catch (error) {
+      console.error('Error during PWA installation:', error);
+    }
+  }, [deferredPrompt]);
 
   useFrame((state) => {
     if (!textRef.current || animationComplete) return;
@@ -107,6 +163,9 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
       setAnimationComplete(true);
     }
   });
+
+  // Show PWA button only on mobile/tablet when installable and not installed
+  const showPWAButton = (isMobile || isTablet) && isInstallable && !isInstalled;
 
   return (
     <group position-y={0}>
@@ -129,65 +188,66 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         <meshBasicMaterial ref={materialRef as any} transparent depthTest={false} depthWrite={false} />
       </Text>
 
-      {/* Loading Progress Bar or Start Button */}
-      {!isLoaded ? (
-        <group position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}>
-          {/* Progress bar background */}
+      <mesh
+        position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}
+        scale={buttonScale}
+        onClick={handleClick}
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave}
+      >
+        <planeGeometry args={[1, 1]} />
+        <meshBasicMaterial
+          map={startButtonTexture}
+          transparent
+          opacity={1}
+          depthTest={false}
+          depthWrite={false}
+        />
+      </mesh>
+
+      {/* PWA Install Button - 3D integrated */}
+      {showPWAButton && (
+        <group
+          position={pwaButtonPosition}
+          scale={pwaButtonScale}
+          onClick={handlePWAClick}
+          onPointerEnter={handlePWAPointerEnter}
+          onPointerLeave={handlePWAPointerLeave}
+        >
+          {/* Button background circle */}
           <mesh position-z={0.01}>
-            <planeGeometry args={[progressBarWidth, progressBarHeight]} />
+            <circleGeometry args={[1, 32]} />
             <meshBasicMaterial 
-              color="#333333" 
+              color={isPWAHovered ? "#0066cc" : "#0080ff"} 
               transparent 
-              opacity={0.4} 
+              opacity={0.9}
               depthWrite={false}
             />
           </mesh>
           
-          {/* Progress bar fill */}
-          <mesh 
-            position-z={0.02}
-            position-x={-(progressBarWidth / 2) + (progressBarWidth * loadingProgress / 100) / 2}
-            scale-x={loadingProgress / 100}
-          >
-            <planeGeometry args={[progressBarWidth, progressBarHeight]} />
+          {/* Button border */}
+          <mesh position-z={0.005} scale={[1.05, 1.05, 1]}>
+            <circleGeometry args={[1, 32]} />
             <meshBasicMaterial 
-              color="#ffffff" 
+              color="white" 
               transparent 
-              opacity={0.9} 
+              opacity={0.8}
               depthWrite={false}
             />
           </mesh>
           
-          {/* Percentage text */}
+          {/* PWA Icon Text */}
           <Text
-            fontSize={getFontSize(0.12, 0.1, 0.14, 0.16, 0.18)}
-            color="#ffffff"
-            position-z={0.03}
-            position-y={getSpacing(-0.25, -0.2, -0.28, -0.3, -0.35)}
+            fontSize={0.4}
+            color="white"
+            position-z={0.02}
             font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
             anchorX="center"
             anchorY="middle"
           >
-            {Math.round(loadingProgress)}%
+            📱
           </Text>
         </group>
-      ) : (
-        <mesh
-          position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}
-          scale={buttonScale}
-          onClick={handleClick}
-          onPointerEnter={handlePointerEnter}
-          onPointerLeave={handlePointerLeave}
-        >
-          <planeGeometry args={[1, 1]} />
-          <meshBasicMaterial
-            map={startButtonTexture}
-            transparent
-            opacity={1}
-            depthTest={false}
-            depthWrite={false}
-          />
-        </mesh>
       )}
     </group>
   );

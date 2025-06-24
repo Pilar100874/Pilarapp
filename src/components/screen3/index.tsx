@@ -10,38 +10,28 @@ import { useThree } from '@react-three/fiber';
 export const Screen3 = () => {
   const photoList = Object.entries(dataPhotos);
   const [activeIndex, setActiveIndex] = useState(Math.floor(photoList.length / 2));
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const arrowTexture = useTexture('/seta_B.png');
-  const { isMobilePortrait, isTabletPortrait, isMobile, isTablet } = useResponsiveText();
+  const { isMobilePortrait, isMobile, isTablet } = useResponsiveText();
   const { gl } = useThree();
   
   // Touch handling refs
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
-  const swipeThreshold = 40;
-  const swipeTimeThreshold = 600;
-  const isDraggingRef = useRef(false);
+  const swipeThreshold = 50;
+  const swipeTimeThreshold = 500;
 
   const handlePhotoClick = (index: number) => {
-    if (!isDraggingRef.current && !isTransitioning) {
-      setActiveIndex(index);
-    }
+    setActiveIndex(index);
   };
 
   const handlePrevious = useCallback(() => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
     setActiveIndex((prev) => (prev > 0 ? prev - 1 : photoList.length - 1));
-    setTimeout(() => setIsTransitioning(false), 1000);
-  }, [photoList.length, isTransitioning]);
+  }, [photoList.length]);
 
   const handleNext = useCallback(() => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
     setActiveIndex((prev) => (prev < photoList.length - 1 ? prev + 1 : 0));
-    setTimeout(() => setIsTransitioning(false), 1000);
-  }, [photoList.length, isTransitioning]);
+  }, [photoList.length]);
 
-  // Enhanced touch event handlers for fan interaction
+  // Touch event handlers
   const handleTouchStart = useCallback((event: TouchEvent) => {
     if (!isMobile && !isTablet) return;
     
@@ -51,20 +41,6 @@ export const Screen3 = () => {
       y: touch.clientY,
       time: Date.now()
     };
-    isDraggingRef.current = false;
-  }, [isMobile, isTablet]);
-
-  const handleTouchMove = useCallback((event: TouchEvent) => {
-    if (!touchStartRef.current || (!isMobile && !isTablet)) return;
-    
-    const touch = event.touches[0];
-    const deltaX = Math.abs(touch.clientX - touchStartRef.current.x);
-    const deltaY = Math.abs(touch.clientY - touchStartRef.current.y);
-    
-    if (deltaX > deltaY && deltaX > 15) {
-      event.preventDefault();
-      isDraggingRef.current = true;
-    }
   }, [isMobile, isTablet]);
 
   const handleTouchEnd = useCallback((event: TouchEvent) => {
@@ -76,25 +52,25 @@ export const Screen3 = () => {
     const deltaTime = Date.now() - touchStartRef.current.time;
     const distance = Math.abs(deltaX);
 
+    // Check if it's a valid horizontal swipe
     if (
       distance > swipeThreshold && 
       deltaTime < swipeTimeThreshold && 
-      distance > deltaY * 1.3
+      distance > deltaY * 1.5 // Ensure it's more horizontal than vertical
     ) {
       event.preventDefault();
       event.stopPropagation();
       
       if (deltaX > 0) {
+        // Swipe right - go to previous
         handlePrevious();
       } else {
+        // Swipe left - go to next
         handleNext();
       }
     }
 
     touchStartRef.current = null;
-    setTimeout(() => {
-      isDraggingRef.current = false;
-    }, 100);
   }, [isMobile, isTablet, handlePrevious, handleNext]);
 
   // Setup touch event listeners
@@ -104,18 +80,14 @@ export const Screen3 = () => {
     const canvas = gl.domElement;
     
     const touchStartHandler = (e: TouchEvent) => {
+      // Only handle touches in the screen3 area (approximate)
       const rect = canvas.getBoundingClientRect();
       const touch = e.touches[0];
       const relativeY = (touch.clientY - rect.top) / rect.height;
       
-      if (relativeY > 0.15 && relativeY < 0.45) {
+      // Screen3 is roughly in the middle section of the scroll
+      if (relativeY > 0.2 && relativeY < 0.4) {
         handleTouchStart(e);
-      }
-    };
-    
-    const touchMoveHandler = (e: TouchEvent) => {
-      if (touchStartRef.current) {
-        handleTouchMove(e);
       }
     };
     
@@ -125,219 +97,107 @@ export const Screen3 = () => {
       }
     };
     
-    canvas.addEventListener('touchstart', touchStartHandler, { passive: false });
-    canvas.addEventListener('touchmove', touchMoveHandler, { passive: false });
+    canvas.addEventListener('touchstart', touchStartHandler, { passive: true });
     canvas.addEventListener('touchend', touchEndHandler, { passive: false });
     
     return () => {
       canvas.removeEventListener('touchstart', touchStartHandler);
-      canvas.removeEventListener('touchmove', touchMoveHandler);
       canvas.removeEventListener('touchend', touchEndHandler);
     };
-  }, [gl.domElement, handleTouchStart, handleTouchMove, handleTouchEnd, isMobile, isTablet]);
+  }, [gl.domElement, handleTouchStart, handleTouchEnd, isMobile, isTablet]);
 
-  // Auto-play functionality (optional - disabled for fan to let users explore)
-  // useEffect(() => {
-  //   const autoPlayInterval = setInterval(() => {
-  //     if (!isTransitioning && !isDraggingRef.current) {
-  //       handleNext();
-  //     }
-  //   }, 6000);
+  // Button positioning based on orientation
+  const buttonY = isMobilePortrait ? -3.0 : 0;
+  const buttonScale = isMobilePortrait ? 0.4 : 0.5;
+  const buttonSpacing = isMobilePortrait ? 2.5 : 5;
 
-  //   return () => clearInterval(autoPlayInterval);
-  // }, [handleNext, isTransitioning]);
-
-  // Use mobile layout for portrait orientations
-  const useMobileLayout = isMobilePortrait || isTabletPortrait;
-
-  // Fan-style navigation buttons
-  const buttonScale = useMobileLayout ? 0.35 : 0.5;
-  const buttonSpacing = useMobileLayout ? 3.5 : 5.5;
-  const buttonY = useMobileLayout ? -3.5 : -2.5;
+  // Mobile portrait navigation buttons (moved up 1cm from -3.5 to -3.4)
+  const mobileNavButtonY = -3.4; // Moved up by 1cm (0.1 units)
+  const mobileNavButtonScale = 0.378; // Reduced by additional 10% (0.42 * 0.9 = 0.378)
+  const mobileNavButtonSpacing = 1.134; // Reduced by additional 10% (1.26 * 0.9 = 1.134)
 
   return (
     <Scroll>
       <group position-y={SCREEN3_OFFSET_START_Y} position-x={0}>
-        {/* Fan Navigation Buttons with Elegant Styling */}
-        {!useMobileLayout && (
+        {/* Desktop/Tablet Navigation Buttons */}
+        {!isMobilePortrait && (
           <>
-            {/* Previous Button with Glow */}
-            <group position={[-buttonSpacing, buttonY, 1]}>
-              {/* Outer glow */}
-              <mesh scale={[buttonScale * 2, buttonScale * 2, 1]}>
-                <planeGeometry args={[1, 1]} />
-                <meshBasicMaterial 
-                  color="#ffffff" 
-                  transparent 
-                  opacity={0.05} 
-                  depthWrite={false}
-                />
-              </mesh>
-              {/* Inner glow */}
-              <mesh scale={[buttonScale * 1.3, buttonScale * 1.3, 1]}>
-                <planeGeometry args={[1, 1]} />
-                <meshBasicMaterial 
-                  color="#ffffff" 
-                  transparent 
-                  opacity={0.1} 
-                  depthWrite={false}
-                />
-              </mesh>
-              {/* Main button */}
-              <mesh
-                scale={[buttonScale, buttonScale, 1]}
-                rotation={[0, 0, Math.PI / 2]}
-                onClick={handlePrevious}
-                onPointerOver={() => { 
-                  if (!isMobile && !isTablet) {
-                    document.body.style.cursor = 'pointer'; 
-                  }
-                }}
-                onPointerOut={() => { 
-                  if (!isMobile && !isTablet) {
-                    document.body.style.cursor = 'default'; 
-                  }
-                }}
-              >
-                <planeGeometry args={[1, 1]} />
-                <meshBasicMaterial 
-                  map={arrowTexture} 
-                  transparent 
-                  opacity={0.9}
-                  depthWrite={false}
-                />
-              </mesh>
-            </group>
+            {/* Previous Button */}
+            <mesh
+              position={[-buttonSpacing, buttonY, 0]}
+              scale={[buttonScale, buttonScale, 1]}
+              rotation={[0, 0, Math.PI / 2]}
+              onClick={handlePrevious}
+              onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
+              onPointerOut={() => { document.body.style.cursor = 'default'; }}
+            >
+              <planeGeometry args={[1, 1]} />
+              <meshBasicMaterial map={arrowTexture} transparent opacity={1} />
+            </mesh>
 
-            {/* Next Button with Glow */}
-            <group position={[buttonSpacing, buttonY, 1]}>
-              {/* Outer glow */}
-              <mesh scale={[buttonScale * 2, buttonScale * 2, 1]}>
-                <planeGeometry args={[1, 1]} />
-                <meshBasicMaterial 
-                  color="#ffffff" 
-                  transparent 
-                  opacity={0.05} 
-                  depthWrite={false}
-                />
-              </mesh>
-              {/* Inner glow */}
-              <mesh scale={[buttonScale * 1.3, buttonScale * 1.3, 1]}>
-                <planeGeometry args={[1, 1]} />
-                <meshBasicMaterial 
-                  color="#ffffff" 
-                  transparent 
-                  opacity={0.1} 
-                  depthWrite={false}
-                />
-              </mesh>
-              {/* Main button */}
-              <mesh
-                scale={[buttonScale, buttonScale, 1]}
-                rotation={[0, 0, -Math.PI / 2]}
-                onClick={handleNext}
-                onPointerOver={() => { 
-                  if (!isMobile && !isTablet) {
-                    document.body.style.cursor = 'pointer'; 
-                  }
-                }}
-                onPointerOut={() => { 
-                  if (!isMobile && !isTablet) {
-                    document.body.style.cursor = 'default'; 
-                  }
-                }}
-              >
-                <planeGeometry args={[1, 1]} />
-                <meshBasicMaterial 
-                  map={arrowTexture} 
-                  transparent 
-                  opacity={0.9}
-                  depthWrite={false}
-                />
-              </mesh>
-            </group>
+            {/* Next Button */}
+            <mesh
+              position={[buttonSpacing, buttonY, 0]}
+              scale={[buttonScale, buttonScale, 1]}
+              rotation={[0, 0, -Math.PI / 2]}
+              onClick={handleNext}
+              onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
+              onPointerOut={() => { document.body.style.cursor = 'default'; }}
+            >
+              <planeGeometry args={[1, 1]} />
+              <meshBasicMaterial map={arrowTexture} transparent opacity={1} />
+            </mesh>
           </>
         )}
 
-        {/* Elegant Mobile Navigation for Fan */}
-        {useMobileLayout && (
+        {/* Mobile Portrait Navigation Buttons (moved up 1cm) */}
+        {isMobilePortrait && (
           <>
-            {/* Sleek Navigation Panel */}
-            <group position-y={-4.5}>
-              {/* Background panel with rounded corners effect */}
-              <mesh position-z={0.05}>
-                <planeGeometry args={[7, 1]} />
+            {/* Previous Button */}
+            <mesh
+              position={[-mobileNavButtonSpacing, mobileNavButtonY, 0.1]}
+              scale={[mobileNavButtonScale, mobileNavButtonScale, 1]}
+              rotation={[0, 0, Math.PI / 2]}
+              onClick={handlePrevious}
+            >
+              <planeGeometry args={[1, 1]} />
+              <meshBasicMaterial map={arrowTexture} transparent opacity={0.9} />
+            </mesh>
+
+            {/* Next Button */}
+            <mesh
+              position={[mobileNavButtonSpacing, mobileNavButtonY, 0.1]}
+              scale={[mobileNavButtonScale, mobileNavButtonScale, 1]}
+              rotation={[0, 0, -Math.PI / 2]}
+              onClick={handleNext}
+            >
+              <planeGeometry args={[1, 1]} />
+              <meshBasicMaterial map={arrowTexture} transparent opacity={0.9} />
+            </mesh>
+
+            {/* Photo indicator dots (also moved up) */}
+            {photoList.map((_, index) => (
+              <mesh
+                key={`dot-${index}`}
+                position={[
+                  (index - Math.floor(photoList.length / 2)) * 0.189, // Reduced spacing by additional 10% (0.21 * 0.9 = 0.189)
+                  mobileNavButtonY - 0.504, // Reduced distance by additional 10% (0.56 * 0.9 = 0.504)
+                  0.1
+                ]}
+                scale={[0.063, 0.063, 1]} // Reduced by additional 10% (0.07 * 0.9 = 0.063)
+                onClick={() => setActiveIndex(index)}
+              >
+                <circleGeometry args={[1, 8]} />
                 <meshBasicMaterial 
-                  color="#000000" 
+                  color={index === activeIndex ? "#ffffff" : "#666666"} 
                   transparent 
-                  opacity={0.25} 
-                  depthWrite={false}
+                  opacity={index === activeIndex ? 1 : 0.5} 
                 />
               </mesh>
-              
-              {/* Navigation buttons */}
-              <mesh
-                position={[-2, 0, 0.1]}
-                scale={[0.28, 0.28, 1]}
-                rotation={[0, 0, Math.PI / 2]}
-                onClick={handlePrevious}
-              >
-                <planeGeometry args={[1, 1]} />
-                <meshBasicMaterial map={arrowTexture} transparent opacity={0.85} />
-              </mesh>
-
-              <mesh
-                position={[2, 0, 0.1]}
-                scale={[0.28, 0.28, 1]}
-                rotation={[0, 0, -Math.PI / 2]}
-                onClick={handleNext}
-              >
-                <planeGeometry args={[1, 1]} />
-                <meshBasicMaterial map={arrowTexture} transparent opacity={0.85} />
-              </mesh>
-
-              {/* Fan-style Progress Indicators */}
-              {photoList.map((_, index) => {
-                const indicatorAngle = (index / (photoList.length - 1) - 0.5) * Math.PI * 0.6;
-                const indicatorRadius = 0.8;
-                const indicatorX = Math.sin(indicatorAngle) * indicatorRadius;
-                const indicatorY = -Math.abs(Math.cos(indicatorAngle)) * 0.3 - 0.2;
-                
-                return (
-                  <group key={`fan-indicator-${index}`} position={[indicatorX, indicatorY, 0.1]}>
-                    {/* Active indicator glow */}
-                    {index === activeIndex && (
-                      <mesh scale={[0.18, 0.18, 1]}>
-                        <circleGeometry args={[1, 16]} />
-                        <meshBasicMaterial 
-                          color="#ffffff" 
-                          transparent 
-                          opacity={0.4} 
-                          depthWrite={false}
-                        />
-                      </mesh>
-                    )}
-                    {/* Main indicator */}
-                    <mesh
-                      scale={[0.09, 0.09, 1]}
-                      onClick={() => setActiveIndex(index)}
-                    >
-                      <circleGeometry args={[1, 16]} />
-                      <meshBasicMaterial 
-                        color={index === activeIndex ? "#ffffff" : "#666666"} 
-                        transparent 
-                        opacity={index === activeIndex ? 1 : 0.6} 
-                        depthWrite={false}
-                      />
-                    </mesh>
-                  </group>
-                );
-              })}
-            </group>
+            ))}
           </>
         )}
 
-        {/* Render all photos in fan formation */}
         {photoList.map(([name, src], index) => (
           <Photo
             key={name}
@@ -347,8 +207,6 @@ export const Screen3 = () => {
             totalPhotos={photoList.length}
             activeIndex={activeIndex}
             onClick={() => handlePhotoClick(index)}
-            useMobileLayout={useMobileLayout}
-            isTransitioning={isTransitioning}
           />
         ))}
       </group>

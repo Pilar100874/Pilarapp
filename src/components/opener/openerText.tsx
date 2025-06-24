@@ -19,7 +19,7 @@ export const OpenerText = ({ py }: OpenerText) => {
   const arrowRef = useRef<any>();
   const [startFade, setStartFade] = useState(false);
   const scroll = useScroll();
-  const { getFontSize, getSpacing, getScale, isMobile, isTabletPortrait } = useResponsiveText();
+  const { getFontSize, getSpacing, getScale, isMobile } = useResponsiveText();
 
   // Responsive font sizes with orientation consideration
   const text1Size = getFontSize(0.2, 0.18, 0.25, 0.28, 0.35);
@@ -46,21 +46,21 @@ export const OpenerText = ({ py }: OpenerText) => {
 
   // Smooth hover handlers
   const handlePointerOver = useCallback(() => {
-    if (!isMobile && !isTabletPortrait) {
+    if (!isMobile) {
       document.body.style.cursor = 'pointer';
     }
-  }, [isMobile, isTabletPortrait]);
+  }, [isMobile]);
 
   const handlePointerOut = useCallback(() => {
-    if (!isMobile && !isTabletPortrait) {
+    if (!isMobile) {
       document.body.style.cursor = 'default';
     }
-  }, [isMobile, isTabletPortrait]);
+  }, [isMobile]);
 
   useFrame((state) => {
     if (!logoRef.current?.material || !text1Ref.current?.material || 
         !text2Ref.current?.material || !arrowRef.current?.material ||
-        ((isMobile || isTabletPortrait) && (!text3Ref.current?.material || !text4Ref.current?.material))) return;
+        (isMobile && (!text3Ref.current?.material || !text4Ref.current?.material))) return;
 
     if (state.clock.getElapsedTime() > 1 && !startFade) {
       setStartFade(true);
@@ -73,7 +73,7 @@ export const OpenerText = ({ py }: OpenerText) => {
       logoRef.current.material.opacity = opacity;
       text1Ref.current.material.opacity = opacity;
       text2Ref.current.material.opacity = opacity;
-      if (isMobile || isTabletPortrait) {
+      if (isMobile) {
         text3Ref.current.material.opacity = opacity;
         text4Ref.current.material.opacity = opacity;
       }
@@ -82,7 +82,7 @@ export const OpenerText = ({ py }: OpenerText) => {
       logoRef.current.material.opacity = 0;
       text1Ref.current.material.opacity = 0;
       text2Ref.current.material.opacity = 0;
-      if (isMobile || isTabletPortrait) {
+      if (isMobile) {
         text3Ref.current.material.opacity = 0;
         text4Ref.current.material.opacity = 0;
       }
@@ -126,8 +126,7 @@ export const OpenerText = ({ py }: OpenerText) => {
         <meshBasicMaterial transparent opacity={0} depthTest={false} depthWrite={false} />
       </Text>
 
-      {/* Use multi-line layout for both mobile and tablet portrait */}
-      {(isMobile || isTabletPortrait) ? (
+      {isMobile ? (
         <>
           <Text
             ref={text2Ref}

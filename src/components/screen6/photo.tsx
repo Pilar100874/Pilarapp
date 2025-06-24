@@ -3,7 +3,6 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { MathUtils, Mesh, PlaneGeometry } from 'three';
 import { Plane } from '@react-three/drei';
-import { useResponsiveText } from '@/utils/responsive';
 
 type Photo = {
   src: string;
@@ -24,20 +23,11 @@ export const Photo = (props: Photo) => {
   const startTime = useRef(Date.now());
   const lastPosition = useRef({ x: 0, z: 0, rotation: 0 });
   const { viewport } = useThree();
-  const { isTabletPortrait, isMobilePortrait } = useResponsiveText();
 
   // Responsive configuration
   const isMobile = viewport.width < 5;
-  
-  // Base dimensions with reductions for both tablet portrait and mobile portrait
-  let baseWidth = (3.25 * 1.1) * (isMobile ? 0.7 : 1);
-  let baseHeight = (4.5 * 1.1) * (isMobile ? 0.7 : 1);
-  
-  if (isTabletPortrait || isMobilePortrait) {
-    baseWidth = baseWidth * 0.7; // 30% reduction for both tablet portrait and mobile portrait
-    baseHeight = baseHeight * 0.7; // 30% reduction for both tablet portrait and mobile portrait
-  }
-  
+  const baseWidth = (3.25 * 1.1) * (isMobile ? 0.7 : 1);
+  const baseHeight = (4.5 * 1.1) * (isMobile ? 0.7 : 1);
   const rotationSpeed = isMobile ? 0.198 : 0.264;
   const radius = isMobile ? 2 : 3;
   const xOffset = 1;

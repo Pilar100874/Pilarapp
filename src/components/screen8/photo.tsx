@@ -44,31 +44,20 @@ export const Photo = (props: Photo) => {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const { viewport } = useThree();
-  const { isMobilePortrait, isTabletPortrait } = useResponsiveText();
+  const { isMobilePortrait } = useResponsiveText();
 
   // Responsive configuration
   const isMobile = viewport.width < 5;
-  
-  // Use mobile portrait layout for both mobile portrait AND tablet portrait
-  const useMobileLayout = isMobilePortrait || isTabletPortrait;
-  
-  // Column configuration: 2 columns for mobile layout, 3 for desktop/tablet landscape
-  const columns = useMobileLayout ? 2 : 3;
+  const columns = isMobile ? 2 : 3;
   
   // Base spacing values
   let spacing = isMobile ? 2.2 : 2.8;
   let verticalSpacing = isMobile ? 3.2 : 4.3;
   
-  // Reduce spacing by 20% for mobile layout (both mobile portrait and tablet portrait)
-  if (useMobileLayout) {
+  // Reduce spacing by 20% for mobile portrait
+  if (isMobilePortrait) {
     spacing = spacing * 0.8; // 20% reduction
     verticalSpacing = verticalSpacing * 0.8; // 20% reduction
-  }
-  
-  // Additional 50% reduction in spacing specifically for tablet portrait
-  if (isTabletPortrait) {
-    spacing = spacing * 0.5; // Additional 50% reduction for tablet portrait
-    verticalSpacing = verticalSpacing * 0.5; // Additional 50% reduction for tablet portrait
   }
   
   const column = props.index % columns;
@@ -78,18 +67,13 @@ export const Photo = (props: Photo) => {
   const baseY = -row * verticalSpacing;
   const baseZ = 0;
 
-  // Apply reductions to the base scale for mobile layout
+  // Apply 20% reduction to the base scale, plus additional 10% for mobile portrait
   const baseScale = 0.8; // 20% reduction from 1
   let scale = isMobile ? (baseScale * 0.7) : baseScale;
   
-  // Additional 10% reduction for mobile layout (both mobile portrait and tablet portrait)
-  if (useMobileLayout) {
+  // Additional 10% reduction for mobile portrait
+  if (isMobilePortrait) {
     scale = scale * 0.9; // Additional 10% reduction
-  }
-  
-  // Additional 15% reduction specifically for tablet portrait
-  if (isTabletPortrait) {
-    scale = scale * 0.85; // Additional 15% reduction for tablet portrait
   }
 
   // Button configuration - moved up 3cm (0.3 units) from previous position
