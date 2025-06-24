@@ -11,7 +11,7 @@ export const Screen3 = () => {
   const photoList = Object.entries(dataPhotos);
   const [activeIndex, setActiveIndex] = useState(Math.floor(photoList.length / 2));
   const arrowTexture = useTexture('/seta_B.png');
-  const { isMobilePortrait, isMobile, isTablet } = useResponsiveText();
+  const { isMobilePortrait, isTabletPortrait, isMobile, isTablet } = useResponsiveText();
   const { gl } = useThree();
   
   // Touch handling refs
@@ -31,7 +31,7 @@ export const Screen3 = () => {
     setActiveIndex((prev) => (prev < photoList.length - 1 ? prev + 1 : 0));
   }, [photoList.length]);
 
-  // Touch event handlers
+  // Touch event handlers - now includes tablet portrait
   const handleTouchStart = useCallback((event: TouchEvent) => {
     if (!isMobile && !isTablet) return;
     
@@ -73,7 +73,7 @@ export const Screen3 = () => {
     touchStartRef.current = null;
   }, [isMobile, isTablet, handlePrevious, handleNext]);
 
-  // Setup touch event listeners
+  // Setup touch event listeners - now includes tablet portrait
   useEffect(() => {
     if (!gl.domElement || (!isMobile && !isTablet)) return;
     
@@ -106,12 +106,15 @@ export const Screen3 = () => {
     };
   }, [gl.domElement, handleTouchStart, handleTouchEnd, isMobile, isTablet]);
 
-  // Button positioning based on orientation
-  const buttonY = isMobilePortrait ? -3.0 : 0;
-  const buttonScale = isMobilePortrait ? 0.4 : 0.5;
-  const buttonSpacing = isMobilePortrait ? 2.5 : 5;
+  // Use mobile portrait layout for both mobile portrait AND tablet portrait
+  const useMobileLayout = isMobilePortrait || isTabletPortrait;
 
-  // Mobile portrait navigation buttons (moved up 1cm from -3.5 to -3.4)
+  // Button positioning based on layout
+  const buttonY = useMobileLayout ? -3.0 : 0;
+  const buttonScale = useMobileLayout ? 0.4 : 0.5;
+  const buttonSpacing = useMobileLayout ? 2.5 : 5;
+
+  // Mobile-style navigation buttons for both mobile portrait and tablet portrait
   const mobileNavButtonY = -3.4; // Moved up by 1cm (0.1 units)
   const mobileNavButtonScale = 0.378; // Reduced by additional 10% (0.42 * 0.9 = 0.378)
   const mobileNavButtonSpacing = 1.134; // Reduced by additional 10% (1.26 * 0.9 = 1.134)
@@ -119,8 +122,8 @@ export const Screen3 = () => {
   return (
     <Scroll>
       <group position-y={SCREEN3_OFFSET_START_Y} position-x={0}>
-        {/* Desktop/Tablet Navigation Buttons */}
-        {!isMobilePortrait && (
+        {/* Desktop/Tablet Landscape Navigation Buttons */}
+        {!useMobileLayout && (
           <>
             {/* Previous Button */}
             <mesh
@@ -150,8 +153,8 @@ export const Screen3 = () => {
           </>
         )}
 
-        {/* Mobile Portrait Navigation Buttons (moved up 1cm) */}
-        {isMobilePortrait && (
+        {/* Mobile-style Navigation Buttons (for both mobile portrait and tablet portrait) */}
+        {useMobileLayout && (
           <>
             {/* Previous Button */}
             <mesh
@@ -175,7 +178,7 @@ export const Screen3 = () => {
               <meshBasicMaterial map={arrowTexture} transparent opacity={0.9} />
             </mesh>
 
-            {/* Photo indicator dots (also moved up) */}
+            {/* Photo indicator dots */}
             {photoList.map((_, index) => (
               <mesh
                 key={`dot-${index}`}

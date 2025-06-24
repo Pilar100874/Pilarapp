@@ -24,18 +24,18 @@ export const Photo = (props: Photo) => {
   const startTime = useRef(Date.now());
   const lastPosition = useRef({ x: 0, z: 0, rotation: 0 });
   const { viewport } = useThree();
-  const { isTabletPortrait } = useResponsiveText();
+  const { isTabletPortrait, isMobilePortrait } = useResponsiveText();
 
   // Responsive configuration
   const isMobile = viewport.width < 5;
   
-  // Base dimensions with 30% reduction for tablet portrait
+  // Base dimensions with reductions for both tablet portrait and mobile portrait
   let baseWidth = (3.25 * 1.1) * (isMobile ? 0.7 : 1);
   let baseHeight = (4.5 * 1.1) * (isMobile ? 0.7 : 1);
   
-  if (isTabletPortrait) {
-    baseWidth = baseWidth * 0.7; // 30% reduction for tablet portrait
-    baseHeight = baseHeight * 0.7; // 30% reduction for tablet portrait
+  if (isTabletPortrait || isMobilePortrait) {
+    baseWidth = baseWidth * 0.7; // 30% reduction for both tablet portrait and mobile portrait
+    baseHeight = baseHeight * 0.7; // 30% reduction for both tablet portrait and mobile portrait
   }
   
   const rotationSpeed = isMobile ? 0.198 : 0.264;

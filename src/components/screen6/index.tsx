@@ -12,7 +12,7 @@ export const Screen6 = () => {
   const [order, setOrder] = useState(photoList.map((_, i) => i));
   const [isAnimationPaused, setIsAnimationPaused] = useState(true); // Start paused (showing play button)
   const playTexture = useTexture('/play.png');
-  const { isMobilePortrait } = useResponsiveText();
+  const { isMobilePortrait, isTabletPortrait } = useResponsiveText();
   const { isPlaying, toggle } = useAudio();
 
   const rotatePhotos = (clickedIndex: number) => {
@@ -34,8 +34,11 @@ export const Screen6 = () => {
     setIsAnimationPaused(!isPlaying); // Will be opposite after toggle
   };
 
-  // Button position - move up 2cm (0.2 units) in mobile portrait
-  const buttonY = isMobilePortrait ? 0.2 : 0; // Moved up by 2cm in mobile portrait
+  // Use mobile portrait layout for both mobile portrait AND tablet portrait
+  const useMobileLayout = isMobilePortrait || isTabletPortrait;
+
+  // Button position - move up 2cm (0.2 units) in mobile layout
+  const buttonY = useMobileLayout ? 0.2 : 0; // Moved up by 2cm in mobile layout
 
   return (
     <Scroll>

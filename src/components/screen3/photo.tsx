@@ -20,7 +20,7 @@ export const Photo = (props: Photo) => {
   const [isHovered, setIsHovered] = useState(false);
   const scroll = useScroll();
   const { viewport } = useThree();
-  const { isTabletPortrait } = useResponsiveText();
+  const { isTabletPortrait, isMobilePortrait } = useResponsiveText();
 
   // Responsive configuration
   const isMobile = viewport.width < 5;
@@ -30,10 +30,10 @@ export const Photo = (props: Photo) => {
   const rotationFactor = isMobile ? 0.25 : 0.35;
   const perspective = isMobile ? 1 : 1.5;
   
-  // Base scale with 30% reduction for tablet portrait
+  // Base scale with reductions for tablet portrait (same as mobile portrait)
   let baseScale = isMobile ? 0.7 : 1;
-  if (isTabletPortrait) {
-    baseScale = baseScale * 0.7; // 30% reduction for tablet portrait
+  if (isTabletPortrait || isMobilePortrait) {
+    baseScale = baseScale * 0.7; // 30% reduction for both tablet portrait and mobile portrait
   }
 
   // Smooth click handler to prevent flicker
@@ -59,7 +59,7 @@ export const Photo = (props: Photo) => {
     }
   }, [props.src, props.onClick]);
 
-  // Smooth hover handlers
+  // Smooth hover handlers - disable for both mobile portrait and tablet portrait
   const handlePointerEnter = useCallback(() => {
     setIsHovered(true);
     if (!isMobile && !isTabletPortrait) {
