@@ -12,6 +12,8 @@ type Photo = {
   totalPhotos: number;
   activeIndex: number;
   onClick?: () => void;
+  useGridLayout: boolean;
+  useCarouselLayout: boolean;
 };
 
 export const Photo = (props: Photo) => {
@@ -20,46 +22,93 @@ export const Photo = (props: Photo) => {
   const [isHovered, setIsHovered] = useState(false);
   const scroll = useScroll();
   const { viewport } = useThree();
-  const { isTabletPortrait, isMobilePortrait } = useResponsiveText();
+  const { 
+    isTabletPortrait, 
+    isMobilePortrait, 
+    isMobileLandscape, 
+    isTabletLandscape,
+    isMobile,
+    isTablet 
+  } = useResponsiveText();
 
-  // Responsive configuration
-  const isMobile = viewport.width < 5;
-  
-  // Use mobile portrait layout for both mobile portrait AND tablet portrait
-  const useMobileLayout = isMobilePortrait || isTabletPortrait;
+  // Enhanced responsive configuration for different orientations
+  const getLayoutConfig = () => {
+    if (isMobileLandscape) {
+      return {
+        columns: 3,
+        horizontalSpacing: 2.8,
+        verticalSpacing: 4.2,
+        baseScale: 0.5,
+        carouselSpacing: 1.4,
+        centerZ: 0,
+        sideZ: -1.2,
+        rotationFactor: 0.2,
+        perspective: 0.8
+      };
+    } else if (isTabletLandscape) {
+      return {
+        columns: 3,
+        horizontalSpacing: 4.0,
+        verticalSpacing: 5.8,
+        baseScale: 0.8,
+        carouselSpacing: 2.2,
+        centerZ: 0,
+        sideZ: -1.8,
+        rotationFactor: 0.3,
+        perspective: 1.2
+      };
+    } else if (isMobilePortrait) {
+      return {
+        columns: 2,
+        horizontalSpacing: 3.2,
+        verticalSpacing: 5.0,
+        baseScale: 0.6,
+        carouselSpacing: 1.6,
+        centerZ: 0,
+        sideZ: -1.4,
+        rotationFactor: 0.25,
+        perspective: 1.0
+      };
+    } else if (isTabletPortrait) {
+      return {
+        columns: 2,
+        horizontalSpacing: 4.5,
+        verticalSpacing: 6.5,
+        baseScale: 0.7,
+        carouselSpacing: 2.0,
+        centerZ: 0,
+        sideZ: -1.6,
+        rotationFactor: 0.28,
+        perspective: 1.1
+      };
+    } else {
+      // Desktop
+      return {
+        columns: 3,
+        horizontalSpacing: 4.5,
+        verticalSpacing: 6.5,
+        baseScale: 1.0,
+        carouselSpacing: 2.5,
+        centerZ: 0,
+        sideZ: -2,
+        rotationFactor: 0.35,
+        perspective: 1.5
+      };
+    }
+  };
 
-  // Layout configuration - organize in rows to prevent overlap
-  const columns = useMobileLayout ? 2 : 3; // 2 columns for mobile, 3 for desktop
-  const rows = Math.ceil(props.totalPhotos / columns);
+  const config = getLayoutConfig();
+
+  // Calculate position in grid layout
+  const column = props.index % config.columns;
+  const row = Math.floor(props.index / config.columns);
   
-  // Calculate position in grid
-  const column = props.index % columns;
-  const row = Math.floor(props.index / columns);
-  
-  // Spacing configuration with proper separation
-  const horizontalSpacing = useMobileLayout ? 3.5 : 4.5; // Increased horizontal spacing
-  const verticalSpacing = useMobileLayout ? 5.5 : 6.5; // Increased vertical spacing for clear separation
-  
-  // Calculate base position in grid layout
-  const baseX = (column - (columns - 1) / 2) * horizontalSpacing;
-  const baseY = -row * verticalSpacing; // Negative to stack downward
+  const baseX = (column - (config.columns - 1) / 2) * config.horizontalSpacing;
+  const baseY = -row * config.verticalSpacing;
   
   // Only show active photo in carousel mode, or show all in grid mode
-  const shouldShow = props.isActive || useMobileLayout;
+  const shouldShow = props.isActive || props.useGridLayout;
   
-  // For carousel mode (desktop/tablet landscape), use original carousel logic
-  const carouselSpacing = isMobile ? 1.75 : 2.5;
-  const centerZ = 0;
-  const sideZ = isMobile ? -1.5 : -2;
-  const rotationFactor = isMobile ? 0.25 : 0.35;
-  const perspective = isMobile ? 1 : 1.5;
-  
-  // Base scale with reductions for tablet portrait (same as mobile portrait)
-  let baseScale = isMobile ? 0.7 : 1;
-  if (isTabletPortrait || isMobilePortrait) {
-    baseScale = baseScale * 0.7; // 30% reduction for both tablet portrait and mobile portrait
-  }
-
   // Smooth click handler to prevent flicker
   const handleClick = useCallback((event: any) => {
     event.stopPropagation();
@@ -83,51 +132,53 @@ export const Photo = (props: Photo) => {
     }
   }, [props.src, props.onClick]);
 
-  // Smooth hover handlers - disable for both mobile portrait and tablet portrait
+  // Enhanced hover handlers for different devices
   const handlePointerEnter = useCallback(() => {
     setIsHovered(true);
-    if (!isMobile && !isTabletPortrait) {
+    if (!isMobile && !isTablet) {
       document.body.style.cursor = 'pointer';
     }
-  }, [isMobile, isTabletPortrait]);
+  }, [isMobile, isTablet]);
 
   const handlePointerLeave = useCallback(() => {
     setIsHovered(false);
-    if (!isMobile && !isTabletPortrait) {
+    if (!isMobile && !isTablet) {
       document.body.style.cursor = 'default';
     }
-  }, [isMobile, isTabletPortrait]);
+  }, [isMobile, isTablet]);
 
   useFrame(() => {
     if (!ref.current) return;
 
-    if (useMobileLayout) {
-      // Grid layout for mobile - static positioning
+    if (props.useGridLayout) {
+      // Grid layout for mobile/tablet portrait
       ref.current.position.x = baseX;
       ref.current.position.y = baseY;
       ref.current.position.z = 0;
       ref.current.rotation.y = 0;
       
       const hoverScale = isHovered ? 1.05 : 1;
-      const targetScale = hoverScale * baseScale;
+      const targetScale = hoverScale * config.baseScale;
       
       ref.current.scale.x = MathUtils.lerp(ref.current.scale.x, targetScale, 0.08);
       ref.current.scale.y = MathUtils.lerp(ref.current.scale.y, targetScale, 0.08);
     } else {
-      // Carousel layout for desktop/tablet landscape
+      // Carousel layout for desktop/tablet landscape/mobile landscape
       const relativeIndex = props.index - props.activeIndex;
       
-      const targetX = relativeIndex * carouselSpacing;
+      const targetX = relativeIndex * config.carouselSpacing;
       
-      let targetZ = centerZ;
+      let targetZ = config.centerZ;
       if (relativeIndex !== 0) {
-        targetZ = sideZ - Math.abs(relativeIndex) * perspective;
+        targetZ = config.sideZ - Math.abs(relativeIndex) * config.perspective;
       }
 
-      const targetRotationY = -relativeIndex * rotationFactor;
+      const targetRotationY = -relativeIndex * config.rotationFactor;
 
       const hoverScale = isHovered ? 1.05 : 1;
-      const targetScale = props.isActive ? hoverScale * baseScale : hoverScale * baseScale * 0.85;
+      const targetScale = props.isActive ? 
+        hoverScale * config.baseScale : 
+        hoverScale * config.baseScale * 0.85;
 
       // Smoother interpolation to prevent flicker
       ref.current.position.x = MathUtils.lerp(ref.current.position.x, targetX, 0.08);
@@ -139,7 +190,7 @@ export const Photo = (props: Photo) => {
   });
 
   // Don't render if not visible in carousel mode
-  if (!shouldShow && !useMobileLayout) {
+  if (!shouldShow && props.useCarouselLayout) {
     return null;
   }
 
