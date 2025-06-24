@@ -9,13 +9,13 @@ interface LoadingScreenProps {
 }
 
 const LoadingText = ({ progress }: { progress: number }) => {
-  const { getFontSize } = useResponsiveText();
+  const { getFontSize, getSpacing } = useResponsiveText();
   
   const titleFontSize = getFontSize(0.4, 0.35, 0.5, 0.55, 0.7);
+  const progressFontSize = getFontSize(0.25, 0.22, 0.3, 0.35, 0.45);
   
   return (
     <group>
-      {/* Background text (gray) */}
       <Text
         fontSize={titleFontSize}
         letterSpacing={0.005}
@@ -23,38 +23,40 @@ const LoadingText = ({ progress }: { progress: number }) => {
         font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
         anchorX="center"
         anchorY="middle"
-        color="rgb(77, 77, 77)"
       >
         PILAR APRESENTA
         <meshBasicMaterial transparent depthTest={false} depthWrite={false} />
       </Text>
       
-      {/* Foreground text (white) with clipping mask */}
       <Text
-        fontSize={titleFontSize}
+        fontSize={progressFontSize}
         letterSpacing={0.005}
-        position-z={0.11}
+        position-z={0.1}
+        position-y={getSpacing(-0.8, -0.6, -0.9, -1.0, -1.2)}
         font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
         anchorX="center"
         anchorY="middle"
-        color="white"
       >
-        PILAR APRESENTA
-        <meshBasicMaterial 
-          transparent 
-          depthTest={false} 
-          depthWrite={false}
-          clipShadows={true}
-        />
-        {/* Create clipping plane that moves from left to right */}
-        <primitive 
-          object={{
-            type: 'ClippingPlane',
-            normal: { x: -1, y: 0, z: 0 },
-            constant: -3 + (progress / 100) * 6 // Moves from left (-3) to right (3)
-          }}
-        />
+        {Math.round(progress)}%
+        <meshBasicMaterial transparent depthTest={false} depthWrite={false} />
       </Text>
+      
+      {/* Progress Bar Background */}
+      <mesh position-y={getSpacing(-1.4, -1.1, -1.5, -1.6, -1.8)} position-z={0.05}>
+        <planeGeometry args={[4, 0.05]} />
+        <meshBasicMaterial color="#333333" transparent opacity={0.3} />
+      </mesh>
+      
+      {/* Progress Bar Fill */}
+      <mesh 
+        position-y={getSpacing(-1.4, -1.1, -1.5, -1.6, -1.8)} 
+        position-z={0.06}
+        position-x={-2 + (progress / 100) * 2}
+        scale-x={progress / 100}
+      >
+        <planeGeometry args={[4, 0.05]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.8} />
+      </mesh>
     </group>
   );
 };
@@ -168,9 +170,10 @@ export const LoadingScreen = ({ onLoadingComplete }: LoadingScreenProps) => {
         setProgress(100);
         setTimeout(() => {
           setIsComplete(true);
-          // Smoothly transition to landing page without flicker
-          onLoadingComplete();
-        }, 500); // Wait 0.5 seconds after reaching 100%
+          setTimeout(() => {
+            onLoadingComplete();
+          }, 500);
+        }, 500);
         return;
       }
 
@@ -200,7 +203,7 @@ export const LoadingScreen = ({ onLoadingComplete }: LoadingScreenProps) => {
         backgroundColor: 'black',
         zIndex: 1000,
         opacity: isComplete ? 0 : 1,
-        transition: isComplete ? 'opacity 1s ease-out' : 'none',
+        transition: 'opacity 0.5s ease-out',
         pointerEvents: isComplete ? 'none' : 'all'
       }}
     >
