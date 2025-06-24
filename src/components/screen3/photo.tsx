@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useRef, useState, useCallback } from 'react';
 import { MathUtils, Mesh } from 'three';
 import { Plane } from '@react-three/drei';
+import { useResponsiveText } from '@/utils/responsive';
 
 type Photo = {
   src: string;
@@ -19,6 +20,7 @@ export const Photo = (props: Photo) => {
   const [isHovered, setIsHovered] = useState(false);
   const scroll = useScroll();
   const { viewport } = useThree();
+  const { isTabletPortrait } = useResponsiveText();
 
   // Responsive configuration
   const isMobile = viewport.width < 5;
@@ -27,7 +29,12 @@ export const Photo = (props: Photo) => {
   const sideZ = isMobile ? -1.5 : -2;
   const rotationFactor = isMobile ? 0.25 : 0.35;
   const perspective = isMobile ? 1 : 1.5;
-  const baseScale = isMobile ? 0.7 : 1;
+  
+  // Base scale with 30% reduction for tablet portrait
+  let baseScale = isMobile ? 0.7 : 1;
+  if (isTabletPortrait) {
+    baseScale = baseScale * 0.7; // 30% reduction for tablet portrait
+  }
 
   // Smooth click handler to prevent flicker
   const handleClick = useCallback((event: any) => {
@@ -55,17 +62,17 @@ export const Photo = (props: Photo) => {
   // Smooth hover handlers
   const handlePointerEnter = useCallback(() => {
     setIsHovered(true);
-    if (!isMobile) {
+    if (!isMobile && !isTabletPortrait) {
       document.body.style.cursor = 'pointer';
     }
-  }, [isMobile]);
+  }, [isMobile, isTabletPortrait]);
 
   const handlePointerLeave = useCallback(() => {
     setIsHovered(false);
-    if (!isMobile) {
+    if (!isMobile && !isTabletPortrait) {
       document.body.style.cursor = 'default';
     }
-  }, [isMobile]);
+  }, [isMobile, isTabletPortrait]);
 
   useFrame(() => {
     if (!ref.current) return;

@@ -44,7 +44,7 @@ export const Photo = (props: Photo) => {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const { viewport } = useThree();
-  const { isMobilePortrait } = useResponsiveText();
+  const { isMobilePortrait, isTabletPortrait } = useResponsiveText();
 
   // Responsive configuration
   const isMobile = viewport.width < 5;
@@ -67,13 +67,18 @@ export const Photo = (props: Photo) => {
   const baseY = -row * verticalSpacing;
   const baseZ = 0;
 
-  // Apply 20% reduction to the base scale, plus additional 10% for mobile portrait
+  // Apply 20% reduction to the base scale, plus additional 10% for mobile portrait, plus 30% for tablet portrait
   const baseScale = 0.8; // 20% reduction from 1
   let scale = isMobile ? (baseScale * 0.7) : baseScale;
   
   // Additional 10% reduction for mobile portrait
   if (isMobilePortrait) {
     scale = scale * 0.9; // Additional 10% reduction
+  }
+  
+  // Additional 30% reduction for tablet portrait
+  if (isTabletPortrait) {
+    scale = scale * 0.7; // 30% reduction for tablet portrait
   }
 
   // Button configuration - moved up 3cm (0.3 units) from previous position
