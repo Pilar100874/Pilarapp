@@ -33,7 +33,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isPWAButtonHovered, setIsPWAButtonHovered] = useState(false);
   const logoTexture = useTexture('/logo_branco.png');
   const startButtonTexture = useTexture('/iniciar.png');
-  const pilarIconTexture = useTexture('/icone_pilar.png');
+  const pwaIconTexture = useTexture('/icopwa.png');
   const textRef = useRef<any>();
   const materialRef = useRef<MeshBasicMaterial | null>(null);
   const [animationComplete, setAnimationComplete] = useState(false);
@@ -317,14 +317,14 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
             />
           </mesh>
           
-          {/* Pilar Icon */}
+          {/* PWA Icon using icopwa.png */}
           <mesh 
             position={[-pwaButtonWidth / 2 + pwaIconSize / 2 + 0.15, 0, 0.02]}
             scale={[pwaIconSize, pwaIconSize, 1]}
           >
             <planeGeometry args={[1, 1]} />
             <meshBasicMaterial 
-              map={pilarIconTexture} 
+              map={pwaIconTexture} 
               transparent 
               opacity={1}
               depthWrite={false}
