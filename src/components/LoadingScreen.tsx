@@ -13,12 +13,9 @@ const LoadingText = ({ progress }: { progress: number }) => {
   
   const titleFontSize = getFontSize(0.4, 0.35, 0.5, 0.55, 0.7);
   
-  // Calculate color based on progress - from gray to white
-  const grayValue = 0.3 + (progress / 100) * 0.7; // From 0.3 to 1.0
-  const textColor = `rgb(${Math.round(grayValue * 255)}, ${Math.round(grayValue * 255)}, ${Math.round(grayValue * 255)})`;
-  
   return (
     <group>
+      {/* Background text (gray) */}
       <Text
         fontSize={titleFontSize}
         letterSpacing={0.005}
@@ -26,10 +23,37 @@ const LoadingText = ({ progress }: { progress: number }) => {
         font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
         anchorX="center"
         anchorY="middle"
-        color={textColor}
+        color="rgb(77, 77, 77)"
       >
         PILAR APRESENTA
         <meshBasicMaterial transparent depthTest={false} depthWrite={false} />
+      </Text>
+      
+      {/* Foreground text (white) with clipping mask */}
+      <Text
+        fontSize={titleFontSize}
+        letterSpacing={0.005}
+        position-z={0.11}
+        font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
+        anchorX="center"
+        anchorY="middle"
+        color="white"
+      >
+        PILAR APRESENTA
+        <meshBasicMaterial 
+          transparent 
+          depthTest={false} 
+          depthWrite={false}
+          clipShadows={true}
+        />
+        {/* Create clipping plane that moves from left to right */}
+        <primitive 
+          object={{
+            type: 'ClippingPlane',
+            normal: { x: -1, y: 0, z: 0 },
+            constant: -3 + (progress / 100) * 6 // Moves from left (-3) to right (3)
+          }}
+        />
       </Text>
     </group>
   );
@@ -38,7 +62,6 @@ const LoadingText = ({ progress }: { progress: number }) => {
 export const LoadingScreen = ({ onLoadingComplete }: LoadingScreenProps) => {
   const [progress, setProgress] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
-  const [shouldHide, setShouldHide] = useState(false);
   const startTimeRef = useRef(Date.now());
   const assetsLoadedRef = useRef(false);
 
@@ -145,12 +168,9 @@ export const LoadingScreen = ({ onLoadingComplete }: LoadingScreenProps) => {
         setProgress(100);
         setTimeout(() => {
           setIsComplete(true);
-          // Hide the loading screen but keep the text visible
-          setTimeout(() => {
-            setShouldHide(true);
-            onLoadingComplete();
-          }, 1000); // Wait 1 second after reaching 100%
-        }, 500);
+          // Smoothly transition to landing page without flicker
+          onLoadingComplete();
+        }, 500); // Wait 0.5 seconds after reaching 100%
         return;
       }
 
@@ -179,9 +199,9 @@ export const LoadingScreen = ({ onLoadingComplete }: LoadingScreenProps) => {
         height: '100vh', 
         backgroundColor: 'black',
         zIndex: 1000,
-        opacity: shouldHide ? 0 : 1,
-        transition: 'opacity 0.5s ease-out',
-        pointerEvents: shouldHide ? 'none' : 'all'
+        opacity: isComplete ? 0 : 1,
+        transition: isComplete ? 'opacity 1s ease-out' : 'none',
+        pointerEvents: isComplete ? 'none' : 'all'
       }}
     >
       <Canvas style={{ width: '100%', height: '100%' }}>
