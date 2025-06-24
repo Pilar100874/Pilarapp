@@ -30,66 +30,67 @@ export const Photo = (props: Photo) => {
     isTablet 
   } = useResponsiveText();
 
-  // Modern carousel configuration
-  const getModernConfig = () => {
+  // Fan carousel configuration
+  const getFanConfig = () => {
     if (props.useMobileLayout) {
       return {
-        // Stack layout for mobile
-        spacing: 0,
-        baseScale: 0.64, // Reduced by 20% from 0.8
-        activeScale: 0.8, // Reduced by 20% from 1.0
-        inactiveScale: 0.56, // Reduced by 20% from 0.7
-        zSpacing: 0.5,
-        rotationIntensity: 0.1,
-        parallaxStrength: 0.3,
-        hoverLift: 0.2
+        // Mobile fan layout
+        fanRadius: 2.5,
+        fanAngleSpread: Math.PI * 0.8, // 144 degrees spread
+        centerOffset: { x: 0, y: -1, z: 0 },
+        baseScale: 0.5, // Reduced by 20% from 0.625
+        activeScale: 0.64, // Reduced by 20% from 0.8
+        inactiveScale: 0.4, // Reduced by 20% from 0.5
+        rotationIntensity: 0.15,
+        hoverLift: 0.3,
+        depthVariation: 1.2
       };
     } else {
       return {
-        // Modern 3D carousel for desktop
-        spacing: 3.5,
-        baseScale: 0.72, // Reduced by 20% from 0.9
-        activeScale: 0.96, // Reduced by 20% from 1.2
+        // Desktop fan layout
+        fanRadius: 4.5,
+        fanAngleSpread: Math.PI * 0.9, // 162 degrees spread
+        centerOffset: { x: 0, y: -0.5, z: -1 },
+        baseScale: 0.64, // Reduced by 20% from 0.8
+        activeScale: 0.88, // Reduced by 20% from 1.1
         inactiveScale: 0.56, // Reduced by 20% from 0.7
-        zSpacing: 2.5,
-        rotationIntensity: 0.4,
-        parallaxStrength: 0.8,
-        hoverLift: 0.5
+        rotationIntensity: 0.25,
+        hoverLift: 0.5,
+        depthVariation: 2
       };
     }
   };
 
-  const config = getModernConfig();
+  const config = getFanConfig();
 
-  // Calculate modern positioning
-  const getModernPosition = () => {
+  // Calculate fan positioning
+  const getFanPosition = () => {
     const relativeIndex = props.index - props.activeIndex;
+    const totalPhotos = props.totalPhotos;
     
-    if (props.useMobileLayout) {
-      // Stack layout - only show active and adjacent
-      const isVisible = Math.abs(relativeIndex) <= 1;
-      if (!isVisible) return { visible: false, x: 0, y: 0, z: -10 };
-      
-      return {
-        visible: true,
-        x: relativeIndex * 0.3, // Slight offset for depth
-        y: relativeIndex * -0.2, // Slight vertical offset
-        z: -Math.abs(relativeIndex) * config.zSpacing,
-        rotation: relativeIndex * config.rotationIntensity
-      };
-    } else {
-      // Modern 3D carousel
-      const angle = (relativeIndex / props.totalPhotos) * Math.PI * 2;
-      const radius = 4;
-      
-      return {
-        visible: true,
-        x: Math.sin(angle) * radius + relativeIndex * config.spacing * 0.3,
-        y: Math.cos(angle) * 0.5, // Slight vertical wave
-        z: Math.cos(angle) * radius - config.zSpacing,
-        rotation: angle + relativeIndex * config.rotationIntensity
-      };
-    }
+    // Calculate angle for fan spread
+    const normalizedIndex = props.index / (totalPhotos - 1); // 0 to 1
+    const fanAngle = (normalizedIndex - 0.5) * config.fanAngleSpread; // Center the fan
+    
+    // Calculate position on the fan arc
+    const x = Math.sin(fanAngle) * config.fanRadius + config.centerOffset.x;
+    const y = -Math.abs(Math.cos(fanAngle)) * (config.fanRadius * 0.3) + config.centerOffset.y;
+    const z = Math.cos(fanAngle) * config.depthVariation + config.centerOffset.z;
+    
+    // Active photo comes forward
+    const activeBoost = props.isActive ? 1.5 : 0;
+    const finalZ = z + activeBoost;
+    
+    // Rotation to face the center (like cards in a fan)
+    const cardRotation = fanAngle * 0.7; // Slight rotation towards center
+    
+    return {
+      x,
+      y,
+      z: finalZ,
+      rotation: cardRotation,
+      fanAngle
+    };
   };
 
   // Smooth click handler
@@ -134,64 +135,63 @@ export const Photo = (props: Photo) => {
     if (!ref.current) return;
 
     const time = state.clock.getElapsedTime();
-    const position = getModernPosition();
+    const position = getFanPosition();
     
-    if (!position.visible) {
-      ref.current.visible = false;
-      return;
-    }
+    // Smooth transitions with fan-specific easing
+    const transitionSpeed = props.isTransitioning ? 0.12 : 0.06;
     
-    ref.current.visible = true;
-
-    // Modern smooth transitions
-    const transitionSpeed = props.isTransitioning ? 0.15 : 0.08;
-    
-    // Position with parallax and mouse interaction
+    // Mouse interaction for subtle parallax
     const mouseInfluence = new Vector3(
-      state.mouse.x * config.parallaxStrength,
-      state.mouse.y * config.parallaxStrength * 0.5,
+      state.mouse.x * 0.3,
+      state.mouse.y * 0.2,
       0
     );
     
+    // Target position with mouse influence
     const targetX = position.x + mouseInfluence.x;
     const targetY = position.y + mouseInfluence.y;
     const targetZ = position.z + (isHovered ? config.hoverLift : 0);
 
+    // Smooth position interpolation
     ref.current.position.x = MathUtils.lerp(ref.current.position.x, targetX, transitionSpeed);
     ref.current.position.y = MathUtils.lerp(ref.current.position.y, targetY, transitionSpeed);
     ref.current.position.z = MathUtils.lerp(ref.current.position.z, targetZ, transitionSpeed);
 
-    // Modern rotation with floating effect
-    const floatingRotation = Math.sin(time * 0.5 + props.index) * 0.05;
-    const targetRotationY = (position.rotation || 0) + floatingRotation;
-    const targetRotationX = Math.sin(time * 0.3 + props.index) * 0.02;
+    // Fan-style rotation with subtle floating
+    const floatingRotation = Math.sin(time * 0.4 + props.index * 0.5) * 0.03;
+    const targetRotationY = position.rotation + floatingRotation;
+    const targetRotationX = Math.sin(time * 0.2 + props.index) * 0.01;
+    const targetRotationZ = Math.sin(time * 0.3 + props.index) * 0.005; // Subtle card flutter
     
     ref.current.rotation.y = MathUtils.lerp(ref.current.rotation.y, targetRotationY, transitionSpeed);
     ref.current.rotation.x = MathUtils.lerp(ref.current.rotation.x, targetRotationX, transitionSpeed);
+    ref.current.rotation.z = MathUtils.lerp(ref.current.rotation.z, targetRotationZ, transitionSpeed);
 
     // Dynamic scaling with breathing effect
-    const breathingScale = 1 + Math.sin(time * 0.8 + props.index) * 0.02;
+    const breathingScale = 1 + Math.sin(time * 0.6 + props.index * 0.3) * 0.015;
     const baseScale = props.isActive ? config.activeScale : config.inactiveScale;
-    const hoverScale = isHovered ? 1.1 : 1;
+    const hoverScale = isHovered ? 1.15 : 1;
     const targetScale = baseScale * hoverScale * breathingScale;
 
     ref.current.scale.x = MathUtils.lerp(ref.current.scale.x, targetScale, transitionSpeed);
     ref.current.scale.y = MathUtils.lerp(ref.current.scale.y, targetScale, transitionSpeed);
 
-    // Glow effect for active photo
+    // Enhanced glow effect for active photo
     if (glowRef.current) {
-      const glowOpacity = props.isActive ? 0.3 : 0;
+      const glowOpacity = props.isActive ? 0.4 : (isHovered ? 0.15 : 0);
       const currentOpacity = (glowRef.current.material as any).opacity;
-      (glowRef.current.material as any).opacity = MathUtils.lerp(currentOpacity, glowOpacity, 0.1);
+      (glowRef.current.material as any).opacity = MathUtils.lerp(currentOpacity, glowOpacity, 0.08);
       
-      // Pulsing glow
-      const pulseIntensity = 0.1 + Math.sin(time * 2) * 0.05;
-      glowRef.current.scale.setScalar(1.2 + pulseIntensity);
+      // Pulsing glow with fan-specific timing
+      const pulseIntensity = 0.15 + Math.sin(time * 1.5 + position.fanAngle) * 0.08;
+      glowRef.current.scale.setScalar(1.3 + pulseIntensity);
+      
+      // Copy main photo transformations to glow
+      glowRef.current.position.copy(ref.current.position);
+      glowRef.current.rotation.copy(ref.current.rotation);
+      glowRef.current.position.z -= 0.1; // Slightly behind
     }
   });
-
-  const position = getModernPosition();
-  if (!position.visible) return null;
 
   // Reduced image dimensions by 20%
   const imageWidth = 3.25 * 0.8; // 2.6
@@ -199,11 +199,10 @@ export const Photo = (props: Photo) => {
 
   return (
     <group>
-      {/* Glow effect for active photo - removed background rectangle */}
+      {/* Enhanced glow effect for fan cards */}
       <Plane
         ref={glowRef}
-        args={[imageWidth * 1.2, imageHeight * 1.2]}
-        position-z={-0.1}
+        args={[imageWidth * 1.4, imageHeight * 1.4]}
       >
         <meshBasicMaterial 
           color="#ffffff" 
@@ -213,7 +212,7 @@ export const Photo = (props: Photo) => {
         />
       </Plane>
       
-      {/* Main photo with modern effects - reduced size by 20% */}
+      {/* Main photo card with fan positioning */}
       <Plane
         ref={ref}
         args={[imageWidth, imageHeight]}
@@ -226,18 +225,18 @@ export const Photo = (props: Photo) => {
         onPointerLeave={handlePointerLeave}
       />
       
-      {/* Reflection effect for active photo - reduced size by 20% */}
-      {props.isActive && !props.useMobileLayout && (
+      {/* Subtle shadow effect for depth */}
+      {!props.useMobileLayout && (
         <Plane
-          args={[imageWidth, imageHeight]}
-          position-y={-5.5}
-          rotation-x={Math.PI}
-          scale-y={-0.3}
+          args={[imageWidth * 0.9, imageHeight * 0.9]}
+          position-y={-0.1}
+          position-z={-0.05}
+          rotation-x={Math.PI * 0.1}
         >
           <meshBasicMaterial 
-            map={photo}
+            color="#000000"
             transparent
-            opacity={0.2}
+            opacity={0.1}
             depthWrite={false}
           />
         </Plane>

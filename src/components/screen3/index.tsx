@@ -31,17 +31,17 @@ export const Screen3 = () => {
     if (isTransitioning) return;
     setIsTransitioning(true);
     setActiveIndex((prev) => (prev > 0 ? prev - 1 : photoList.length - 1));
-    setTimeout(() => setIsTransitioning(false), 800);
+    setTimeout(() => setIsTransitioning(false), 1000);
   }, [photoList.length, isTransitioning]);
 
   const handleNext = useCallback(() => {
     if (isTransitioning) return;
     setIsTransitioning(true);
     setActiveIndex((prev) => (prev < photoList.length - 1 ? prev + 1 : 0));
-    setTimeout(() => setIsTransitioning(false), 800);
+    setTimeout(() => setIsTransitioning(false), 1000);
   }, [photoList.length, isTransitioning]);
 
-  // Enhanced touch event handlers
+  // Enhanced touch event handlers for fan interaction
   const handleTouchStart = useCallback((event: TouchEvent) => {
     if (!isMobile && !isTablet) return;
     
@@ -136,35 +136,45 @@ export const Screen3 = () => {
     };
   }, [gl.domElement, handleTouchStart, handleTouchMove, handleTouchEnd, isMobile, isTablet]);
 
-  // Auto-play functionality (optional)
-  useEffect(() => {
-    const autoPlayInterval = setInterval(() => {
-      if (!isTransitioning && !isDraggingRef.current) {
-        handleNext();
-      }
-    }, 5000); // Auto advance every 5 seconds
+  // Auto-play functionality (optional - disabled for fan to let users explore)
+  // useEffect(() => {
+  //   const autoPlayInterval = setInterval(() => {
+  //     if (!isTransitioning && !isDraggingRef.current) {
+  //       handleNext();
+  //     }
+  //   }, 6000);
 
-    return () => clearInterval(autoPlayInterval);
-  }, [handleNext, isTransitioning]);
+  //   return () => clearInterval(autoPlayInterval);
+  // }, [handleNext, isTransitioning]);
 
   // Use mobile layout for portrait orientations
   const useMobileLayout = isMobilePortrait || isTabletPortrait;
 
-  // Modern button styling
-  const buttonScale = useMobileLayout ? 0.4 : 0.6;
-  const buttonSpacing = useMobileLayout ? 4 : 6;
-  const buttonY = useMobileLayout ? -0.5 : 0;
+  // Fan-style navigation buttons
+  const buttonScale = useMobileLayout ? 0.35 : 0.5;
+  const buttonSpacing = useMobileLayout ? 3.5 : 5.5;
+  const buttonY = useMobileLayout ? -3.5 : -2.5;
 
   return (
     <Scroll>
       <group position-y={SCREEN3_OFFSET_START_Y} position-x={0}>
-        {/* Modern Navigation Buttons with Glow Effect */}
+        {/* Fan Navigation Buttons with Elegant Styling */}
         {!useMobileLayout && (
           <>
             {/* Previous Button with Glow */}
-            <group position={[-buttonSpacing, buttonY, 0.5]}>
-              {/* Glow effect */}
-              <mesh scale={[buttonScale * 1.5, buttonScale * 1.5, 1]}>
+            <group position={[-buttonSpacing, buttonY, 1]}>
+              {/* Outer glow */}
+              <mesh scale={[buttonScale * 2, buttonScale * 2, 1]}>
+                <planeGeometry args={[1, 1]} />
+                <meshBasicMaterial 
+                  color="#ffffff" 
+                  transparent 
+                  opacity={0.05} 
+                  depthWrite={false}
+                />
+              </mesh>
+              {/* Inner glow */}
+              <mesh scale={[buttonScale * 1.3, buttonScale * 1.3, 1]}>
                 <planeGeometry args={[1, 1]} />
                 <meshBasicMaterial 
                   color="#ffffff" 
@@ -200,9 +210,19 @@ export const Screen3 = () => {
             </group>
 
             {/* Next Button with Glow */}
-            <group position={[buttonSpacing, buttonY, 0.5]}>
-              {/* Glow effect */}
-              <mesh scale={[buttonScale * 1.5, buttonScale * 1.5, 1]}>
+            <group position={[buttonSpacing, buttonY, 1]}>
+              {/* Outer glow */}
+              <mesh scale={[buttonScale * 2, buttonScale * 2, 1]}>
+                <planeGeometry args={[1, 1]} />
+                <meshBasicMaterial 
+                  color="#ffffff" 
+                  transparent 
+                  opacity={0.05} 
+                  depthWrite={false}
+                />
+              </mesh>
+              {/* Inner glow */}
+              <mesh scale={[buttonScale * 1.3, buttonScale * 1.3, 1]}>
                 <planeGeometry args={[1, 1]} />
                 <meshBasicMaterial 
                   color="#ffffff" 
@@ -239,78 +259,85 @@ export const Screen3 = () => {
           </>
         )}
 
-        {/* Modern Mobile Navigation */}
+        {/* Elegant Mobile Navigation for Fan */}
         {useMobileLayout && (
           <>
-            {/* Sleek Navigation Bar */}
-            <group position-y={-4}>
-              {/* Background bar */}
+            {/* Sleek Navigation Panel */}
+            <group position-y={-4.5}>
+              {/* Background panel with rounded corners effect */}
               <mesh position-z={0.05}>
-                <planeGeometry args={[6, 0.8]} />
+                <planeGeometry args={[7, 1]} />
                 <meshBasicMaterial 
                   color="#000000" 
                   transparent 
-                  opacity={0.3} 
+                  opacity={0.25} 
                   depthWrite={false}
                 />
               </mesh>
               
               {/* Navigation buttons */}
               <mesh
-                position={[-1.5, 0, 0.1]}
-                scale={[0.3, 0.3, 1]}
+                position={[-2, 0, 0.1]}
+                scale={[0.28, 0.28, 1]}
                 rotation={[0, 0, Math.PI / 2]}
                 onClick={handlePrevious}
               >
                 <planeGeometry args={[1, 1]} />
-                <meshBasicMaterial map={arrowTexture} transparent opacity={0.8} />
+                <meshBasicMaterial map={arrowTexture} transparent opacity={0.85} />
               </mesh>
 
               <mesh
-                position={[1.5, 0, 0.1]}
-                scale={[0.3, 0.3, 1]}
+                position={[2, 0, 0.1]}
+                scale={[0.28, 0.28, 1]}
                 rotation={[0, 0, -Math.PI / 2]}
                 onClick={handleNext}
               >
                 <planeGeometry args={[1, 1]} />
-                <meshBasicMaterial map={arrowTexture} transparent opacity={0.8} />
+                <meshBasicMaterial map={arrowTexture} transparent opacity={0.85} />
               </mesh>
 
-              {/* Modern Progress Indicators */}
-              {photoList.map((_, index) => (
-                <group key={`indicator-${index}`} position={[(index - Math.floor(photoList.length / 2)) * 0.4, -0.15, 0.1]}>
-                  {/* Active indicator glow */}
-                  {index === activeIndex && (
-                    <mesh scale={[0.15, 0.15, 1]}>
+              {/* Fan-style Progress Indicators */}
+              {photoList.map((_, index) => {
+                const indicatorAngle = (index / (photoList.length - 1) - 0.5) * Math.PI * 0.6;
+                const indicatorRadius = 0.8;
+                const indicatorX = Math.sin(indicatorAngle) * indicatorRadius;
+                const indicatorY = -Math.abs(Math.cos(indicatorAngle)) * 0.3 - 0.2;
+                
+                return (
+                  <group key={`fan-indicator-${index}`} position={[indicatorX, indicatorY, 0.1]}>
+                    {/* Active indicator glow */}
+                    {index === activeIndex && (
+                      <mesh scale={[0.18, 0.18, 1]}>
+                        <circleGeometry args={[1, 16]} />
+                        <meshBasicMaterial 
+                          color="#ffffff" 
+                          transparent 
+                          opacity={0.4} 
+                          depthWrite={false}
+                        />
+                      </mesh>
+                    )}
+                    {/* Main indicator */}
+                    <mesh
+                      scale={[0.09, 0.09, 1]}
+                      onClick={() => setActiveIndex(index)}
+                    >
                       <circleGeometry args={[1, 16]} />
                       <meshBasicMaterial 
-                        color="#ffffff" 
+                        color={index === activeIndex ? "#ffffff" : "#666666"} 
                         transparent 
-                        opacity={0.3} 
+                        opacity={index === activeIndex ? 1 : 0.6} 
                         depthWrite={false}
                       />
                     </mesh>
-                  )}
-                  {/* Main indicator */}
-                  <mesh
-                    scale={[0.08, 0.08, 1]}
-                    onClick={() => setActiveIndex(index)}
-                  >
-                    <circleGeometry args={[1, 16]} />
-                    <meshBasicMaterial 
-                      color={index === activeIndex ? "#ffffff" : "#666666"} 
-                      transparent 
-                      opacity={index === activeIndex ? 1 : 0.6} 
-                      depthWrite={false}
-                    />
-                  </mesh>
-                </group>
-              ))}
+                  </group>
+                );
+              })}
             </group>
           </>
         )}
 
-        {/* Render all photos with modern effects */}
+        {/* Render all photos in fan formation */}
         {photoList.map(([name, src], index) => (
           <Photo
             key={name}
