@@ -1,15 +1,18 @@
 import { Text, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useState, useRef, useCallback } from 'react';
-import { MeshBasicMaterial } from 'three';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { MeshBasicMaterial, RingGeometry, Group } from 'three';
 import { useResponsiveText } from '@/utils/responsive';
 
 export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [isLoaded, setIsLoaded] = useState(false);
   const logoTexture = useTexture('/logo_branco.png');
   const startButtonTexture = useTexture('/iniciar.png');
   const textRef = useRef<any>();
   const materialRef = useRef<MeshBasicMaterial | null>(null);
+  const progressRingRef = useRef<Group>(null);
   const [animationComplete, setAnimationComplete] = useState(false);
   const { getFontSize, getSpacing, getScale, isMobile } = useResponsiveText();
 
@@ -36,13 +39,45 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         1
       ]) as [number, number, number];
 
+  // Progress circle scale
+  const progressScale = getScale(0.8, 0.7, 1.0, 1.2, 1.5);
+
+  // Background loading simulation
+  useEffect(() => {
+    const loadAssets = async () => {
+      // Simulate loading various assets
+      const totalSteps = 20;
+      let currentStep = 0;
+
+      const updateProgress = () => {
+        currentStep++;
+        const progress = (currentStep / totalSteps) * 100;
+        setLoadingProgress(progress);
+
+        if (progress >= 100) {
+          setIsLoaded(true);
+        } else {
+          // Random delay between 100-300ms to simulate real loading
+          setTimeout(updateProgress, Math.random() * 200 + 100);
+        }
+      };
+
+      // Start loading after a small delay
+      setTimeout(updateProgress, 500);
+    };
+
+    loadAssets();
+  }, []);
+
   // Smooth handlers to prevent flicker
   const handlePointerEnter = useCallback(() => {
-    setIsHovered(true);
-    if (!isMobile) {
-      document.body.style.cursor = 'pointer';
+    if (isLoaded) {
+      setIsHovered(true);
+      if (!isMobile) {
+        document.body.style.cursor = 'pointer';
+      }
     }
-  }, [isMobile]);
+  }, [isMobile, isLoaded]);
 
   const handlePointerLeave = useCallback(() => {
     setIsHovered(false);
@@ -52,10 +87,10 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   }, [isMobile]);
 
   const handleClick = useCallback((event: any) => {
+    if (!isLoaded) return;
     event.stopPropagation();
-    // Just start the experience - music will start automatically in the opener
     onStart();
-  }, [onStart]);
+  }, [onStart, isLoaded]);
 
   useFrame((state) => {
     if (!textRef.current || animationComplete) return;
@@ -70,7 +105,22 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
     if (opacity >= 1) {
       setAnimationComplete(true);
     }
+
+    // Animate progress ring rotation
+    if (progressRingRef.current && !isLoaded) {
+      progressRingRef.current.rotation.z = elapsed * 2;
+    }
   });
+
+  // Create progress ring geometry
+  const createProgressRing = (progress: number) => {
+    const radius = 0.15;
+    const thickness = 0.02;
+    const segments = 64;
+    const angle = (progress / 100) * Math.PI * 2;
+    
+    return new RingGeometry(radius - thickness, radius + thickness, 0, angle, segments);
+  };
 
   return (
     <group position-y={0}>
@@ -93,22 +143,60 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         <meshBasicMaterial ref={materialRef as any} transparent depthTest={false} depthWrite={false} />
       </Text>
 
-      <mesh
-        position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}
-        scale={buttonScale}
-        onClick={handleClick}
-        onPointerEnter={handlePointerEnter}
-        onPointerLeave={handlePointerLeave}
-      >
-        <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial
-          map={startButtonTexture}
-          transparent
-          opacity={1}
-          depthTest={false}
-          depthWrite={false}
-        />
-      </mesh>
+      {/* Loading Progress Circle or Start Button */}
+      {!isLoaded ? (
+        <group 
+          ref={progressRingRef}
+          position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}
+          scale={[progressScale, progressScale, 1]}
+        >
+          {/* Background circle */}
+          <mesh>
+            <ringGeometry args={[0.13, 0.17, 64]} />
+            <meshBasicMaterial color="#333333" transparent opacity={0.3} />
+          </mesh>
+          
+          {/* Progress circle */}
+          <mesh geometry={createProgressRing(loadingProgress)}>
+            <meshBasicMaterial color="#ffffff" transparent opacity={0.9} />
+          </mesh>
+          
+          {/* Center circle with percentage */}
+          <mesh>
+            <circleGeometry args={[0.12, 32]} />
+            <meshBasicMaterial color="#000000" transparent opacity={0.7} />
+          </mesh>
+          
+          {/* Percentage text */}
+          <Text
+            fontSize={getFontSize(0.08, 0.07, 0.09, 0.1, 0.12)}
+            color="#ffffff"
+            position-z={0.01}
+            font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
+            anchorX="center"
+            anchorY="middle"
+          >
+            {Math.round(loadingProgress)}%
+          </Text>
+        </group>
+      ) : (
+        <mesh
+          position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}
+          scale={buttonScale}
+          onClick={handleClick}
+          onPointerEnter={handlePointerEnter}
+          onPointerLeave={handlePointerLeave}
+        >
+          <planeGeometry args={[1, 1]} />
+          <meshBasicMaterial
+            map={startButtonTexture}
+            transparent
+            opacity={1}
+            depthTest={false}
+            depthWrite={false}
+          />
+        </mesh>
+      )}
     </group>
   );
 };
