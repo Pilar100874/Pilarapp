@@ -48,14 +48,19 @@ export const Photo = (props: Photo) => {
 
   // Responsive configuration
   const isMobile = viewport.width < 5;
-  const columns = isMobile ? 2 : 3;
+  
+  // Use mobile portrait layout for both mobile portrait AND tablet portrait
+  const useMobileLayout = isMobilePortrait || isTabletPortrait;
+  
+  // Column configuration: 2 columns for mobile layout, 3 for desktop/tablet landscape
+  const columns = useMobileLayout ? 2 : 3;
   
   // Base spacing values
   let spacing = isMobile ? 2.2 : 2.8;
   let verticalSpacing = isMobile ? 3.2 : 4.3;
   
-  // Reduce spacing by 20% for both mobile portrait and tablet portrait
-  if (isMobilePortrait || isTabletPortrait) {
+  // Reduce spacing by 20% for mobile layout (both mobile portrait and tablet portrait)
+  if (useMobileLayout) {
     spacing = spacing * 0.8; // 20% reduction
     verticalSpacing = verticalSpacing * 0.8; // 20% reduction
   }
@@ -67,13 +72,13 @@ export const Photo = (props: Photo) => {
   const baseY = -row * verticalSpacing;
   const baseZ = 0;
 
-  // Apply reductions to the base scale for both mobile portrait and tablet portrait
+  // Apply reductions to the base scale for mobile layout
   const baseScale = 0.8; // 20% reduction from 1
   let scale = isMobile ? (baseScale * 0.7) : baseScale;
   
-  // Additional 10% reduction for mobile portrait, and same for tablet portrait
-  if (isMobilePortrait || isTabletPortrait) {
-    scale = scale * 0.9; // Additional 10% reduction for both
+  // Additional 10% reduction for mobile layout (both mobile portrait and tablet portrait)
+  if (useMobileLayout) {
+    scale = scale * 0.9; // Additional 10% reduction
   }
 
   // Button configuration - moved up 3cm (0.3 units) from previous position
