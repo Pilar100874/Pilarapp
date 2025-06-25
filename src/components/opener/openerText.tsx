@@ -16,7 +16,6 @@ export const OpenerText = ({ py }: OpenerText) => {
   const text2Ref = useRef<any>();
   const text3Ref = useRef<any>();
   const text4Ref = useRef<any>();
-  const text5Ref = useRef<any>();
   const arrowRef = useRef<any>();
   const [startFade, setStartFade] = useState(false);
   const scroll = useScroll();
@@ -69,8 +68,7 @@ export const OpenerText = ({ py }: OpenerText) => {
       requiredRefs.push(
         text2Ref.current?.material,
         text3Ref.current?.material,
-        text4Ref.current?.material,
-        text5Ref.current?.material
+        text4Ref.current?.material
       );
     } else {
       requiredRefs.push(text2Ref.current?.material);
@@ -94,7 +92,6 @@ export const OpenerText = ({ py }: OpenerText) => {
         text2Ref.current.material.opacity = opacity;
         text3Ref.current.material.opacity = opacity;
         text4Ref.current.material.opacity = opacity;
-        text5Ref.current.material.opacity = opacity;
       } else {
         text2Ref.current.material.opacity = opacity;
       }
@@ -107,7 +104,6 @@ export const OpenerText = ({ py }: OpenerText) => {
         text2Ref.current.material.opacity = 0;
         text3Ref.current.material.opacity = 0;
         text4Ref.current.material.opacity = 0;
-        text5Ref.current.material.opacity = 0;
       } else {
         text2Ref.current.material.opacity = 0;
       }
@@ -191,21 +187,7 @@ export const OpenerText = ({ py }: OpenerText) => {
             anchorX="center"
             anchorY="middle"
           >
-            AQUI
-            <meshBasicMaterial transparent opacity={0} depthTest={false} depthWrite={false} />
-          </Text>
-          <Text
-            ref={text5Ref}
-            fontSize={text2Size}
-            letterSpacing={0.005}
-            position-z={0.1}
-            position-y={getSpacing(-2.4, -1.6, -2.6, -2.8, -3.0)}
-            textAlign={"left"}
-            font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
-            anchorX="center"
-            anchorY="middle"
-          >
-            !!!
+            AQUI !!!
             <meshBasicMaterial transparent opacity={0} depthTest={false} depthWrite={false} />
           </Text>
         </>
