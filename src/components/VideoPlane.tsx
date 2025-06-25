@@ -22,6 +22,7 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
   const [musicStarted, setMusicStarted] = useState(false);
   const [userInteracted, setUserInteracted] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+  const [orientationChanged, setOrientationChanged] = useState(false);
   const { play } = useAudio();
   const initialY = -15;
   const targetY = 0;
@@ -40,6 +41,68 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
     loop: true,
     crossOrigin: "anonymous",
   });
+
+  // Enhanced orientation change detection for iOS
+  useEffect(() => {
+    if (!isIOS) return;
+
+    let orientationTimeout: number;
+
+    const handleOrientationChange = () => {
+      console.log('iOS orientation change detected');
+      setOrientationChanged(true);
+      
+      // Clear any existing timeout
+      if (orientationTimeout) {
+        clearTimeout(orientationTimeout);
+      }
+      
+      // Set a timeout to trigger video/music after orientation stabilizes
+      orientationTimeout = setTimeout(() => {
+        console.log('iOS orientation stabilized, attempting to start media');
+        setUserInteracted(true);
+        
+        // Try to start video and music after orientation change
+        const video = videoTexture.source.data as HTMLVideoElement;
+        
+        if (video && !videoStarted) {
+          video.muted = true;
+          video.playsInline = true;
+          video.setAttribute('playsinline', 'true');
+          video.setAttribute('webkit-playsinline', 'true');
+          
+          video.play().then(() => {
+            console.log('iOS video started after orientation change');
+            setVideoStarted(true);
+            
+            // Start music after video starts
+            if (!musicStarted) {
+              setMusicStarted(true);
+              play().catch(error => {
+                console.warn('iOS music start failed after orientation:', error);
+              });
+            }
+          }).catch(error => {
+            console.warn('iOS video start failed after orientation:', error);
+          });
+        }
+      }, 500); // Wait 500ms for orientation to stabilize
+    };
+
+    // Listen for orientation changes
+    window.addEventListener('orientationchange', handleOrientationChange);
+    
+    // Also listen for resize events as backup
+    window.addEventListener('resize', handleOrientationChange);
+
+    return () => {
+      window.removeEventListener('orientationchange', handleOrientationChange);
+      window.removeEventListener('resize', handleOrientationChange);
+      if (orientationTimeout) {
+        clearTimeout(orientationTimeout);
+      }
+    };
+  }, [isIOS, videoTexture, play, videoStarted, musicStarted]);
 
   // Enhanced user interaction detection for iOS
   useEffect(() => {
@@ -87,6 +150,7 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
       document.removeEventListener('touchend', handleUserInteraction);
       document.removeEventListener('click', handleUserInteraction);
       document.removeEventListener('keydown', handleUserInteraction);
+      document.removeEventListener('scroll', handleUserInteraction);
     };
 
     // Multiple event listeners for better iOS compatibility
@@ -94,12 +158,14 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
     document.addEventListener('touchend', handleUserInteraction, { passive: true });
     document.addEventListener('click', handleUserInteraction);
     document.addEventListener('keydown', handleUserInteraction);
+    document.addEventListener('scroll', handleUserInteraction, { passive: true });
 
     return () => {
       document.removeEventListener('touchstart', handleUserInteraction);
       document.removeEventListener('touchend', handleUserInteraction);
       document.removeEventListener('click', handleUserInteraction);
       document.removeEventListener('keydown', handleUserInteraction);
+      document.removeEventListener('scroll', handleUserInteraction);
     };
   }, [isIOS, videoTexture, play, musicStarted]);
 
@@ -122,6 +188,63 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
       console.log('iOS video setup completed');
     }
   }, [videoTexture, isIOS]);
+
+  // iOS-specific scroll detection to trigger media
+  useEffect(() => {
+    if (!isIOS) return;
+
+    let scrollTimeout: number;
+    let lastScrollTime = 0;
+
+    const handleScroll = () => {
+      const now = Date.now();
+      lastScrollTime = now;
+      
+      // Clear existing timeout
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+      
+      // Set timeout to detect when scrolling stops
+      scrollTimeout = setTimeout(() => {
+        if (now === lastScrollTime && !videoStarted && !musicStarted) {
+          console.log('iOS scroll detected, attempting to start media');
+          setUserInteracted(true);
+          
+          const video = videoTexture.source.data as HTMLVideoElement;
+          
+          if (video) {
+            video.muted = true;
+            video.playsInline = true;
+            
+            video.play().then(() => {
+              console.log('iOS video started after scroll');
+              setVideoStarted(true);
+              
+              // Start music
+              if (!musicStarted) {
+                setMusicStarted(true);
+                play().catch(error => {
+                  console.warn('iOS music start failed after scroll:', error);
+                });
+              }
+            }).catch(error => {
+              console.warn('iOS video start failed after scroll:', error);
+            });
+          }
+        }
+      }, 150);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+    };
+  }, [isIOS, videoTexture, play, videoStarted, musicStarted]);
 
   useFrame((state) => {
     if (!ref.current) return;
@@ -155,6 +278,29 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
         }
       }).catch(error => {
         console.warn('Non-iOS video start failed:', error);
+      });
+    }
+
+    // For iOS, try to start video after animation if user interacted or orientation changed
+    if (isIOS && progress >= 0.8 && !videoStarted && (userInteracted || orientationChanged)) {
+      setVideoStarted(true);
+      const video = videoTexture.source.data as HTMLVideoElement;
+      
+      video.muted = true;
+      video.playsInline = true;
+      
+      video.play().then(() => {
+        console.log('iOS video started after animation');
+        
+        // Start music for iOS
+        if (!musicStarted) {
+          setMusicStarted(true);
+          play().catch(error => {
+            console.warn('iOS music start failed after animation:', error);
+          });
+        }
+      }).catch(error => {
+        console.warn('iOS video start failed after animation:', error);
       });
     }
 

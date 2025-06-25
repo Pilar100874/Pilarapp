@@ -16,6 +16,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isFullyLoaded, setIsFullyLoaded] = useState(false);
   const [userInteracted, setUserInteracted] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+  const [orientationChanged, setOrientationChanged] = useState(false);
   const logoTexture = useTexture('/logo_branco.png');
   const startButtonTexture = useTexture('/iniciar.png');
   const textRef = useRef<any>();
@@ -35,6 +36,25 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
     console.log('Landing Page - iOS detected:', iosDetected);
   }, []);
 
+  // iOS orientation change detection
+  useEffect(() => {
+    if (!isIOS) return;
+
+    const handleOrientationChange = () => {
+      console.log('Landing Page - iOS orientation change detected');
+      setOrientationChanged(true);
+      setUserInteracted(true);
+    };
+
+    window.addEventListener('orientationchange', handleOrientationChange);
+    window.addEventListener('resize', handleOrientationChange);
+
+    return () => {
+      window.removeEventListener('orientationchange', handleOrientationChange);
+      window.removeEventListener('resize', handleOrientationChange);
+    };
+  }, [isIOS]);
+
   // Enhanced user interaction detection for iOS
   useEffect(() => {
     let interactionDetected = false;
@@ -51,36 +71,39 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
       document.removeEventListener('touchend', handleUserInteraction);
       document.removeEventListener('click', handleUserInteraction);
       document.removeEventListener('keydown', handleUserInteraction);
+      document.removeEventListener('scroll', handleUserInteraction);
     };
 
     document.addEventListener('touchstart', handleUserInteraction, { passive: true });
     document.addEventListener('touchend', handleUserInteraction, { passive: true });
     document.addEventListener('click', handleUserInteraction);
     document.addEventListener('keydown', handleUserInteraction);
+    document.addEventListener('scroll', handleUserInteraction, { passive: true });
 
     return () => {
       document.removeEventListener('touchstart', handleUserInteraction);
       document.removeEventListener('touchend', handleUserInteraction);
       document.removeEventListener('click', handleUserInteraction);
       document.removeEventListener('keydown', handleUserInteraction);
+      document.removeEventListener('scroll', handleUserInteraction);
     };
   }, []);
 
   // Faster loading simulation for iOS
   useEffect(() => {
-    const baseInterval = isIOS ? 100 : 200; // Much faster on iOS
-    const randomRange = isIOS ? 100 : 300;
+    const baseInterval = isIOS ? 50 : 200; // Much faster on iOS
+    const randomRange = isIOS ? 50 : 300;
     
     const loadingInterval = setInterval(() => {
       setLoadingProgress(prev => {
-        const increment = Math.random() * (isIOS ? 20 : 15) + (isIOS ? 10 : 5); // Faster increment on iOS
+        const increment = Math.random() * (isIOS ? 25 : 15) + (isIOS ? 15 : 5); // Faster increment on iOS
         const newProgress = Math.min(prev + increment, 100);
         
         if (newProgress >= 100) {
           clearInterval(loadingInterval);
           setTimeout(() => {
             setIsFullyLoaded(true);
-          }, isIOS ? 100 : 300); // Much shorter delay on iOS
+          }, isIOS ? 50 : 300); // Much shorter delay on iOS
         }
         
         return newProgress;
@@ -186,9 +209,9 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
       setUserInteracted(true);
     }
     
-    console.log('Start button clicked, iOS:', isIOS, 'User interacted:', userInteracted);
+    console.log('Start button clicked, iOS:', isIOS, 'User interacted:', userInteracted, 'Orientation changed:', orientationChanged);
     onStart();
-  }, [onStart, userInteracted, isIOS]);
+  }, [onStart, userInteracted, isIOS, orientationChanged]);
 
   // PWA button handlers
   const handlePWAPointerEnter = useCallback(() => {
@@ -319,7 +342,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
               anchorX="center"
               anchorY="middle"
             >
-              Preparando para iOS...
+              {orientationChanged ? 'Pronto para iOS!' : 'Gire a tela para ativar...'}
             </Text>
           )}
         </group>
