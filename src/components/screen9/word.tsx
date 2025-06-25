@@ -22,11 +22,16 @@ export const Word = ({ index, value }: Word) => {
   // Responsive vertical spacing with orientation
   const verticalSpacing = getSpacing(1.4, 1.2, 1.6, 1.8, 2.24);
   
-  // Responsive text width with orientation - fix left margin for tablet portrait
+  // Responsive text width with orientation - increase width for tablet portrait to prevent cutting
   let maxWidth = getFontSize(3.8, 5.5, 5.2, 6.0, 7.45);
   
+  // Increase max width for tablet portrait to prevent text cutting
+  if (isTabletPortrait) {
+    maxWidth = maxWidth * 1.2; // Increase by 20% for tablet portrait
+  }
+  
   // Adjust text positioning for tablet portrait to fix left cut-off
-  const textPositionX = isTabletPortrait ? 0.1 : 0; // Move text 1cm to the right for tablet portrait
+  const textPositionX = isTabletPortrait ? 0.2 : 0; // Move text 2cm to the right for tablet portrait
 
   return (
     <Text
