@@ -5,7 +5,6 @@ import { Photo } from './photo';
 import { useState } from 'react';
 import { useTexture } from '@react-three/drei';
 import { useResponsiveText } from '@/utils/responsive';
-import { useAudio } from '@/components/AudioManager';
 
 export const Screen6 = () => {
   const photoList = Object.entries(dataPhotos);
@@ -13,7 +12,6 @@ export const Screen6 = () => {
   const [isAnimationPaused, setIsAnimationPaused] = useState(true); // Start paused (showing play button)
   const playTexture = useTexture('/play.png');
   const { isMobilePortrait } = useResponsiveText();
-  const { isPlaying, toggle } = useAudio();
 
   const rotatePhotos = (clickedIndex: number) => {
     const newOrder = [...order];
@@ -26,12 +24,11 @@ export const Screen6 = () => {
     setOrder(newOrder);
   };
 
-  const handlePlayPauseClick = async () => {
-    console.log('Screen6 play/pause clicked, current music state:', isPlaying);
+  const handlePlayPauseClick = () => {
+    console.log('Screen6 animation play/pause clicked, current state:', isAnimationPaused);
     
-    // Toggle music and sync animation state
-    await toggle();
-    setIsAnimationPaused(!isPlaying); // Will be opposite after toggle
+    // Only toggle animation state - don't affect music
+    setIsAnimationPaused(!isAnimationPaused);
   };
 
   // Button position - move up 2cm (0.2 units) in mobile portrait
@@ -40,11 +37,11 @@ export const Screen6 = () => {
   return (
     <Scroll>
       <group position-y={SCREEN6_OFFSET_START_Y} rotation-y={Math.PI * -0.05}>
-        {/* Play/Pause Button - controls both music and animation */}
+        {/* Play/Pause Button - controls ONLY animation, not music */}
         <mesh
           position={[-2, buttonY, 2]}
           scale={[0.45, 0.45, 1]}
-          rotation={[0, 0, isPlaying ? Math.PI : 0]} // Play icon when paused, pause icon when playing
+          rotation={[0, 0, isAnimationPaused ? 0 : Math.PI]} // Play icon when paused, pause icon when playing
           onClick={handlePlayPauseClick}
           onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
           onPointerOut={() => { document.body.style.cursor = 'default'; }}
@@ -69,7 +66,7 @@ export const Screen6 = () => {
               index={displayIndex}
               totalPhotos={photoList.length}
               onClick={() => rotatePhotos(originalIndex)}
-              isPaused={!isPlaying} // Animation follows music state
+              isPaused={isAnimationPaused} // Animation follows local state, not music state
             />
           );
         })}
