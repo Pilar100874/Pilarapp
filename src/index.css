@@ -99,13 +99,16 @@ canvas {
   outline: none !important;
 }
 
-/* Enhanced audio and video elements for iOS compatibility */
+/* Enhanced audio and video elements for maximum compatibility */
 audio, video {
   -webkit-playsinline: true;
   playsinline: true;
+  /* Force inline playback on all devices */
+  -webkit-playsinline: true !important;
+  playsinline: true !important;
 }
 
-/* iOS-specific video optimizations */
+/* Enhanced video optimizations for all platforms */
 video {
   -webkit-playsinline: true;
   -webkit-transform: translateZ(0);
@@ -116,14 +119,26 @@ video {
   -webkit-transform: translate3d(0, 0, 0);
   transform: translate3d(0, 0, 0);
   will-change: transform;
+  /* Ensure video displays properly */
+  object-fit: cover;
+  /* Prevent video controls */
+  -webkit-media-controls: none;
+  -moz-media-controls: none;
+  media-controls: none;
+  /* Force video to be treated as inline content */
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-/* iOS-specific audio optimizations */
+/* Enhanced audio optimizations */
 audio {
   -webkit-playsinline: true;
   /* Ensure audio can be controlled */
   -webkit-user-select: none;
   user-select: none;
+  /* Hide audio element */
+  display: none;
 }
 
 @media (prefers-color-scheme: light) {
@@ -155,20 +170,23 @@ audio {
     min-width: 44px;
   }
   
-  /* iOS-specific video fixes */
+  /* Enhanced mobile video fixes */
   video {
     object-fit: cover;
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
-    /* Ensure video is properly displayed on iOS */
+    /* Ensure video is properly displayed on mobile */
     -webkit-mask-image: -webkit-radial-gradient(white, black);
+    /* Force video attributes */
+    -webkit-playsinline: true !important;
+    playsinline: true !important;
   }
 }
 
 /* iOS Safari specific fixes */
 @supports (-webkit-touch-callout: none) {
   video {
-    -webkit-playsinline: true;
+    -webkit-playsinline: true !important;
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
     will-change: transform;
@@ -176,10 +194,13 @@ audio {
     display: block;
     width: 100%;
     height: 100%;
+    /* Additional iOS-specific attributes */
+    -webkit-media-controls-start-playback-button: none;
+    -webkit-media-controls: none;
   }
   
   audio {
-    -webkit-playsinline: true;
+    -webkit-playsinline: true !important;
     /* Ensure audio works on iOS */
     display: none;
   }
@@ -199,6 +220,9 @@ audio {
   video {
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
+    /* Force playsinline on high DPI devices */
+    -webkit-playsinline: true !important;
+    playsinline: true !important;
   }
 }
 
@@ -209,4 +233,29 @@ audio {
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
   }
+  
+  video {
+    -webkit-playsinline: true !important;
+    playsinline: true !important;
+  }
+}
+
+/* Additional video compatibility fixes */
+video::-webkit-media-controls {
+  display: none !important;
+}
+
+video::-webkit-media-controls-start-playback-button {
+  display: none !important;
+}
+
+video::-webkit-media-controls-enclosure {
+  display: none !important;
+}
+
+/* Force video autoplay compatibility */
+video[autoplay] {
+  -webkit-playsinline: true !important;
+  playsinline: true !important;
+  muted: true;
 }
