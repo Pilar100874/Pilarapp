@@ -70,10 +70,10 @@ export const ShopButton = () => {
     const time = Date.now() * 0.001;
     const floatOffset = Math.sin(time) * 0.03; // Reduced float amplitude
     
-    // Base offset with tablet portrait adjustment - move up 30cm (3 units) from previous 10cm
+    // Base offset with tablet portrait adjustment - move up 30cm (3 units)
     let baseOffset = getSpacing(-2.5, -2.0, -2.7, -2.9, -3.2);
     if (isTabletPortrait) {
-      baseOffset += 3.0; // Move up by 30cm (3 units) for tablet portrait - increased from 1.0 to 3.0
+      baseOffset += 3.0; // Move up by 30cm (3 units) for tablet portrait
     }
     
     buttonRef.current.position.y = floatOffset + baseOffset;
