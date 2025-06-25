@@ -9,7 +9,7 @@ import { useResponsiveText } from '@/utils/responsive';
 export const Screen6 = () => {
   const photoList = Object.entries(dataPhotos);
   const [order, setOrder] = useState(photoList.map((_, i) => i));
-  const [isAnimationPaused, setIsAnimationPaused] = useState(true); // Start paused (showing play button)
+  const [isAnimationPaused, setIsAnimationPaused] = useState(false); // Start playing (changed from true to false)
   const playTexture = useTexture('/play.png');
   const { isMobilePortrait } = useResponsiveText();
 
