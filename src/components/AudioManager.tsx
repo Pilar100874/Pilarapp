@@ -27,35 +27,75 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [userInteracted, setUserInteracted] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
 
+  // Detect iOS
   useEffect(() => {
-    // Detect user interaction for iOS
-    const handleUserInteraction = () => {
+    const iosDetected = /iPhone|iPad|iPod/.test(navigator.userAgent);
+    setIsIOS(iosDetected);
+    console.log('Audio Manager - iOS detected:', iosDetected);
+  }, []);
+
+  // Enhanced user interaction detection
+  useEffect(() => {
+    let interactionDetected = false;
+
+    const handleUserInteraction = (event: Event) => {
+      if (interactionDetected) return;
+      
+      console.log('Audio Manager - User interaction detected:', event.type);
+      interactionDetected = true;
       setUserInteracted(true);
+      
+      // For iOS, try to unlock audio context immediately
+      if (isIOS && audioRef.current) {
+        const audio = audioRef.current;
+        
+        // Try to play and immediately pause to unlock audio context
+        audio.muted = true;
+        audio.play().then(() => {
+          audio.pause();
+          audio.muted = false;
+          audio.volume = 0.7;
+          console.log('iOS audio context unlocked');
+        }).catch(error => {
+          console.warn('iOS audio unlock failed:', error);
+        });
+      }
+      
+      // Remove listeners
       document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('touchend', handleUserInteraction);
       document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
     };
 
     document.addEventListener('touchstart', handleUserInteraction, { passive: true });
+    document.addEventListener('touchend', handleUserInteraction, { passive: true });
     document.addEventListener('click', handleUserInteraction);
+    document.addEventListener('keydown', handleUserInteraction);
 
     return () => {
       document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('touchend', handleUserInteraction);
       document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
     };
-  }, []);
+  }, [isIOS]);
 
   useEffect(() => {
-    // Create single audio instance
+    // Create audio instance
     audioRef.current = new Audio('/musica.mp3');
     audioRef.current.loop = true;
     audioRef.current.volume = 0.7;
     audioRef.current.preload = 'auto';
+    audioRef.current.crossOrigin = 'anonymous';
 
     // iOS-specific audio setup
-    if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+    if (isIOS) {
       audioRef.current.setAttribute('playsinline', 'true');
       audioRef.current.setAttribute('webkit-playsinline', 'true');
+      audioRef.current.muted = false; // Don't mute by default on iOS
     }
 
     const audio = audioRef.current;
@@ -82,6 +122,12 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
 
     const handleError = (e: Event) => {
       console.error('Audio error:', e);
+      // Try to reload on error
+      setTimeout(() => {
+        if (audio.readyState === 0) {
+          audio.load();
+        }
+      }, 1000);
     };
 
     const handleStalled = () => {
@@ -91,12 +137,22 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
       }
     };
 
+    const handleLoadStart = () => {
+      console.log('Audio load started');
+    };
+
+    const handleLoadedData = () => {
+      console.log('Audio data loaded');
+    };
+
     audio.addEventListener('canplaythrough', handleCanPlayThrough);
     audio.addEventListener('play', handlePlay);
     audio.addEventListener('pause', handlePause);
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('error', handleError);
     audio.addEventListener('stalled', handleStalled);
+    audio.addEventListener('loadstart', handleLoadStart);
+    audio.addEventListener('loadeddata', handleLoadedData);
 
     // Start loading
     audio.load();
@@ -108,10 +164,12 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
       audio.removeEventListener('stalled', handleStalled);
+      audio.removeEventListener('loadstart', handleLoadStart);
+      audio.removeEventListener('loadeddata', handleLoadedData);
       audio.pause();
       audio.src = '';
     };
-  }, []);
+  }, [isIOS]);
 
   const play = async () => {
     if (!audioRef.current || !isLoaded) {
@@ -119,48 +177,80 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
       return;
     }
 
-    // Check if user has interacted (required for iOS)
-    if (!userInteracted && /iPhone|iPad|iPod/.test(navigator.userAgent)) {
+    // For iOS, check if user has interacted
+    if (isIOS && !userInteracted) {
       console.warn('iOS requires user interaction before audio playback');
       return;
     }
     
     try {
+      const audio = audioRef.current;
+      
       // Reset audio position if it's ended
-      if (audioRef.current.ended) {
-        audioRef.current.currentTime = 0;
+      if (audio.ended) {
+        audio.currentTime = 0;
       }
 
-      await audioRef.current.play();
+      // For iOS, ensure audio is properly configured
+      if (isIOS) {
+        audio.muted = false;
+        audio.volume = 0.7;
+      }
+
+      await audio.play();
       console.log('Audio play successful');
     } catch (error) {
       console.error('Audio play failed:', error);
       
       // Enhanced retry logic for iOS
-      if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+      if (isIOS) {
         try {
-          // Try to unlock audio context on iOS
-          audioRef.current.muted = true;
-          await audioRef.current.play();
-          audioRef.current.muted = false;
-          audioRef.current.volume = 0.7;
-          console.log('iOS audio unlocked and playing');
+          console.log('Attempting iOS audio recovery...');
+          const audio = audioRef.current;
+          
+          // Try the mute/unmute trick for iOS
+          audio.muted = true;
+          await audio.play();
+          
+          setTimeout(() => {
+            audio.muted = false;
+            audio.volume = 0.7;
+            console.log('iOS audio recovery successful');
+          }, 100);
+          
         } catch (iosError) {
-          console.error('iOS audio unlock failed:', iosError);
+          console.error('iOS audio recovery failed:', iosError);
           
           // Final fallback: reload and retry
           try {
             audioRef.current.load();
             setTimeout(async () => {
               try {
-                await audioRef.current?.play();
+                if (audioRef.current && userInteracted) {
+                  await audioRef.current.play();
+                  console.log('iOS audio final retry successful');
+                }
               } catch (finalError) {
-                console.error('Final audio retry failed:', finalError);
+                console.error('iOS audio final retry failed:', finalError);
               }
-            }, 1000);
+            }, 2000);
           } catch (reloadError) {
-            console.error('Audio reload failed:', reloadError);
+            console.error('iOS audio reload failed:', reloadError);
           }
+        }
+      } else {
+        // Non-iOS retry logic
+        try {
+          audioRef.current.load();
+          setTimeout(async () => {
+            try {
+              await audioRef.current?.play();
+            } catch (retryError) {
+              console.error('Audio retry failed:', retryError);
+            }
+          }, 500);
+        } catch (reloadError) {
+          console.error('Audio reload failed:', reloadError);
         }
       }
     }

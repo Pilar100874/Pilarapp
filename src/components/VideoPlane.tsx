@@ -21,80 +21,140 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
   const [videoStarted, setVideoStarted] = useState(false);
   const [musicStarted, setMusicStarted] = useState(false);
   const [userInteracted, setUserInteracted] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
   const { play } = useAudio();
-  const initialY = -15; // Start position further down
-  const targetY = 0; // Final position at top
+  const initialY = -15;
+  const targetY = 0;
+
+  // Detect iOS
+  useEffect(() => {
+    const iosDetected = /iPhone|iPad|iPod/.test(navigator.userAgent);
+    setIsIOS(iosDetected);
+    console.log('iOS detected:', iosDetected);
+  }, []);
 
   const videoTexture = useVideoTexture(texturePath, {
-    autoplay: false, // Don't start playing immediately
-    muted: true, // Mute video for iOS autoplay compatibility
-    playsInline: true, // Required for iOS
+    autoplay: false,
+    muted: true,
+    playsInline: true,
     loop: true,
+    crossOrigin: "anonymous",
   });
 
-  // Detect user interaction for iOS
+  // Enhanced user interaction detection for iOS
   useEffect(() => {
-    const handleUserInteraction = () => {
+    let interactionDetected = false;
+
+    const handleUserInteraction = (event: Event) => {
+      if (interactionDetected) return;
+      
+      console.log('User interaction detected:', event.type);
+      interactionDetected = true;
       setUserInteracted(true);
+      
+      // For iOS, immediately try to start video and audio
+      if (isIOS) {
+        const video = videoTexture.source.data as HTMLVideoElement;
+        
+        // Setup video for iOS
+        video.muted = true;
+        video.playsInline = true;
+        video.setAttribute('playsinline', 'true');
+        video.setAttribute('webkit-playsinline', 'true');
+        video.setAttribute('controls', 'false');
+        
+        // Try to play video immediately on iOS
+        video.play().then(() => {
+          console.log('iOS video started successfully');
+          setVideoStarted(true);
+          
+          // Start music after video starts
+          setTimeout(() => {
+            if (!musicStarted) {
+              setMusicStarted(true);
+              play().catch(error => {
+                console.warn('iOS music start failed:', error);
+              });
+            }
+          }, 500);
+        }).catch(error => {
+          console.warn('iOS video start failed:', error);
+        });
+      }
+      
+      // Remove listeners after first interaction
       document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('touchend', handleUserInteraction);
       document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
     };
 
+    // Multiple event listeners for better iOS compatibility
     document.addEventListener('touchstart', handleUserInteraction, { passive: true });
+    document.addEventListener('touchend', handleUserInteraction, { passive: true });
     document.addEventListener('click', handleUserInteraction);
+    document.addEventListener('keydown', handleUserInteraction);
 
     return () => {
       document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('touchend', handleUserInteraction);
       document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
     };
-  }, []);
+  }, [isIOS, videoTexture, play, musicStarted]);
+
+  // Enhanced video setup for iOS
+  useEffect(() => {
+    const video = videoTexture.source.data as HTMLVideoElement;
+    
+    if (isIOS) {
+      // iOS-specific video attributes
+      video.muted = true;
+      video.playsInline = true;
+      video.setAttribute('playsinline', 'true');
+      video.setAttribute('webkit-playsinline', 'true');
+      video.setAttribute('controls', 'false');
+      video.setAttribute('preload', 'metadata');
+      
+      // Force load on iOS
+      video.load();
+      
+      console.log('iOS video setup completed');
+    }
+  }, [videoTexture, isIOS]);
 
   useFrame((state) => {
     if (!ref.current) return;
 
     const elapsed = state.clock.getElapsedTime();
-    const duration = 1.5; // Animation duration in seconds
+    const duration = 1.5;
     const progress = Math.min(elapsed / duration, 1);
     
-    // Smooth easing function
     const easeOutCubic = (x: number): number => 1 - Math.pow(1 - x, 3);
     const easedProgress = easeOutCubic(progress);
     
-    // Animate position from bottom to top
     ref.current.position.y = initialY + (targetY - initialY) * easedProgress;
 
-    // Start video when animation is almost complete AND user has interacted
-    if (progress >= 0.8 && !videoStarted && userInteracted) {
+    // For non-iOS devices, start video when animation is complete
+    if (!isIOS && progress >= 0.8 && !videoStarted && userInteracted) {
       setVideoStarted(true);
       const video = videoTexture.source.data as HTMLVideoElement;
       
-      // iOS-specific video setup
       video.muted = true;
       video.playsInline = true;
-      video.setAttribute('playsinline', 'true');
-      video.setAttribute('webkit-playsinline', 'true');
       
-      video.play().catch(error => {
-        console.warn('Video autoplay failed:', error);
-        // Fallback: try again after a short delay
-        setTimeout(() => {
-          video.play().catch(e => console.warn('Video retry failed:', e));
-        }, 500);
-      });
-    }
-
-    // Start music automatically when video starts (only after user interaction)
-    if (videoStarted && !musicStarted && userInteracted) {
-      setMusicStarted(true);
-      console.log('Starting music automatically in opener...');
-      
-      // Use the centralized audio manager with iOS-specific handling
-      play().catch(error => {
-        console.warn('Music autoplay failed in opener:', error);
-        // For iOS, we might need to wait for explicit user interaction
-        if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
-          console.log('iOS detected - music will start on next user interaction');
+      video.play().then(() => {
+        console.log('Non-iOS video started successfully');
+        
+        // Start music for non-iOS devices
+        if (!musicStarted) {
+          setMusicStarted(true);
+          play().catch(error => {
+            console.warn('Non-iOS music start failed:', error);
+          });
         }
+      }).catch(error => {
+        console.warn('Non-iOS video start failed:', error);
       });
     }
 

@@ -15,6 +15,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [isFullyLoaded, setIsFullyLoaded] = useState(false);
   const [userInteracted, setUserInteracted] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
   const logoTexture = useTexture('/logo_branco.png');
   const startButtonTexture = useTexture('/iniciar.png');
   const textRef = useRef<any>();
@@ -27,39 +28,59 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
 
-  // Detect user interaction for iOS compatibility
+  // Detect iOS
   useEffect(() => {
-    const handleUserInteraction = () => {
+    const iosDetected = /iPhone|iPad|iPod/.test(navigator.userAgent);
+    setIsIOS(iosDetected);
+    console.log('Landing Page - iOS detected:', iosDetected);
+  }, []);
+
+  // Enhanced user interaction detection for iOS
+  useEffect(() => {
+    let interactionDetected = false;
+
+    const handleUserInteraction = (event: Event) => {
+      if (interactionDetected) return;
+      
+      console.log('Landing Page - User interaction detected:', event.type);
+      interactionDetected = true;
       setUserInteracted(true);
+      
+      // Remove listeners after first interaction
       document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('touchend', handleUserInteraction);
       document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
     };
 
     document.addEventListener('touchstart', handleUserInteraction, { passive: true });
+    document.addEventListener('touchend', handleUserInteraction, { passive: true });
     document.addEventListener('click', handleUserInteraction);
+    document.addEventListener('keydown', handleUserInteraction);
 
     return () => {
       document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('touchend', handleUserInteraction);
       document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
     };
   }, []);
 
-  // Loading simulation - faster on iOS
+  // Faster loading simulation for iOS
   useEffect(() => {
-    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
-    const baseInterval = isIOS ? 150 : 200; // Faster loading on iOS
-    const randomRange = isIOS ? 200 : 300; // Smaller random range on iOS
+    const baseInterval = isIOS ? 100 : 200; // Much faster on iOS
+    const randomRange = isIOS ? 100 : 300;
     
     const loadingInterval = setInterval(() => {
       setLoadingProgress(prev => {
-        const increment = Math.random() * 15 + (isIOS ? 8 : 5); // Faster increment on iOS
+        const increment = Math.random() * (isIOS ? 20 : 15) + (isIOS ? 10 : 5); // Faster increment on iOS
         const newProgress = Math.min(prev + increment, 100);
         
         if (newProgress >= 100) {
           clearInterval(loadingInterval);
           setTimeout(() => {
             setIsFullyLoaded(true);
-          }, isIOS ? 200 : 300); // Shorter delay on iOS
+          }, isIOS ? 100 : 300); // Much shorter delay on iOS
         }
         
         return newProgress;
@@ -67,7 +88,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
     }, baseInterval + Math.random() * randomRange);
 
     return () => clearInterval(loadingInterval);
-  }, []);
+  }, [isIOS]);
 
   // PWA setup
   useEffect(() => {
@@ -132,15 +153,15 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
     : [getScale(0.3, 0.25, 0.35, 0.4, 0.5), getScale(0.3, 0.25, 0.35, 0.4, 0.5), 1]) as [number, number, number];
   
   const pwaButtonPosition = [
-    getSpacing(2.2, 1.8, 2.5, 2.8, 3.2), // X position (right side)
-    getSpacing(0.6, 0.4, 0.7, 0.8, 1.0),  // Y position (top)
-    0.1 // Z position (slightly forward)
+    getSpacing(2.2, 1.8, 2.5, 2.8, 3.2),
+    getSpacing(0.6, 0.4, 0.7, 0.8, 1.0),
+    0.1
   ] as [number, number, number];
 
-  // Loading bar dimensions and position - reduced by 50%
-  const loadingBarWidth = getScale(1.5, 1.25, 1.75, 2.0, 2.25); // Reduced from 3.0-4.5 to 1.5-2.25
-  const loadingBarHeight = getScale(0.04, 0.03, 0.05, 0.06, 0.075); // Reduced from 0.08-0.15 to 0.04-0.075
-  const loadingBarY = getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0); // Same position as start button
+  // Loading bar dimensions and position
+  const loadingBarWidth = getScale(1.5, 1.25, 1.75, 2.0, 2.25);
+  const loadingBarHeight = getScale(0.04, 0.03, 0.05, 0.06, 0.075);
+  const loadingBarY = getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0);
 
   // Smooth handlers to prevent flicker
   const handlePointerEnter = useCallback(() => {
@@ -160,13 +181,14 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const handleClick = useCallback((event: any) => {
     event.stopPropagation();
     
-    // Ensure user interaction is registered for iOS
+    // Ensure user interaction is registered
     if (!userInteracted) {
       setUserInteracted(true);
     }
     
+    console.log('Start button clicked, iOS:', isIOS, 'User interacted:', userInteracted);
     onStart();
-  }, [onStart, userInteracted]);
+  }, [onStart, userInteracted, isIOS]);
 
   // PWA button handlers
   const handlePWAPointerEnter = useCallback(() => {
@@ -244,7 +266,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         <meshBasicMaterial ref={materialRef as any} transparent depthTest={false} depthWrite={false} />
       </Text>
 
-      {/* Loading Progress Bar - 50% smaller and in same position as start button */}
+      {/* Loading Progress Bar */}
       {!isFullyLoaded && (
         <group position-y={loadingBarY}>
           {/* Background bar */}
@@ -258,7 +280,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
             />
           </mesh>
           
-          {/* Progress bar - changed to green */}
+          {/* Progress bar */}
           <mesh 
             position-z={0.06} 
             position-x={-loadingBarWidth/2 + (loadingBarWidth * loadingProgress/100)/2}
@@ -273,18 +295,33 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
             />
           </mesh>
           
-          {/* Progress percentage text - smaller font */}
+          {/* Progress percentage text */}
           <Text
-            fontSize={getFontSize(0.08, 0.06, 0.09, 0.1, 0.125)} // Reduced from 0.15-0.25 to 0.08-0.125
+            fontSize={getFontSize(0.08, 0.06, 0.09, 0.1, 0.125)}
             color="white"
             position-z={0.07}
-            position-y={getSpacing(-0.15, -0.12, -0.17, -0.18, -0.2)} // Adjusted position
+            position-y={getSpacing(-0.15, -0.12, -0.17, -0.18, -0.2)}
             font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
             anchorX="center"
             anchorY="middle"
           >
             {Math.round(loadingProgress)}%
           </Text>
+          
+          {/* iOS-specific loading message */}
+          {isIOS && (
+            <Text
+              fontSize={getFontSize(0.06, 0.05, 0.07, 0.08, 0.1)}
+              color="white"
+              position-z={0.07}
+              position-y={getSpacing(-0.3, -0.25, -0.35, -0.4, -0.45)}
+              font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
+              anchorX="center"
+              anchorY="middle"
+            >
+              Preparando para iOS...
+            </Text>
+          )}
         </group>
       )}
 
@@ -308,7 +345,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         </mesh>
       )}
 
-      {/* PWA Install Button - 3D integrated */}
+      {/* PWA Install Button */}
       {showPWAButton && isFullyLoaded && (
         <group
           position={pwaButtonPosition}
@@ -317,7 +354,6 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
           onPointerEnter={handlePWAPointerEnter}
           onPointerLeave={handlePWAPointerLeave}
         >
-          {/* Button background circle */}
           <mesh position-z={0.01}>
             <circleGeometry args={[1, 32]} />
             <meshBasicMaterial 
@@ -328,7 +364,6 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
             />
           </mesh>
           
-          {/* Button border */}
           <mesh position-z={0.005} scale={[1.05, 1.05, 1]}>
             <circleGeometry args={[1, 32]} />
             <meshBasicMaterial 
@@ -339,7 +374,6 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
             />
           </mesh>
           
-          {/* PWA Icon Text */}
           <Text
             fontSize={0.4}
             color="white"

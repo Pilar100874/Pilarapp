@@ -99,7 +99,7 @@ canvas {
   outline: none !important;
 }
 
-/* Ensure audio and video elements work properly on mobile */
+/* Enhanced audio and video elements for iOS compatibility */
 audio, video {
   -webkit-playsinline: true;
   playsinline: true;
@@ -112,6 +112,18 @@ video {
   -moz-transform: translateZ(0);
   -ms-transform: translateZ(0);
   transform: translateZ(0);
+  /* Force hardware acceleration */
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+/* iOS-specific audio optimizations */
+audio {
+  -webkit-playsinline: true;
+  /* Ensure audio can be controlled */
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 @media (prefers-color-scheme: light) {
@@ -148,6 +160,8 @@ video {
     object-fit: cover;
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
+    /* Ensure video is properly displayed on iOS */
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
   }
 }
 
@@ -158,9 +172,41 @@ video {
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
     will-change: transform;
+    /* Force video to be inline on iOS */
+    display: block;
+    width: 100%;
+    height: 100%;
   }
   
   audio {
     -webkit-playsinline: true;
+    /* Ensure audio works on iOS */
+    display: none;
+  }
+  
+  /* iOS-specific canvas optimizations */
+  canvas {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+}
+
+/* Additional iOS-specific media queries */
+@media screen and (-webkit-min-device-pixel-ratio: 2) {
+  /* High DPI iOS devices */
+  video {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* iOS standalone app mode */
+@media all and (display-mode: standalone) {
+  body {
+    /* Adjust for iOS status bar in standalone mode */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }
