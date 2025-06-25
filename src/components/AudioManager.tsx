@@ -26,104 +26,64 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [userInteracted, setUserInteracted] = useState(false);
-  const [isIOS, setIsIOS] = useState(false);
-  const [orientationChanged, setOrientationChanged] = useState(false);
+  const [audioUnlocked, setAudioUnlocked] = useState(false);
 
-  // Detect iOS
-  useEffect(() => {
-    const iosDetected = /iPhone|iPad|iPod/.test(navigator.userAgent);
-    setIsIOS(iosDetected);
-    console.log('Audio Manager - iOS detected:', iosDetected);
-  }, []);
-
-  // iOS orientation change detection
-  useEffect(() => {
-    if (!isIOS) return;
-
-    let orientationTimeout: number;
-
-    const handleOrientationChange = () => {
-      console.log('Audio Manager - iOS orientation change detected');
-      setOrientationChanged(true);
-      setUserInteracted(true);
-      
-      // Clear any existing timeout
-      if (orientationTimeout) {
-        clearTimeout(orientationTimeout);
-      }
-      
-      // Try to unlock audio after orientation change
-      orientationTimeout = setTimeout(() => {
-        if (audioRef.current) {
-          const audio = audioRef.current;
-          
-          // Try to unlock audio context after orientation change
-          audio.muted = true;
-          audio.play().then(() => {
-            audio.pause();
-            audio.muted = false;
-            audio.volume = 0.7;
-            console.log('iOS audio unlocked after orientation change');
-          }).catch(error => {
-            console.warn('iOS audio unlock failed after orientation:', error);
-          });
-        }
-      }, 300);
-    };
-
-    window.addEventListener('orientationchange', handleOrientationChange);
-    window.addEventListener('resize', handleOrientationChange);
-
-    return () => {
-      window.removeEventListener('orientationchange', handleOrientationChange);
-      window.removeEventListener('resize', handleOrientationChange);
-      if (orientationTimeout) {
-        clearTimeout(orientationTimeout);
-      }
-    };
-  }, [isIOS]);
-
-  // Enhanced user interaction detection
+  // Universal user interaction detection to unlock audio
   useEffect(() => {
     let interactionDetected = false;
 
     const handleUserInteraction = (event: Event) => {
       if (interactionDetected) return;
       
-      console.log('Audio Manager - User interaction detected:', event.type);
+      console.log('User interaction detected for audio unlock:', event.type);
       interactionDetected = true;
-      setUserInteracted(true);
+      setAudioUnlocked(true);
       
-      // For iOS, try to unlock audio context immediately
-      if (isIOS && audioRef.current) {
+      // Try to unlock audio context immediately on any interaction
+      if (audioRef.current) {
         const audio = audioRef.current;
         
-        // Try to play and immediately pause to unlock audio context
-        audio.muted = true;
-        audio.play().then(() => {
-          audio.pause();
-          audio.muted = false;
-          audio.volume = 0.7;
-          console.log('iOS audio context unlocked');
-        }).catch(error => {
-          console.warn('iOS audio unlock failed:', error);
-        });
+        // Create a promise to unlock audio
+        const unlockAudio = async () => {
+          try {
+            // Try to play and immediately pause to unlock audio context
+            const originalVolume = audio.volume;
+            audio.muted = true;
+            audio.volume = 0;
+            
+            await audio.play();
+            audio.pause();
+            audio.currentTime = 0;
+            
+            // Restore original settings
+            audio.muted = false;
+            audio.volume = originalVolume;
+            
+            console.log('Audio context unlocked successfully');
+          } catch (error) {
+            console.warn('Audio unlock attempt failed:', error);
+          }
+        };
+        
+        unlockAudio();
       }
       
-      // Remove listeners
+      // Remove listeners after first interaction
       document.removeEventListener('touchstart', handleUserInteraction);
       document.removeEventListener('touchend', handleUserInteraction);
       document.removeEventListener('click', handleUserInteraction);
       document.removeEventListener('keydown', handleUserInteraction);
       document.removeEventListener('scroll', handleUserInteraction);
+      document.removeEventListener('mousemove', handleUserInteraction);
     };
 
+    // Listen for various interaction events
     document.addEventListener('touchstart', handleUserInteraction, { passive: true });
     document.addEventListener('touchend', handleUserInteraction, { passive: true });
     document.addEventListener('click', handleUserInteraction);
     document.addEventListener('keydown', handleUserInteraction);
     document.addEventListener('scroll', handleUserInteraction, { passive: true });
+    document.addEventListener('mousemove', handleUserInteraction, { passive: true });
 
     return () => {
       document.removeEventListener('touchstart', handleUserInteraction);
@@ -131,48 +91,9 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
       document.removeEventListener('click', handleUserInteraction);
       document.removeEventListener('keydown', handleUserInteraction);
       document.removeEventListener('scroll', handleUserInteraction);
+      document.removeEventListener('mousemove', handleUserInteraction);
     };
-  }, [isIOS]);
-
-  // iOS scroll detection for audio unlock
-  useEffect(() => {
-    if (!isIOS) return;
-
-    let scrollTimeout: number;
-    let lastScrollTime = 0;
-
-    const handleScroll = () => {
-      const now = Date.now();
-      lastScrollTime = now;
-      
-      if (!userInteracted) {
-        setUserInteracted(true);
-        
-        // Try to unlock audio on scroll
-        if (audioRef.current) {
-          const audio = audioRef.current;
-          audio.muted = true;
-          audio.play().then(() => {
-            audio.pause();
-            audio.muted = false;
-            audio.volume = 0.7;
-            console.log('iOS audio unlocked on scroll');
-          }).catch(error => {
-            console.warn('iOS audio unlock on scroll failed:', error);
-          });
-        }
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (scrollTimeout) {
-        clearTimeout(scrollTimeout);
-      }
-    };
-  }, [isIOS, userInteracted]);
+  }, []);
 
   useEffect(() => {
     // Create audio instance
@@ -182,12 +103,9 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
     audioRef.current.preload = 'auto';
     audioRef.current.crossOrigin = 'anonymous';
 
-    // iOS-specific audio setup
-    if (isIOS) {
-      audioRef.current.setAttribute('playsinline', 'true');
-      audioRef.current.setAttribute('webkit-playsinline', 'true');
-      audioRef.current.muted = false; // Don't mute by default on iOS
-    }
+    // Universal audio setup for better compatibility
+    audioRef.current.setAttribute('playsinline', 'true');
+    audioRef.current.setAttribute('webkit-playsinline', 'true');
 
     const audio = audioRef.current;
 
@@ -260,7 +178,7 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
       audio.pause();
       audio.src = '';
     };
-  }, [isIOS]);
+  }, []);
 
   const play = async () => {
     if (!audioRef.current || !isLoaded) {
@@ -268,9 +186,9 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
       return;
     }
 
-    // For iOS, check if user has interacted or orientation changed
-    if (isIOS && !userInteracted && !orientationChanged) {
-      console.warn('iOS requires user interaction before audio playback');
+    // Check if audio context is unlocked
+    if (!audioUnlocked) {
+      console.warn('Audio context not yet unlocked - waiting for user interaction');
       return;
     }
     
@@ -282,64 +200,46 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
         audio.currentTime = 0;
       }
 
-      // For iOS, ensure audio is properly configured
-      if (isIOS) {
-        audio.muted = false;
-        audio.volume = 0.7;
-      }
+      // Ensure audio is properly configured
+      audio.muted = false;
+      audio.volume = 0.7;
 
       await audio.play();
       console.log('Audio play successful');
     } catch (error) {
       console.error('Audio play failed:', error);
       
-      // Enhanced retry logic for iOS
-      if (isIOS) {
-        try {
-          console.log('Attempting iOS audio recovery...');
-          const audio = audioRef.current;
-          
-          // Try the mute/unmute trick for iOS
-          audio.muted = true;
-          await audio.play();
-          
-          setTimeout(() => {
-            audio.muted = false;
-            audio.volume = 0.7;
-            console.log('iOS audio recovery successful');
-          }, 100);
-          
-        } catch (iosError) {
-          console.error('iOS audio recovery failed:', iosError);
-          
-          // Final fallback: reload and retry
-          try {
-            audioRef.current.load();
-            setTimeout(async () => {
-              try {
-                if (audioRef.current && (userInteracted || orientationChanged)) {
-                  await audioRef.current.play();
-                  console.log('iOS audio final retry successful');
-                }
-              } catch (finalError) {
-                console.error('iOS audio final retry failed:', finalError);
-              }
-            }, 2000);
-          } catch (reloadError) {
-            console.error('iOS audio reload failed:', reloadError);
-          }
-        }
-      } else {
-        // Non-iOS retry logic
+      // Enhanced retry logic
+      try {
+        console.log('Attempting audio recovery...');
+        const audio = audioRef.current;
+        
+        // Try the mute/unmute trick
+        audio.muted = true;
+        await audio.play();
+        
+        setTimeout(() => {
+          audio.muted = false;
+          audio.volume = 0.7;
+          console.log('Audio recovery successful');
+        }, 100);
+        
+      } catch (recoveryError) {
+        console.error('Audio recovery failed:', recoveryError);
+        
+        // Final fallback: reload and retry
         try {
           audioRef.current.load();
           setTimeout(async () => {
             try {
-              await audioRef.current?.play();
-            } catch (retryError) {
-              console.error('Audio retry failed:', retryError);
+              if (audioRef.current && audioUnlocked) {
+                await audioRef.current.play();
+                console.log('Audio final retry successful');
+              }
+            } catch (finalError) {
+              console.error('Audio final retry failed:', finalError);
             }
-          }, 500);
+          }, 2000);
         } catch (reloadError) {
           console.error('Audio reload failed:', reloadError);
         }

@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { MeshBasicMaterial } from 'three';
 import { useResponsiveText } from '@/utils/responsive';
+import { useAudio } from '@/components/AudioManager';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -14,96 +15,34 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isPWAHovered, setIsPWAHovered] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [isFullyLoaded, setIsFullyLoaded] = useState(false);
-  const [userInteracted, setUserInteracted] = useState(false);
-  const [isIOS, setIsIOS] = useState(false);
-  const [orientationChanged, setOrientationChanged] = useState(false);
   const logoTexture = useTexture('/logo_branco.png');
   const startButtonTexture = useTexture('/iniciar.png');
   const textRef = useRef<any>();
   const materialRef = useRef<MeshBasicMaterial | null>(null);
   const [animationComplete, setAnimationComplete] = useState(false);
   const { getFontSize, getSpacing, getScale, isMobile, isTablet } = useResponsiveText();
+  const { play } = useAudio();
   
   // PWA state
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
 
-  // Detect iOS
+  // Faster loading simulation
   useEffect(() => {
-    const iosDetected = /iPhone|iPad|iPod/.test(navigator.userAgent);
-    setIsIOS(iosDetected);
-    console.log('Landing Page - iOS detected:', iosDetected);
-  }, []);
-
-  // iOS orientation change detection
-  useEffect(() => {
-    if (!isIOS) return;
-
-    const handleOrientationChange = () => {
-      console.log('Landing Page - iOS orientation change detected');
-      setOrientationChanged(true);
-      setUserInteracted(true);
-    };
-
-    window.addEventListener('orientationchange', handleOrientationChange);
-    window.addEventListener('resize', handleOrientationChange);
-
-    return () => {
-      window.removeEventListener('orientationchange', handleOrientationChange);
-      window.removeEventListener('resize', handleOrientationChange);
-    };
-  }, [isIOS]);
-
-  // Enhanced user interaction detection for iOS
-  useEffect(() => {
-    let interactionDetected = false;
-
-    const handleUserInteraction = (event: Event) => {
-      if (interactionDetected) return;
-      
-      console.log('Landing Page - User interaction detected:', event.type);
-      interactionDetected = true;
-      setUserInteracted(true);
-      
-      // Remove listeners after first interaction
-      document.removeEventListener('touchstart', handleUserInteraction);
-      document.removeEventListener('touchend', handleUserInteraction);
-      document.removeEventListener('click', handleUserInteraction);
-      document.removeEventListener('keydown', handleUserInteraction);
-      document.removeEventListener('scroll', handleUserInteraction);
-    };
-
-    document.addEventListener('touchstart', handleUserInteraction, { passive: true });
-    document.addEventListener('touchend', handleUserInteraction, { passive: true });
-    document.addEventListener('click', handleUserInteraction);
-    document.addEventListener('keydown', handleUserInteraction);
-    document.addEventListener('scroll', handleUserInteraction, { passive: true });
-
-    return () => {
-      document.removeEventListener('touchstart', handleUserInteraction);
-      document.removeEventListener('touchend', handleUserInteraction);
-      document.removeEventListener('click', handleUserInteraction);
-      document.removeEventListener('keydown', handleUserInteraction);
-      document.removeEventListener('scroll', handleUserInteraction);
-    };
-  }, []);
-
-  // Faster loading simulation for iOS
-  useEffect(() => {
-    const baseInterval = isIOS ? 50 : 200; // Much faster on iOS
-    const randomRange = isIOS ? 50 : 300;
+    const baseInterval = 100;
+    const randomRange = 200;
     
     const loadingInterval = setInterval(() => {
       setLoadingProgress(prev => {
-        const increment = Math.random() * (isIOS ? 25 : 15) + (isIOS ? 15 : 5); // Faster increment on iOS
+        const increment = Math.random() * 20 + 10;
         const newProgress = Math.min(prev + increment, 100);
         
         if (newProgress >= 100) {
           clearInterval(loadingInterval);
           setTimeout(() => {
             setIsFullyLoaded(true);
-          }, isIOS ? 50 : 300); // Much shorter delay on iOS
+          }, 200);
         }
         
         return newProgress;
@@ -111,7 +50,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
     }, baseInterval + Math.random() * randomRange);
 
     return () => clearInterval(loadingInterval);
-  }, [isIOS]);
+  }, []);
 
   // PWA setup
   useEffect(() => {
@@ -201,17 +140,22 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
     }
   }, [isMobile]);
 
-  const handleClick = useCallback((event: any) => {
+  const handleClick = useCallback(async (event: any) => {
     event.stopPropagation();
     
-    // Ensure user interaction is registered
-    if (!userInteracted) {
-      setUserInteracted(true);
+    console.log('Start button clicked - starting music immediately');
+    
+    // Start music immediately when button is clicked
+    try {
+      await play();
+      console.log('Music started successfully on button click');
+    } catch (error) {
+      console.warn('Music failed to start on button click:', error);
     }
     
-    console.log('Start button clicked, iOS:', isIOS, 'User interacted:', userInteracted, 'Orientation changed:', orientationChanged);
+    // Start the experience
     onStart();
-  }, [onStart, userInteracted, isIOS, orientationChanged]);
+  }, [onStart, play]);
 
   // PWA button handlers
   const handlePWAPointerEnter = useCallback(() => {
@@ -330,21 +274,6 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
           >
             {Math.round(loadingProgress)}%
           </Text>
-          
-          {/* iOS-specific loading message */}
-          {isIOS && (
-            <Text
-              fontSize={getFontSize(0.06, 0.05, 0.07, 0.08, 0.1)}
-              color="white"
-              position-z={0.07}
-              position-y={getSpacing(-0.3, -0.25, -0.35, -0.4, -0.45)}
-              font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
-              anchorX="center"
-              anchorY="middle"
-            >
-              {orientationChanged ? 'Pronto para iOS!' : 'Gire a tela para ativar...'}
-            </Text>
-          )}
         </group>
       )}
 
