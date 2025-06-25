@@ -20,7 +20,7 @@ export const OpenerText = ({ py }: OpenerText) => {
   const arrowRef = useRef<any>();
   const [startFade, setStartFade] = useState(false);
   const scroll = useScroll();
-  const { getFontSize, getSpacing, getScale, isMobile, isTabletPortrait } = useResponsiveText();
+  const { getFontSize, getSpacing, getScale, isMobile, isTabletPortrait, isMobilePortrait } = useResponsiveText();
 
   // Responsive font sizes with orientation consideration
   const text1Size = getFontSize(0.2, 0.18, 0.25, 0.28, 0.35);
@@ -35,6 +35,9 @@ export const OpenerText = ({ py }: OpenerText) => {
   
   // Arrow position with orientation - moved down by 8cm total (0.8 units)
   const arrowY = getSpacing(-2.8, -2.3, -3.2, -3.5, -4.2);
+
+  // Determine if we should use split text layout
+  const useSplitText = isMobilePortrait || isTabletPortrait;
 
   // Smooth arrow click handler
   const handleArrowClick = useCallback((event: any) => {
@@ -59,9 +62,21 @@ export const OpenerText = ({ py }: OpenerText) => {
   }, [isMobile]);
 
   useFrame((state) => {
-    if (!logoRef.current?.material || !text1Ref.current?.material || 
-        !text2Ref.current?.material || !arrowRef.current?.material ||
-        ((isMobile || isTabletPortrait) && (!text3Ref.current?.material || !text4Ref.current?.material || !text5Ref.current?.material))) return;
+    // Check if all required refs exist based on layout
+    const requiredRefs = [logoRef.current?.material, text1Ref.current?.material, arrowRef.current?.material];
+    
+    if (useSplitText) {
+      requiredRefs.push(
+        text2Ref.current?.material,
+        text3Ref.current?.material,
+        text4Ref.current?.material,
+        text5Ref.current?.material
+      );
+    } else {
+      requiredRefs.push(text2Ref.current?.material);
+    }
+
+    if (requiredRefs.some(ref => !ref)) return;
 
     if (state.clock.getElapsedTime() > 1 && !startFade) {
       setStartFade(true);
@@ -73,23 +88,29 @@ export const OpenerText = ({ py }: OpenerText) => {
       
       logoRef.current.material.opacity = opacity;
       text1Ref.current.material.opacity = opacity;
-      text2Ref.current.material.opacity = opacity;
-      if (isMobile || isTabletPortrait) {
+      arrowRef.current.material.opacity = opacity;
+      
+      if (useSplitText) {
+        text2Ref.current.material.opacity = opacity;
         text3Ref.current.material.opacity = opacity;
         text4Ref.current.material.opacity = opacity;
         text5Ref.current.material.opacity = opacity;
+      } else {
+        text2Ref.current.material.opacity = opacity;
       }
-      arrowRef.current.material.opacity = opacity;
     } else {
       logoRef.current.material.opacity = 0;
       text1Ref.current.material.opacity = 0;
-      text2Ref.current.material.opacity = 0;
-      if (isMobile || isTabletPortrait) {
+      arrowRef.current.material.opacity = 0;
+      
+      if (useSplitText) {
+        text2Ref.current.material.opacity = 0;
         text3Ref.current.material.opacity = 0;
         text4Ref.current.material.opacity = 0;
         text5Ref.current.material.opacity = 0;
+      } else {
+        text2Ref.current.material.opacity = 0;
       }
-      arrowRef.current.material.opacity = 0;
     }
   });
 
@@ -129,7 +150,7 @@ export const OpenerText = ({ py }: OpenerText) => {
         <meshBasicMaterial transparent opacity={0} depthTest={false} depthWrite={false} />
       </Text>
 
-      {(isMobile || isTabletPortrait) ? (
+      {useSplitText ? (
         <>
           <Text
             ref={text2Ref}
@@ -170,7 +191,21 @@ export const OpenerText = ({ py }: OpenerText) => {
             anchorX="center"
             anchorY="middle"
           >
-            AQUI !!!
+            AQUI
+            <meshBasicMaterial transparent opacity={0} depthTest={false} depthWrite={false} />
+          </Text>
+          <Text
+            ref={text5Ref}
+            fontSize={text2Size}
+            letterSpacing={0.005}
+            position-z={0.1}
+            position-y={getSpacing(-2.4, -1.6, -2.6, -2.8, -3.0)}
+            textAlign={"left"}
+            font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
+            anchorX="center"
+            anchorY="middle"
+          >
+            !!!
             <meshBasicMaterial transparent opacity={0} depthTest={false} depthWrite={false} />
           </Text>
         </>
