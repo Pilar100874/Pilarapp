@@ -14,7 +14,7 @@ function App() {
   return (
     <AudioProvider>
       <a 
-        href="https://www.pilar.com.br"
+        href="https://loja.pilar.com.br"
         style={{
           position: 'fixed',
           top: '25px',

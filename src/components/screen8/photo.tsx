@@ -92,8 +92,8 @@ export const Photo = (props: Photo) => {
   const getButtonLink = () => {
     const links = [
       'https://loja.pilar.com.br/papelaria',     // Image 1
-      'https://lojja.pilar.com.br/construcao',   // Image 2
-      'https://lojja.pilar.com.br/insumos',      // Image 3
+      'https://loja.pilar.com.br/construcao',   // Image 2
+      'https://loja.pilar.com.br/insumos',      // Image 3
       'https://loja.pilar.com.br/industrial',   // Image 4
       'https://loja.pilar.com.br/grafico',      // Image 5
       'https://loja.pilar.com.br/descartaveis'  // Image 6
