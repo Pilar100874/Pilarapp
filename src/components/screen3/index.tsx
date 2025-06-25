@@ -11,7 +11,7 @@ export const Screen3 = () => {
   const photoList = Object.entries(dataPhotos);
   const [activeIndex, setActiveIndex] = useState(Math.floor(photoList.length / 2));
   const arrowTexture = useTexture('/seta_B.png');
-  const { isMobilePortrait, isMobile, isTablet } = useResponsiveText();
+  const { isMobilePortrait, isTabletPortrait, isMobile, isTablet } = useResponsiveText();
   const { gl } = useThree();
   
   // Touch handling refs
@@ -106,21 +106,21 @@ export const Screen3 = () => {
     };
   }, [gl.domElement, handleTouchStart, handleTouchEnd, isMobile, isTablet]);
 
-  // Button positioning based on orientation
-  const buttonY = isMobilePortrait ? -3.0 : 0;
-  const buttonScale = isMobilePortrait ? 0.4 : 0.5;
-  const buttonSpacing = isMobilePortrait ? 2.5 : 5;
+  // Button positioning based on orientation - now includes tablet portrait
+  const buttonY = (isMobilePortrait || isTabletPortrait) ? -3.0 : 0;
+  const buttonScale = (isMobilePortrait || isTabletPortrait) ? 0.4 : 0.5;
+  const buttonSpacing = (isMobilePortrait || isTabletPortrait) ? 2.5 : 5;
 
-  // Mobile portrait navigation buttons (moved up 1cm from -3.5 to -3.4)
-  const mobileNavButtonY = -3.4; // Moved up by 1cm (0.1 units)
-  const mobileNavButtonScale = 0.378; // Reduced by additional 10% (0.42 * 0.9 = 0.378)
-  const mobileNavButtonSpacing = 1.134; // Reduced by additional 10% (1.26 * 0.9 = 1.134)
+  // Portrait navigation buttons (mobile and tablet) - moved up 1cm from -3.5 to -3.4
+  const portraitNavButtonY = -3.4; // Moved up by 1cm (0.1 units)
+  const portraitNavButtonScale = 0.378; // Reduced by additional 10% (0.42 * 0.9 = 0.378)
+  const portraitNavButtonSpacing = 1.134; // Reduced by additional 10% (1.26 * 0.9 = 1.134)
 
   return (
     <Scroll>
       <group position-y={SCREEN3_OFFSET_START_Y} position-x={0}>
-        {/* Desktop/Tablet Navigation Buttons */}
-        {!isMobilePortrait && (
+        {/* Desktop/Landscape Navigation Buttons */}
+        {!isMobilePortrait && !isTabletPortrait && (
           <>
             {/* Previous Button */}
             <mesh
@@ -150,13 +150,13 @@ export const Screen3 = () => {
           </>
         )}
 
-        {/* Mobile Portrait Navigation Buttons (moved up 1cm) */}
-        {isMobilePortrait && (
+        {/* Portrait Navigation Buttons (Mobile and Tablet) - moved up 1cm */}
+        {(isMobilePortrait || isTabletPortrait) && (
           <>
             {/* Previous Button */}
             <mesh
-              position={[-mobileNavButtonSpacing, mobileNavButtonY, 0.1]}
-              scale={[mobileNavButtonScale, mobileNavButtonScale, 1]}
+              position={[-portraitNavButtonSpacing, portraitNavButtonY, 0.1]}
+              scale={[portraitNavButtonScale, portraitNavButtonScale, 1]}
               rotation={[0, 0, Math.PI / 2]}
               onClick={handlePrevious}
             >
@@ -166,8 +166,8 @@ export const Screen3 = () => {
 
             {/* Next Button */}
             <mesh
-              position={[mobileNavButtonSpacing, mobileNavButtonY, 0.1]}
-              scale={[mobileNavButtonScale, mobileNavButtonScale, 1]}
+              position={[portraitNavButtonSpacing, portraitNavButtonY, 0.1]}
+              scale={[portraitNavButtonScale, portraitNavButtonScale, 1]}
               rotation={[0, 0, -Math.PI / 2]}
               onClick={handleNext}
             >
@@ -181,7 +181,7 @@ export const Screen3 = () => {
                 key={`dot-${index}`}
                 position={[
                   (index - Math.floor(photoList.length / 2)) * 0.189, // Reduced spacing by additional 10% (0.21 * 0.9 = 0.189)
-                  mobileNavButtonY - 0.504, // Reduced distance by additional 10% (0.56 * 0.9 = 0.504)
+                  portraitNavButtonY - 0.504, // Reduced distance by additional 10% (0.56 * 0.9 = 0.504)
                   0.1
                 ]}
                 scale={[0.063, 0.063, 1]} // Reduced by additional 10% (0.07 * 0.9 = 0.063)
