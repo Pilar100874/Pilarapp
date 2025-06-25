@@ -25,6 +25,53 @@
     
     <title>Pilar Comercial e Serviços</title>
     
+    <!-- Compatibility Check Script -->
+    <script>
+      // Early compatibility check before React loads
+      (function() {
+        function checkBasicCompatibility() {
+          // Check for basic features required by the app
+          var hasWebGL = false;
+          try {
+            var canvas = document.createElement('canvas');
+            hasWebGL = !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+          } catch (e) {
+            hasWebGL = false;
+          }
+          
+          var hasES6 = false;
+          try {
+            new Function('() => {}');
+            hasES6 = true;
+          } catch (e) {
+            hasES6 = false;
+          }
+          
+          var hasRequestAnimationFrame = !!window.requestAnimationFrame;
+          var hasCanvas2D = false;
+          try {
+            var canvas = document.createElement('canvas');
+            hasCanvas2D = !!canvas.getContext('2d');
+          } catch (e) {
+            hasCanvas2D = false;
+          }
+          
+          // Check for very old browsers
+          var hasBasicJS = !!(window.JSON && window.localStorage && window.addEventListener);
+          
+          return hasWebGL && hasES6 && hasRequestAnimationFrame && hasCanvas2D && hasBasicJS;
+        }
+        
+        // Perform check after a short delay to allow page to start loading
+        setTimeout(function() {
+          if (!checkBasicCompatibility()) {
+            console.log('Basic compatibility check failed - redirecting to fallback');
+            window.location.href = 'https://loja.pilar.com.br';
+          }
+        }, 500);
+      })();
+    </script>
+    
     <!-- Register Service Worker -->
     <script>
       if ('serviceWorker' in navigator) {

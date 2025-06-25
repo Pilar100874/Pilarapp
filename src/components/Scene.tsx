@@ -12,10 +12,12 @@ import { Screen9 } from '@/components/screen9';
 import { Screen10 } from '@/components/screen10';
 import { Screen11 } from '@/components/screen11';
 import { useEffect, useState } from 'react';
+import { redirectToFallback } from '@/utils/deviceCompatibility';
 
 export const Scene = () => {
   const [aspectRatio, setAspectRatio] = useState(window.innerWidth / window.innerHeight);
   const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait');
+  const [sceneError, setSceneError] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -29,12 +31,22 @@ export const Scene = () => {
       setTimeout(handleResize, 100);
     };
 
+    const handleError = (error: ErrorEvent) => {
+      console.error('Scene error detected:', error);
+      if (error.message?.includes('WebGL') || error.message?.includes('three') || error.message?.includes('canvas')) {
+        setSceneError(true);
+        redirectToFallback();
+      }
+    };
+
     window.addEventListener('resize', handleResize);
     window.addEventListener('orientationchange', handleOrientationChange);
+    window.addEventListener('error', handleError);
     
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('orientationchange', handleOrientationChange);
+      window.removeEventListener('error', handleError);
     };
   }, []);
 
@@ -51,23 +63,71 @@ export const Scene = () => {
     ? (isLandscape ? 0.4 : 0.35) // More distance in mobile landscape
     : 0.25;
 
-  return (
-    <Canvas style={{ width: '100vw', height: '100vh' }}>
-      <color attach="background" args={[new Color('black')]} />
-      <ScrollControls pages={11} damping={damping} distance={distance}>
-        <Opener />
-        <Screen2 />
-        <Screen3 />
-        <Screen4 />
-        <Screen6 />
-        <Screen8 />
-        <Screen7 />
-        <Screen9 />
-        <Screen10 />
-        <Screen11 />
-      </ScrollControls>
-      <ambientLight />
-      <directionalLight />
-    </Canvas>
-  );
+  if (sceneError) {
+    return (
+      <div style={{ 
+        width: '100vw', 
+        height: '100vh', 
+        backgroundColor: 'black', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        color: 'white',
+        fontFamily: 'Arial, sans-serif'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <p>Redirecionando para a loja...</p>
+          <p>Redirecting to store...</p>
+        </div>
+      </div>
+    );
+  }
+
+  try {
+    return (
+      <Canvas style={{ width: '100vw', height: '100vh' }} onCreated={(state) => {
+        // Additional WebGL compatibility check
+        if (!state.gl) {
+          console.error('WebGL context not available in Scene');
+          redirectToFallback();
+        }
+      }}>
+        <color attach="background" args={[new Color('black')]} />
+        <ScrollControls pages={11} damping={damping} distance={distance}>
+          <Opener />
+          <Screen2 />
+          <Screen3 />
+          <Screen4 />
+          <Screen6 />
+          <Screen8 />
+          <Screen7 />
+          <Screen9 />
+          <Screen10 />
+          <Screen11 />
+        </ScrollControls>
+        <ambientLight />
+        <directionalLight />
+      </Canvas>
+    );
+  } catch (error) {
+    console.error('Scene Canvas creation failed:', error);
+    redirectToFallback();
+    return (
+      <div style={{ 
+        width: '100vw', 
+        height: '100vh', 
+        backgroundColor: 'black', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        color: 'white',
+        fontFamily: 'Arial, sans-serif'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <p>Redirecionando para a loja...</p>
+          <p>Redirecting to store...</p>
+        </div>
+      </div>
+    );
+  }
 };
