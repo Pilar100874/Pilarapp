@@ -24,9 +24,9 @@ export const Screen9 = () => {
           <Word key={word} value={word} index={dataScreen9.length - i} />
         ))}
         
-        {/* Show button after text only for tablet portrait */}
+        {/* Show button after text only for tablet portrait - moved down to appear after text */}
         {isTabletPortrait && (
-          <group position-y={-3.0}> {/* Position below the text */}
+          <group position-y={-5.5}> {/* Moved down from -3.0 to -5.5 to appear after the text */}
             <ShopButton />
           </group>
         )}
