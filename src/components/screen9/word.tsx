@@ -14,8 +14,10 @@ export const Word = ({ index, value }: Word) => {
   const refMaterial = useRef<MeshBasicMaterial>(null);
   const { getFontSize, getSpacing, isTabletPortrait } = useResponsiveText();
 
-  // Responsive font sizes with orientation consideration
-  const baseFontSize = getFontSize(0.12, 0.1, 0.14, 0.16, 0.21);
+  // Responsive font sizes with orientation consideration - reduced for tablet portrait
+  const baseFontSize = isTabletPortrait 
+    ? getFontSize(0.12, 0.1, 0.13, 0.16, 0.21) // Reduced from 0.14 to 0.13 for tablet portrait
+    : getFontSize(0.12, 0.1, 0.14, 0.16, 0.21);
   
   // Responsive vertical spacing with orientation
   const verticalSpacing = getSpacing(1.4, 1.2, 1.6, 1.8, 2.24);
