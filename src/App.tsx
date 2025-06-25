@@ -1,17 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Scene } from '@/components/Scene';
 import { LandingScene } from '@/components/LandingScene';
 import { AudioControls } from '@/components/AudioControls';
 import { AudioProvider } from '@/components/AudioManager';
-import { performCompatibilityCheck } from '@/utils/deviceCompatibility';
 
 function App() {
   const [started, setStarted] = useState(false);
-
-  // Perform compatibility check on app mount
-  useEffect(() => {
-    performCompatibilityCheck();
-  }, []);
 
   const handleStart = () => {
     setStarted(true);
