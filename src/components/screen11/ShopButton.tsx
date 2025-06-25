@@ -26,7 +26,7 @@ const createRoundedRectShape = (width: number, height: number, radius: number) =
 export const ShopButton = () => {
   const buttonRef = useRef<Group>(null);
   const [isHovered, setIsHovered] = useState(false);
-  const { getFontSize, getSpacing, isMobile } = useResponsiveText();
+  const { getFontSize, getSpacing, isMobile, isTabletPortrait } = useResponsiveText();
 
   // Responsive configuration with orientation consideration
   const buttonWidth = getFontSize(2.0, 2.5, 2.4, 2.8, 3.5);
@@ -69,7 +69,13 @@ export const ShopButton = () => {
     // Subtle floating animation with responsive positioning
     const time = Date.now() * 0.001;
     const floatOffset = Math.sin(time) * 0.03; // Reduced float amplitude
-    const baseOffset = getSpacing(-2.5, -2.0, -2.7, -2.9, -3.2);
+    
+    // Base offset with tablet portrait adjustment - move up 10cm (1 unit)
+    let baseOffset = getSpacing(-2.5, -2.0, -2.7, -2.9, -3.2);
+    if (isTabletPortrait) {
+      baseOffset += 1.0; // Move up by 10cm (1 unit) for tablet portrait
+    }
+    
     buttonRef.current.position.y = floatOffset + baseOffset;
   });
 
