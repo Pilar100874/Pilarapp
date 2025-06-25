@@ -91,14 +91,14 @@ export const Photo = (props: Photo) => {
   // Define links for each image based on index
   const getButtonLink = () => {
     const links = [
-      'https://www.pilar.com.br/papelaria',     // Image 1
-      'https://www.pilar.com.br/construcao',   // Image 2
-      'https://www.pilar.com.br/insumos',      // Image 3
-      'https://www.pilar.com.br/industrial',   // Image 4
-      'https://www.pilar.com.br/grafico',      // Image 5
-      'https://www.pilar.com.br/descartaveis'  // Image 6
+      'https://loja.pilar.com.br/papelaria',     // Image 1
+      'https://lojja.pilar.com.br/construcao',   // Image 2
+      'https://lojja.pilar.com.br/insumos',      // Image 3
+      'https://loja.pilar.com.br/industrial',   // Image 4
+      'https://loja.pilar.com.br/grafico',      // Image 5
+      'https://loja.pilar.com.br/descartaveis'  // Image 6
     ];
-    return links[props.index] || 'https://www.pilar.com.br';
+    return links[props.index] || 'https://loja.pilar.com.br';
   };
 
   // Smooth image toggle with transition
