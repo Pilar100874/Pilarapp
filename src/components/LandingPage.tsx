@@ -115,10 +115,10 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
     0.1 // Z position (slightly forward)
   ] as [number, number, number];
 
-  // Loading bar dimensions and position
-  const loadingBarWidth = getScale(3.0, 2.5, 3.5, 4.0, 4.5);
-  const loadingBarHeight = getScale(0.08, 0.06, 0.1, 0.12, 0.15);
-  const loadingBarY = getSpacing(-1.2, -1.0, -1.3, -1.4, -1.6);
+  // Loading bar dimensions and position - reduced by 50%
+  const loadingBarWidth = getScale(1.5, 1.25, 1.75, 2.0, 2.25); // Reduced from 3.0-4.5 to 1.5-2.25
+  const loadingBarHeight = getScale(0.04, 0.03, 0.05, 0.06, 0.075); // Reduced from 0.08-0.15 to 0.04-0.075
+  const loadingBarY = getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0); // Same position as start button
 
   // Smooth handlers to prevent flicker
   const handlePointerEnter = useCallback(() => {
@@ -216,7 +216,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         <meshBasicMaterial ref={materialRef as any} transparent depthTest={false} depthWrite={false} />
       </Text>
 
-      {/* Loading Progress Bar */}
+      {/* Loading Progress Bar - 50% smaller and in same position as start button */}
       {!isFullyLoaded && (
         <group position-y={loadingBarY}>
           {/* Background bar */}
@@ -245,12 +245,12 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
             />
           </mesh>
           
-          {/* Progress percentage text */}
+          {/* Progress percentage text - smaller font */}
           <Text
-            fontSize={getFontSize(0.15, 0.12, 0.18, 0.2, 0.25)}
+            fontSize={getFontSize(0.08, 0.06, 0.09, 0.1, 0.125)} // Reduced from 0.15-0.25 to 0.08-0.125
             color="white"
             position-z={0.07}
-            position-y={getSpacing(-0.25, -0.2, -0.28, -0.3, -0.35)}
+            position-y={getSpacing(-0.15, -0.12, -0.17, -0.18, -0.2)} // Adjusted position
             font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
             anchorX="center"
             anchorY="middle"
