@@ -21,6 +21,7 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
   const [videoReady, setVideoReady] = useState(false);
   const [videoStarted, setVideoStarted] = useState(false);
   const [hasTriggered, setHasTriggered] = useState(false);
+  const [userInteracted, setUserInteracted] = useState(false);
 
   const videoTexture = useVideoTexture(texturePath, {
     autoplay: false,
@@ -32,11 +33,40 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
 
   const ref = useRef<Mesh>(null);
 
+  // Detect iOS
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+  // Listen for any user interaction to unlock video on iOS
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      console.log('Screen7: User interaction detected for video unlock');
+      setUserInteracted(true);
+      
+      // Remove listeners after first interaction
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('touchend', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('scroll', handleUserInteraction);
+    };
+
+    document.addEventListener('touchstart', handleUserInteraction, { passive: true });
+    document.addEventListener('touchend', handleUserInteraction, { passive: true });
+    document.addEventListener('click', handleUserInteraction);
+    document.addEventListener('scroll', handleUserInteraction, { passive: true });
+
+    return () => {
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('touchend', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('scroll', handleUserInteraction);
+    };
+  }, []);
+
   // Enhanced video setup
   useEffect(() => {
     const video = videoTexture.source.data as HTMLVideoElement;
     
-    // Universal video attributes
+    // Universal video attributes with iOS-specific handling
     video.muted = true;
     video.playsInline = true;
     video.setAttribute('playsinline', 'true');
@@ -44,6 +74,14 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
     video.setAttribute('controls', 'false');
     video.setAttribute('preload', 'auto');
     video.volume = 0;
+    
+    // iOS-specific attributes
+    if (isIOS) {
+      video.setAttribute('webkit-playsinline', 'true');
+      video.setAttribute('playsinline', 'true');
+      video.defaultMuted = true;
+      video.muted = true;
+    }
     
     const handleCanPlay = () => {
       console.log('Screen7 video can play');
@@ -80,7 +118,7 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
       video.removeEventListener('play', handlePlay);
       video.removeEventListener('error', handleError);
     };
-  }, [videoTexture]);
+  }, [videoTexture, isIOS]);
 
   useFrame((state) => {
     if (!ref.current) {
@@ -90,14 +128,13 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
     const scrollOffset = scroll.offset;
     ref.current.rotation.y = scrollOffset * 2.5;
 
-    // Start video when it comes into view (around screen 7 position)
-    // Screen 7 is roughly at scroll offset 0.55-0.65
-    if (scrollOffset > 0.5 && videoReady && !hasTriggered) {
+    // Start video when it comes into view and user has interacted (iOS requirement)
+    if (scrollOffset > 0.5 && videoReady && !hasTriggered && (!isIOS || userInteracted)) {
       setHasTriggered(true);
       
       const video = videoTexture.source.data as HTMLVideoElement;
       
-      console.log('Attempting to start Screen7 video at scroll offset:', scrollOffset);
+      console.log('Attempting to start Screen7 video at scroll offset:', scrollOffset, 'iOS:', isIOS, 'User interacted:', userInteracted);
       
       const startVideo = async () => {
         try {
@@ -105,12 +142,19 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
           video.playsInline = true;
           video.currentTime = 0;
           video.volume = 0;
+          
+          if (isIOS) {
+            video.defaultMuted = true;
+            video.setAttribute('webkit-playsinline', 'true');
+            video.setAttribute('playsinline', 'true');
+          }
+          
           await video.play();
           console.log('Screen7 video started successfully');
         } catch (error) {
           console.warn('Screen7 video start failed:', error);
           
-          // Retry logic
+          // Retry logic with iOS-specific handling
           setTimeout(async () => {
             try {
               video.load();
@@ -124,10 +168,35 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
               
               video.muted = true;
               video.volume = 0;
+              video.playsInline = true;
+              
+              if (isIOS) {
+                video.defaultMuted = true;
+                video.setAttribute('webkit-playsinline', 'true');
+                video.setAttribute('playsinline', 'true');
+              }
+              
               await video.play();
               console.log('Screen7 video started on retry');
             } catch (retryError) {
               console.error('Screen7 video retry failed:', retryError);
+              
+              // Final iOS fallback
+              if (isIOS) {
+                const playOnNextInteraction = async () => {
+                  try {
+                    await video.play();
+                    console.log('Screen7 video started on iOS fallback');
+                    document.removeEventListener('touchstart', playOnNextInteraction);
+                    document.removeEventListener('click', playOnNextInteraction);
+                  } catch (finalError) {
+                    console.error('Screen7 iOS video fallback failed:', finalError);
+                  }
+                };
+                
+                document.addEventListener('touchstart', playOnNextInteraction, { once: true, passive: true });
+                document.addEventListener('click', playOnNextInteraction, { once: true });
+              }
             }
           }, 500);
         }

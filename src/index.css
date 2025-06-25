@@ -108,9 +108,10 @@ audio, video {
   playsinline: true !important;
 }
 
-/* Enhanced video optimizations for all platforms */
+/* Enhanced video optimizations for all platforms, especially iOS */
 video {
-  -webkit-playsinline: true;
+  -webkit-playsinline: true !important;
+  playsinline: true !important;
   -webkit-transform: translateZ(0);
   -moz-transform: translateZ(0);
   -ms-transform: translateZ(0);
@@ -129,6 +130,8 @@ video {
   display: block;
   width: 100%;
   height: 100%;
+  /* iOS-specific video fixes */
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
 }
 
 /* Enhanced audio optimizations */
@@ -183,10 +186,11 @@ audio {
   }
 }
 
-/* iOS Safari specific fixes */
+/* iOS Safari specific fixes - ENHANCED */
 @supports (-webkit-touch-callout: none) {
   video {
     -webkit-playsinline: true !important;
+    playsinline: true !important;
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
     will-change: transform;
@@ -194,9 +198,18 @@ audio {
     display: block;
     width: 100%;
     height: 100%;
-    /* Additional iOS-specific attributes */
+    /* Enhanced iOS-specific attributes */
     -webkit-media-controls-start-playback-button: none;
     -webkit-media-controls: none;
+    /* Force muted autoplay capability */
+    muted: true;
+    /* Ensure proper video rendering on iOS */
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+    /* Force hardware acceleration on iOS */
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
   
   audio {
@@ -223,6 +236,8 @@ audio {
     /* Force playsinline on high DPI devices */
     -webkit-playsinline: true !important;
     playsinline: true !important;
+    /* Ensure muted for autoplay */
+    muted: true;
   }
 }
 
@@ -237,10 +252,11 @@ audio {
   video {
     -webkit-playsinline: true !important;
     playsinline: true !important;
+    muted: true;
   }
 }
 
-/* Additional video compatibility fixes */
+/* Additional video compatibility fixes for iOS */
 video::-webkit-media-controls {
   display: none !important;
 }
@@ -253,9 +269,52 @@ video::-webkit-media-controls-enclosure {
   display: none !important;
 }
 
-/* Force video autoplay compatibility */
+/* Force video autoplay compatibility on iOS */
 video[autoplay] {
   -webkit-playsinline: true !important;
   playsinline: true !important;
-  muted: true;
+  muted: true !important;
+}
+
+/* iOS-specific video element fixes */
+video[muted] {
+  -webkit-playsinline: true !important;
+  playsinline: true !important;
+}
+
+/* Additional iOS video webkit fixes */
+video::-webkit-media-controls-panel {
+  display: none !important;
+}
+
+video::-webkit-media-controls-play-button {
+  display: none !important;
+}
+
+video::-webkit-media-controls-timeline-container {
+  display: none !important;
+}
+
+video::-webkit-media-controls-current-time-display {
+  display: none !important;
+}
+
+video::-webkit-media-controls-time-remaining-display {
+  display: none !important;
+}
+
+video::-webkit-media-controls-mute-button {
+  display: none !important;
+}
+
+video::-webkit-media-controls-toggle-closed-captions-button {
+  display: none !important;
+}
+
+video::-webkit-media-controls-volume-slider {
+  display: none !important;
+}
+
+video::-webkit-media-controls-fullscreen-button {
+  display: none !important;
 }

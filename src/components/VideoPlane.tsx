@@ -20,6 +20,7 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
   const [videoStarted, setVideoStarted] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
   const [animationStarted, setAnimationStarted] = useState(false);
+  const [userInteracted, setUserInteracted] = useState(false);
   const initialY = -15;
   const targetY = 0;
 
@@ -31,11 +32,40 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
     crossOrigin: "anonymous",
   });
 
-  // Enhanced video setup for all devices
+  // Detect iOS
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+  // Listen for any user interaction to unlock video on iOS
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      console.log('User interaction detected for video unlock');
+      setUserInteracted(true);
+      
+      // Remove listeners after first interaction
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('touchend', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('scroll', handleUserInteraction);
+    };
+
+    document.addEventListener('touchstart', handleUserInteraction, { passive: true });
+    document.addEventListener('touchend', handleUserInteraction, { passive: true });
+    document.addEventListener('click', handleUserInteraction);
+    document.addEventListener('scroll', handleUserInteraction, { passive: true });
+
+    return () => {
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('touchend', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('scroll', handleUserInteraction);
+    };
+  }, []);
+
+  // Enhanced video setup for all devices, especially iOS
   useEffect(() => {
     const video = videoTexture.source.data as HTMLVideoElement;
     
-    // Universal video attributes for better compatibility
+    // iOS-specific video attributes
     video.muted = true;
     video.playsInline = true;
     video.setAttribute('playsinline', 'true');
@@ -43,7 +73,15 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
     video.setAttribute('controls', 'false');
     video.setAttribute('preload', 'auto');
     video.setAttribute('autoplay', 'false');
-    video.volume = 0; // Ensure muted
+    video.volume = 0;
+    
+    // iOS-specific attributes
+    if (isIOS) {
+      video.setAttribute('webkit-playsinline', 'true');
+      video.setAttribute('playsinline', 'true');
+      video.defaultMuted = true;
+      video.muted = true;
+    }
     
     // Event listeners for video state
     const handleCanPlay = () => {
@@ -83,7 +121,7 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
     // Force load
     video.load();
     
-    console.log('Video setup completed');
+    console.log('Video setup completed, iOS:', isIOS);
 
     return () => {
       video.removeEventListener('canplay', handleCanPlay);
@@ -92,29 +130,35 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
       video.removeEventListener('play', handlePlay);
       video.removeEventListener('error', handleError);
     };
-  }, [videoTexture]);
+  }, [videoTexture, isIOS]);
 
-  // Start video immediately when component mounts and video is ready
+  // Start video when ready and user has interacted (especially important for iOS)
   useEffect(() => {
-    if (videoReady && !videoStarted) {
+    if (videoReady && !videoStarted && (!isIOS || userInteracted)) {
       const video = videoTexture.source.data as HTMLVideoElement;
       
-      console.log('Starting video immediately...');
+      console.log('Starting video, iOS:', isIOS, 'User interacted:', userInteracted);
       
       const startVideo = async () => {
         try {
-          // Ensure video is properly configured
+          // Ensure video is properly configured for iOS
           video.muted = true;
           video.playsInline = true;
           video.currentTime = 0;
           video.volume = 0;
+          
+          if (isIOS) {
+            video.defaultMuted = true;
+            video.setAttribute('webkit-playsinline', 'true');
+            video.setAttribute('playsinline', 'true');
+          }
 
           await video.play();
-          console.log('Video started successfully on mount');
+          console.log('Video started successfully');
         } catch (error) {
-          console.warn('Video start failed on mount, will retry...', error);
+          console.warn('Video start failed, will retry...', error);
           
-          // Retry with different approach
+          // iOS-specific retry logic
           setTimeout(async () => {
             try {
               video.load();
@@ -128,10 +172,35 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
               
               video.muted = true;
               video.volume = 0;
+              video.playsInline = true;
+              
+              if (isIOS) {
+                video.defaultMuted = true;
+                video.setAttribute('webkit-playsinline', 'true');
+                video.setAttribute('playsinline', 'true');
+              }
+              
               await video.play();
               console.log('Video started on retry');
             } catch (retryError) {
               console.error('Video retry failed:', retryError);
+              
+              // Final iOS fallback - try to play on next user interaction
+              if (isIOS) {
+                const playOnNextInteraction = async () => {
+                  try {
+                    await video.play();
+                    console.log('Video started on iOS fallback');
+                    document.removeEventListener('touchstart', playOnNextInteraction);
+                    document.removeEventListener('click', playOnNextInteraction);
+                  } catch (finalError) {
+                    console.error('iOS video fallback failed:', finalError);
+                  }
+                };
+                
+                document.addEventListener('touchstart', playOnNextInteraction, { once: true, passive: true });
+                document.addEventListener('click', playOnNextInteraction, { once: true });
+              }
             }
           }, 500);
         }
@@ -139,7 +208,7 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
 
       startVideo();
     }
-  }, [videoReady, videoStarted, videoTexture]);
+  }, [videoReady, videoStarted, videoTexture, isIOS, userInteracted]);
 
   useFrame((state) => {
     if (!ref.current) return;
