@@ -37,12 +37,13 @@ export const AudioControls = () => {
     handleToggle(e as any);
   }, [handleToggle]);
 
-  // Windows-style speaker icon component
+  // Windows-style speaker icon component - increased by 30%
   const SpeakerIcon = ({ isPlaying: playing, size = 24 }: { isPlaying: boolean; size?: number }) => {
+    const adjustedSize = size * 1.3; // 30% increase
     return (
       <svg 
-        width={size} 
-        height={size} 
+        width={adjustedSize} 
+        height={adjustedSize} 
         viewBox="0 0 24 24" 
         fill="white"
         style={{ display: 'block' }}
@@ -79,11 +80,11 @@ export const AudioControls = () => {
         top: '25px',
         left: '25px',
         zIndex: 1000,
-        width: '50px',
-        height: '50px',
-        borderRadius: '50%',
-        border: '2px solid rgba(255, 255, 255, 0.8)',
-        backgroundColor: isPlaying ? 'rgba(0, 150, 0, 0.8)' : 'rgba(150, 0, 0, 0.8)',
+        width: 'auto',
+        height: 'auto',
+        padding: '8px',
+        border: 'none',
+        backgroundColor: 'transparent',
         color: 'white',
         cursor: 'pointer',
         display: 'flex',
@@ -91,9 +92,6 @@ export const AudioControls = () => {
         justifyContent: 'center',
         fontSize: isMobile ? '16px' : '18px',
         transition: 'all 0.3s ease',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
         outline: 'none',
         WebkitTapHighlightColor: 'transparent',
         touchAction: 'manipulation',
@@ -103,13 +101,13 @@ export const AudioControls = () => {
       onMouseEnter={(e) => {
         if (!isMobile) {
           e.currentTarget.style.transform = 'scale(1.1)';
-          e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.4)';
+          e.currentTarget.style.filter = 'drop-shadow(0 2px 8px rgba(255, 255, 255, 0.3))';
         }
       }}
       onMouseLeave={(e) => {
         if (!isMobile) {
           e.currentTarget.style.transform = 'scale(1)';
-          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+          e.currentTarget.style.filter = 'none';
         }
       }}
       title={isPlaying ? 'Pausar música' : 'Tocar música'}
