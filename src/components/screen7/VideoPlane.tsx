@@ -20,6 +20,7 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
   const scale = windowSize.map(size => size * 0.7);
   const [videoReady, setVideoReady] = useState(false);
   const [videoStarted, setVideoStarted] = useState(false);
+  const [hasTriggered, setHasTriggered] = useState(false);
 
   const videoTexture = useVideoTexture(texturePath, {
     autoplay: false,
@@ -42,9 +43,15 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
     video.setAttribute('webkit-playsinline', 'true');
     video.setAttribute('controls', 'false');
     video.setAttribute('preload', 'auto');
+    video.volume = 0;
     
     const handleCanPlay = () => {
       console.log('Screen7 video can play');
+      setVideoReady(true);
+    };
+
+    const handleLoadedMetadata = () => {
+      console.log('Screen7 video metadata loaded');
       setVideoReady(true);
     };
 
@@ -61,6 +68,7 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
     };
 
     video.addEventListener('canplay', handleCanPlay);
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
     video.addEventListener('play', handlePlay);
     video.addEventListener('error', handleError);
     
@@ -68,6 +76,7 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
 
     return () => {
       video.removeEventListener('canplay', handleCanPlay);
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
       video.removeEventListener('play', handlePlay);
       video.removeEventListener('error', handleError);
     };
@@ -82,17 +91,20 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
     ref.current.rotation.y = scrollOffset * 2.5;
 
     // Start video when it comes into view (around screen 7 position)
-    // Screen 7 is roughly at scroll offset 0.6-0.7
-    if (scrollOffset > 0.55 && videoReady && !videoStarted) {
+    // Screen 7 is roughly at scroll offset 0.55-0.65
+    if (scrollOffset > 0.5 && videoReady && !hasTriggered) {
+      setHasTriggered(true);
+      
       const video = videoTexture.source.data as HTMLVideoElement;
       
-      console.log('Attempting to start Screen7 video...');
+      console.log('Attempting to start Screen7 video at scroll offset:', scrollOffset);
       
       const startVideo = async () => {
         try {
           video.muted = true;
           video.playsInline = true;
           video.currentTime = 0;
+          video.volume = 0;
           await video.play();
           console.log('Screen7 video started successfully');
         } catch (error) {
@@ -103,14 +115,21 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
             try {
               video.load();
               await new Promise(resolve => {
-                video.addEventListener('canplay', resolve, { once: true });
+                const handleCanPlay = () => {
+                  video.removeEventListener('canplay', handleCanPlay);
+                  resolve(null);
+                };
+                video.addEventListener('canplay', handleCanPlay);
               });
+              
+              video.muted = true;
+              video.volume = 0;
               await video.play();
               console.log('Screen7 video started on retry');
             } catch (retryError) {
               console.error('Screen7 video retry failed:', retryError);
             }
-          }, 1000);
+          }, 500);
         }
       };
 
