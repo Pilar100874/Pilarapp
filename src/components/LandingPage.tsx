@@ -12,6 +12,8 @@ interface BeforeInstallPromptEvent extends Event {
 export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isPWAHovered, setIsPWAHovered] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [isFullyLoaded, setIsFullyLoaded] = useState(false);
   const logoTexture = useTexture('/logo_branco.png');
   const startButtonTexture = useTexture('/iniciar.png');
   const textRef = useRef<any>();
@@ -23,6 +25,27 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
+
+  // Loading simulation
+  useEffect(() => {
+    const loadingInterval = setInterval(() => {
+      setLoadingProgress(prev => {
+        const increment = Math.random() * 15 + 5; // Random increment between 5-20%
+        const newProgress = Math.min(prev + increment, 100);
+        
+        if (newProgress >= 100) {
+          clearInterval(loadingInterval);
+          setTimeout(() => {
+            setIsFullyLoaded(true);
+          }, 300); // Small delay after reaching 100%
+        }
+        
+        return newProgress;
+      });
+    }, 200 + Math.random() * 300); // Random interval between 200-500ms
+
+    return () => clearInterval(loadingInterval);
+  }, []);
 
   // PWA setup
   useEffect(() => {
@@ -91,6 +114,11 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
     getSpacing(0.6, 0.4, 0.7, 0.8, 1.0),  // Y position (top)
     0.1 // Z position (slightly forward)
   ] as [number, number, number];
+
+  // Loading bar dimensions and position
+  const loadingBarWidth = getScale(3.0, 2.5, 3.5, 4.0, 4.5);
+  const loadingBarHeight = getScale(0.08, 0.06, 0.1, 0.12, 0.15);
+  const loadingBarY = getSpacing(-1.2, -1.0, -1.3, -1.4, -1.6);
 
   // Smooth handlers to prevent flicker
   const handlePointerEnter = useCallback(() => {
@@ -188,25 +216,72 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         <meshBasicMaterial ref={materialRef as any} transparent depthTest={false} depthWrite={false} />
       </Text>
 
-      <mesh
-        position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}
-        scale={buttonScale}
-        onClick={handleClick}
-        onPointerEnter={handlePointerEnter}
-        onPointerLeave={handlePointerLeave}
-      >
-        <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial
-          map={startButtonTexture}
-          transparent
-          opacity={1}
-          depthTest={false}
-          depthWrite={false}
-        />
-      </mesh>
+      {/* Loading Progress Bar */}
+      {!isFullyLoaded && (
+        <group position-y={loadingBarY}>
+          {/* Background bar */}
+          <mesh position-z={0.05}>
+            <planeGeometry args={[loadingBarWidth, loadingBarHeight]} />
+            <meshBasicMaterial 
+              color="#333333" 
+              transparent 
+              opacity={0.3}
+              depthWrite={false}
+            />
+          </mesh>
+          
+          {/* Progress bar */}
+          <mesh 
+            position-z={0.06} 
+            position-x={-loadingBarWidth/2 + (loadingBarWidth * loadingProgress/100)/2}
+            scale-x={loadingProgress/100}
+          >
+            <planeGeometry args={[loadingBarWidth, loadingBarHeight]} />
+            <meshBasicMaterial 
+              color="#ffffff" 
+              transparent 
+              opacity={0.8}
+              depthWrite={false}
+            />
+          </mesh>
+          
+          {/* Progress percentage text */}
+          <Text
+            fontSize={getFontSize(0.15, 0.12, 0.18, 0.2, 0.25)}
+            color="white"
+            position-z={0.07}
+            position-y={getSpacing(-0.25, -0.2, -0.28, -0.3, -0.35)}
+            font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
+            anchorX="center"
+            anchorY="middle"
+          >
+            {Math.round(loadingProgress)}%
+          </Text>
+        </group>
+      )}
+
+      {/* Start Button - only show when fully loaded */}
+      {isFullyLoaded && (
+        <mesh
+          position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}
+          scale={buttonScale}
+          onClick={handleClick}
+          onPointerEnter={handlePointerEnter}
+          onPointerLeave={handlePointerLeave}
+        >
+          <planeGeometry args={[1, 1]} />
+          <meshBasicMaterial
+            map={startButtonTexture}
+            transparent
+            opacity={1}
+            depthTest={false}
+            depthWrite={false}
+          />
+        </mesh>
+      )}
 
       {/* PWA Install Button - 3D integrated */}
-      {showPWAButton && (
+      {showPWAButton && isFullyLoaded && (
         <group
           position={pwaButtonPosition}
           scale={pwaButtonScale}
