@@ -1,13 +1,32 @@
 import { Text, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { MeshBasicMaterial } from 'three';
+import { MeshBasicMaterial, Shape, ShapeGeometry } from 'three';
 import { useResponsiveText } from '@/utils/responsive';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
+
+// Function to create rounded rectangle shape
+const createRoundedRectShape = (width: number, height: number, radius: number) => {
+  const shape = new Shape();
+  const x = -width / 2;
+  const y = -height / 2;
+  
+  shape.moveTo(x, y + radius);
+  shape.lineTo(x, y + height - radius);
+  shape.quadraticCurveTo(x, y + height, x + radius, y + height);
+  shape.lineTo(x + width - radius, y + height);
+  shape.quadraticCurveTo(x + width, y + height, x + width, y + height - radius);
+  shape.lineTo(x + width, y + radius);
+  shape.quadraticCurveTo(x + width, y, x + width - radius, y);
+  shape.lineTo(x + radius, y);
+  shape.quadraticCurveTo(x, y, x, y + radius);
+  
+  return shape;
+};
 
 export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -91,18 +110,14 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   // Font size with orientation adjustments
   const fontSize = getFontSize(0.3, 0.25, 0.4, 0.45, 0.6);
   
+  // Button dimensions and styling
+  const buttonWidth = getScale(2.4, 2.0, 2.8, 3.2, 3.8);
+  const buttonHeight = getScale(0.6, 0.5, 0.7, 0.8, 0.95);
+  const borderRadius = getScale(0.15, 0.125, 0.175, 0.2, 0.24); // Rounded corners
+  const buttonFontSize = getFontSize(0.18, 0.15, 0.21, 0.24, 0.29);
+  
   // Button scale with hover and orientation
-  const buttonScale = (isHovered 
-    ? [
-        getFontSize(1.3, 1.1, 1.6, 1.8, 2.16), 
-        getFontSize(0.325, 0.275, 0.4, 0.45, 0.54), 
-        1
-      ]
-    : [
-        getFontSize(1.2, 1.0, 1.45, 1.65, 1.98), 
-        getFontSize(0.3, 0.25, 0.3625, 0.4125, 0.495), 
-        1
-      ]) as [number, number, number];
+  const buttonScale = isHovered ? 1.05 : 1;
 
   // PWA button scale and position
   const pwaButtonScale = (isPWAHovered 
@@ -119,6 +134,10 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const loadingBarWidth = getScale(1.5, 1.25, 1.75, 2.0, 2.25); // Reduced from 3.0-4.5 to 1.5-2.25
   const loadingBarHeight = getScale(0.04, 0.03, 0.05, 0.06, 0.075); // Reduced from 0.08-0.15 to 0.04-0.075
   const loadingBarY = getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0); // Same position as start button
+
+  // Create rounded rectangle geometry for button
+  const roundedShape = createRoundedRectShape(buttonWidth, buttonHeight, borderRadius);
+  const roundedGeometry = new ShapeGeometry(roundedShape);
 
   // Smooth handlers to prevent flicker
   const handlePointerEnter = useCallback(() => {
@@ -260,24 +279,47 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
         </group>
       )}
 
-      {/* Start Button - only show when fully loaded */}
+      {/* Start Button - only show when fully loaded with rounded corners */}
       {isFullyLoaded && (
-        <mesh
+        <group
           position-y={getSpacing(-0.6, -0.4, -0.7, -0.8, -1.0)}
-          scale={buttonScale}
+          scale={[buttonScale, buttonScale, 1]}
           onClick={handleClick}
           onPointerEnter={handlePointerEnter}
           onPointerLeave={handlePointerLeave}
         >
-          <planeGeometry args={[1, 1]} />
-          <meshBasicMaterial
-            map={startButtonTexture}
-            transparent
-            opacity={1}
-            depthTest={false}
-            depthWrite={false}
-          />
-        </mesh>
+          {/* Button background with rounded corners */}
+          <mesh position-z={0.01} geometry={roundedGeometry}>
+            <meshBasicMaterial 
+              color={isHovered ? "#ffffff" : "#f0f0f0"} 
+              transparent 
+              opacity={0.95}
+              depthWrite={false}
+            />
+          </mesh>
+          
+          {/* Button border */}
+          <mesh position-z={0.005} geometry={roundedGeometry} scale={[1.02, 1.02, 1]}>
+            <meshBasicMaterial 
+              color={isHovered ? "#333333" : "#666666"} 
+              transparent 
+              opacity={0.3}
+              depthWrite={false}
+            />
+          </mesh>
+          
+          {/* Button text */}
+          <Text
+            fontSize={buttonFontSize}
+            color={isHovered ? "#000000" : "#333333"}
+            position-z={0.02}
+            font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
+            anchorX="center"
+            anchorY="middle"
+          >
+            INICIAR EXPERIÊNCIA
+          </Text>
+        </group>
       )}
 
       {/* PWA Install Button - 3D integrated */}
