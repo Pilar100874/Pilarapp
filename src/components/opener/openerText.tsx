@@ -16,10 +16,11 @@ export const OpenerText = ({ py }: OpenerText) => {
   const text2Ref = useRef<any>();
   const text3Ref = useRef<any>();
   const text4Ref = useRef<any>();
+  const text5Ref = useRef<any>();
   const arrowRef = useRef<any>();
   const [startFade, setStartFade] = useState(false);
   const scroll = useScroll();
-  const { getFontSize, getSpacing, getScale, isMobile } = useResponsiveText();
+  const { getFontSize, getSpacing, getScale, isMobile, isTabletPortrait } = useResponsiveText();
 
   // Responsive font sizes with orientation consideration
   const text1Size = getFontSize(0.2, 0.18, 0.25, 0.28, 0.35);
@@ -60,7 +61,7 @@ export const OpenerText = ({ py }: OpenerText) => {
   useFrame((state) => {
     if (!logoRef.current?.material || !text1Ref.current?.material || 
         !text2Ref.current?.material || !arrowRef.current?.material ||
-        (isMobile && (!text3Ref.current?.material || !text4Ref.current?.material))) return;
+        ((isMobile || isTabletPortrait) && (!text3Ref.current?.material || !text4Ref.current?.material || !text5Ref.current?.material))) return;
 
     if (state.clock.getElapsedTime() > 1 && !startFade) {
       setStartFade(true);
@@ -73,18 +74,20 @@ export const OpenerText = ({ py }: OpenerText) => {
       logoRef.current.material.opacity = opacity;
       text1Ref.current.material.opacity = opacity;
       text2Ref.current.material.opacity = opacity;
-      if (isMobile) {
+      if (isMobile || isTabletPortrait) {
         text3Ref.current.material.opacity = opacity;
         text4Ref.current.material.opacity = opacity;
+        text5Ref.current.material.opacity = opacity;
       }
       arrowRef.current.material.opacity = opacity;
     } else {
       logoRef.current.material.opacity = 0;
       text1Ref.current.material.opacity = 0;
       text2Ref.current.material.opacity = 0;
-      if (isMobile) {
+      if (isMobile || isTabletPortrait) {
         text3Ref.current.material.opacity = 0;
         text4Ref.current.material.opacity = 0;
+        text5Ref.current.material.opacity = 0;
       }
       arrowRef.current.material.opacity = 0;
     }
@@ -126,7 +129,7 @@ export const OpenerText = ({ py }: OpenerText) => {
         <meshBasicMaterial transparent opacity={0} depthTest={false} depthWrite={false} />
       </Text>
 
-      {isMobile ? (
+      {(isMobile || isTabletPortrait) ? (
         <>
           <Text
             ref={text2Ref}
