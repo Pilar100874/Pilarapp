@@ -1,16 +1,20 @@
 import { Scroll } from '@react-three/drei';
-import { SCREEN9_OFFSET_START_Y, SCREEN9_MOBILE_PORTRAIT_ADJUSTMENT } from './constants';
+import { SCREEN9_OFFSET_START_Y, SCREEN9_MOBILE_PORTRAIT_ADJUSTMENT, SCREEN9_TABLET_PORTRAIT_ADJUSTMENT } from './constants';
 import { dataScreen9 } from './data';
 import { Word } from './word';
 import { useResponsiveText } from '@/utils/responsive';
 
 export const Screen9 = () => {
-  const { isMobilePortrait } = useResponsiveText();
+  const { isMobilePortrait, isTabletPortrait } = useResponsiveText();
   
-  // Adjust position for mobile portrait - move up by 6cm
-  const adjustedY = isMobilePortrait 
-    ? SCREEN9_OFFSET_START_Y + SCREEN9_MOBILE_PORTRAIT_ADJUSTMENT 
-    : SCREEN9_OFFSET_START_Y;
+  // Adjust position based on device and orientation
+  let adjustedY = SCREEN9_OFFSET_START_Y;
+  
+  if (isMobilePortrait) {
+    adjustedY = SCREEN9_OFFSET_START_Y + SCREEN9_MOBILE_PORTRAIT_ADJUSTMENT;
+  } else if (isTabletPortrait) {
+    adjustedY = SCREEN9_OFFSET_START_Y + SCREEN9_TABLET_PORTRAIT_ADJUSTMENT;
+  }
 
   return (
     <Scroll>
