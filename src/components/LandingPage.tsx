@@ -14,6 +14,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isPWAHovered, setIsPWAHovered] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [isFullyLoaded, setIsFullyLoaded] = useState(false);
+  const [userInteracted, setUserInteracted] = useState(false);
   const logoTexture = useTexture('/logo_branco.png');
   const startButtonTexture = useTexture('/iniciar.png');
   const textRef = useRef<any>();
@@ -26,23 +27,44 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
 
-  // Loading simulation
+  // Detect user interaction for iOS compatibility
   useEffect(() => {
+    const handleUserInteraction = () => {
+      setUserInteracted(true);
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+    };
+
+    document.addEventListener('touchstart', handleUserInteraction, { passive: true });
+    document.addEventListener('click', handleUserInteraction);
+
+    return () => {
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+    };
+  }, []);
+
+  // Loading simulation - faster on iOS
+  useEffect(() => {
+    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+    const baseInterval = isIOS ? 150 : 200; // Faster loading on iOS
+    const randomRange = isIOS ? 200 : 300; // Smaller random range on iOS
+    
     const loadingInterval = setInterval(() => {
       setLoadingProgress(prev => {
-        const increment = Math.random() * 15 + 5; // Random increment between 5-20%
+        const increment = Math.random() * 15 + (isIOS ? 8 : 5); // Faster increment on iOS
         const newProgress = Math.min(prev + increment, 100);
         
         if (newProgress >= 100) {
           clearInterval(loadingInterval);
           setTimeout(() => {
             setIsFullyLoaded(true);
-          }, 300); // Small delay after reaching 100%
+          }, isIOS ? 200 : 300); // Shorter delay on iOS
         }
         
         return newProgress;
       });
-    }, 200 + Math.random() * 300); // Random interval between 200-500ms
+    }, baseInterval + Math.random() * randomRange);
 
     return () => clearInterval(loadingInterval);
   }, []);
@@ -137,8 +159,14 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
   const handleClick = useCallback((event: any) => {
     event.stopPropagation();
+    
+    // Ensure user interaction is registered for iOS
+    if (!userInteracted) {
+      setUserInteracted(true);
+    }
+    
     onStart();
-  }, [onStart]);
+  }, [onStart, userInteracted]);
 
   // PWA button handlers
   const handlePWAPointerEnter = useCallback(() => {

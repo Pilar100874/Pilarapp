@@ -20,13 +20,34 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
   const ref = useRef<Group>(null);
   const [videoStarted, setVideoStarted] = useState(false);
   const [musicStarted, setMusicStarted] = useState(false);
+  const [userInteracted, setUserInteracted] = useState(false);
   const { play } = useAudio();
   const initialY = -15; // Start position further down
   const targetY = 0; // Final position at top
 
   const videoTexture = useVideoTexture(texturePath, {
     autoplay: false, // Don't start playing immediately
+    muted: true, // Mute video for iOS autoplay compatibility
+    playsInline: true, // Required for iOS
+    loop: true,
   });
+
+  // Detect user interaction for iOS
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      setUserInteracted(true);
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+    };
+
+    document.addEventListener('touchstart', handleUserInteraction, { passive: true });
+    document.addEventListener('click', handleUserInteraction);
+
+    return () => {
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+    };
+  }, []);
 
   useFrame((state) => {
     if (!ref.current) return;
@@ -42,20 +63,38 @@ export const VideoPlane = ({ texturePath }: VideoPlane) => {
     // Animate position from bottom to top
     ref.current.position.y = initialY + (targetY - initialY) * easedProgress;
 
-    // Start video when animation is almost complete
-    if (progress >= 0.8 && !videoStarted) {
+    // Start video when animation is almost complete AND user has interacted
+    if (progress >= 0.8 && !videoStarted && userInteracted) {
       setVideoStarted(true);
-      (videoTexture.source.data as HTMLVideoElement).play();
+      const video = videoTexture.source.data as HTMLVideoElement;
+      
+      // iOS-specific video setup
+      video.muted = true;
+      video.playsInline = true;
+      video.setAttribute('playsinline', 'true');
+      video.setAttribute('webkit-playsinline', 'true');
+      
+      video.play().catch(error => {
+        console.warn('Video autoplay failed:', error);
+        // Fallback: try again after a short delay
+        setTimeout(() => {
+          video.play().catch(e => console.warn('Video retry failed:', e));
+        }, 500);
+      });
     }
 
-    // Start music automatically when video starts
-    if (videoStarted && !musicStarted) {
+    // Start music automatically when video starts (only after user interaction)
+    if (videoStarted && !musicStarted && userInteracted) {
       setMusicStarted(true);
       console.log('Starting music automatically in opener...');
       
-      // Use the centralized audio manager
+      // Use the centralized audio manager with iOS-specific handling
       play().catch(error => {
         console.warn('Music autoplay failed in opener:', error);
+        // For iOS, we might need to wait for explicit user interaction
+        if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+          console.log('iOS detected - music will start on next user interaction');
+        }
       });
     }
 

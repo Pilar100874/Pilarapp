@@ -99,10 +99,19 @@ canvas {
   outline: none !important;
 }
 
-/* Ensure audio elements work properly on mobile */
-audio {
+/* Ensure audio and video elements work properly on mobile */
+audio, video {
   -webkit-playsinline: true;
   playsinline: true;
+}
+
+/* iOS-specific video optimizations */
+video {
+  -webkit-playsinline: true;
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 @media (prefers-color-scheme: light) {
@@ -132,5 +141,26 @@ audio {
   button {
     min-height: 44px;
     min-width: 44px;
+  }
+  
+  /* iOS-specific video fixes */
+  video {
+    object-fit: cover;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+  video {
+    -webkit-playsinline: true;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform;
+  }
+  
+  audio {
+    -webkit-playsinline: true;
   }
 }

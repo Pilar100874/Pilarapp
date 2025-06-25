@@ -26,6 +26,24 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [userInteracted, setUserInteracted] = useState(false);
+
+  useEffect(() => {
+    // Detect user interaction for iOS
+    const handleUserInteraction = () => {
+      setUserInteracted(true);
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+    };
+
+    document.addEventListener('touchstart', handleUserInteraction, { passive: true });
+    document.addEventListener('click', handleUserInteraction);
+
+    return () => {
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+    };
+  }, []);
 
   useEffect(() => {
     // Create single audio instance
@@ -33,6 +51,12 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
     audioRef.current.loop = true;
     audioRef.current.volume = 0.7;
     audioRef.current.preload = 'auto';
+
+    // iOS-specific audio setup
+    if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+      audioRef.current.setAttribute('playsinline', 'true');
+      audioRef.current.setAttribute('webkit-playsinline', 'true');
+    }
 
     const audio = audioRef.current;
 
@@ -60,11 +84,19 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
       console.error('Audio error:', e);
     };
 
+    const handleStalled = () => {
+      console.warn('Audio stalled, attempting to reload...');
+      if (audio.readyState < 3) {
+        audio.load();
+      }
+    };
+
     audio.addEventListener('canplaythrough', handleCanPlayThrough);
     audio.addEventListener('play', handlePlay);
     audio.addEventListener('pause', handlePause);
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('error', handleError);
+    audio.addEventListener('stalled', handleStalled);
 
     // Start loading
     audio.load();
@@ -75,32 +107,61 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
       audio.removeEventListener('pause', handlePause);
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
+      audio.removeEventListener('stalled', handleStalled);
       audio.pause();
       audio.src = '';
     };
   }, []);
 
   const play = async () => {
-    if (!audioRef.current || !isLoaded) return;
+    if (!audioRef.current || !isLoaded) {
+      console.warn('Audio not ready for playback');
+      return;
+    }
+
+    // Check if user has interacted (required for iOS)
+    if (!userInteracted && /iPhone|iPad|iPod/.test(navigator.userAgent)) {
+      console.warn('iOS requires user interaction before audio playback');
+      return;
+    }
     
     try {
+      // Reset audio position if it's ended
+      if (audioRef.current.ended) {
+        audioRef.current.currentTime = 0;
+      }
+
       await audioRef.current.play();
       console.log('Audio play successful');
     } catch (error) {
       console.error('Audio play failed:', error);
       
-      // Retry logic for mobile
-      try {
-        audioRef.current.load();
-        setTimeout(async () => {
+      // Enhanced retry logic for iOS
+      if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+        try {
+          // Try to unlock audio context on iOS
+          audioRef.current.muted = true;
+          await audioRef.current.play();
+          audioRef.current.muted = false;
+          audioRef.current.volume = 0.7;
+          console.log('iOS audio unlocked and playing');
+        } catch (iosError) {
+          console.error('iOS audio unlock failed:', iosError);
+          
+          // Final fallback: reload and retry
           try {
-            await audioRef.current?.play();
-          } catch (retryError) {
-            console.error('Audio retry failed:', retryError);
+            audioRef.current.load();
+            setTimeout(async () => {
+              try {
+                await audioRef.current?.play();
+              } catch (finalError) {
+                console.error('Final audio retry failed:', finalError);
+              }
+            }, 1000);
+          } catch (reloadError) {
+            console.error('Audio reload failed:', reloadError);
           }
-        }, 500);
-      } catch (reloadError) {
-        console.error('Audio reload failed:', reloadError);
+        }
       }
     }
   };
