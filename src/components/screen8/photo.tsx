@@ -44,18 +44,18 @@ export const Photo = (props: Photo) => {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const { viewport } = useThree();
-  const { isMobilePortrait } = useResponsiveText();
+  const { isMobilePortrait, isTabletPortrait } = useResponsiveText();
 
-  // Responsive configuration
+  // Responsive configuration - now includes tablet portrait
   const isMobile = viewport.width < 5;
-  const columns = isMobile ? 2 : 3;
+  const columns = (isMobile || isTabletPortrait) ? 2 : 3; // Use 2 columns for both mobile and tablet portrait
   
   // Base spacing values
-  let spacing = isMobile ? 2.2 : 2.8;
-  let verticalSpacing = isMobile ? 3.2 : 4.3;
+  let spacing = (isMobile || isTabletPortrait) ? 2.2 : 2.8; // Same spacing for mobile and tablet portrait
+  let verticalSpacing = (isMobile || isTabletPortrait) ? 3.2 : 4.3; // Same vertical spacing
   
-  // Reduce spacing by 20% for mobile portrait
-  if (isMobilePortrait) {
+  // Reduce spacing by 20% for portrait orientations
+  if (isMobilePortrait || isTabletPortrait) {
     spacing = spacing * 0.8; // 20% reduction
     verticalSpacing = verticalSpacing * 0.8; // 20% reduction
   }
@@ -67,17 +67,17 @@ export const Photo = (props: Photo) => {
   const baseY = -row * verticalSpacing;
   const baseZ = 0;
 
-  // Apply 20% reduction to the base scale, plus additional 10% for mobile portrait
+  // Apply 20% reduction to the base scale, plus additional 10% for portrait orientations
   const baseScale = 0.8; // 20% reduction from 1
-  let scale = isMobile ? (baseScale * 0.7) : baseScale;
+  let scale = (isMobile || isTabletPortrait) ? (baseScale * 0.7) : baseScale; // Same scale for mobile and tablet portrait
   
-  // Additional 10% reduction for mobile portrait
-  if (isMobilePortrait) {
+  // Additional 10% reduction for portrait orientations
+  if (isMobilePortrait || isTabletPortrait) {
     scale = scale * 0.9; // Additional 10% reduction
   }
 
   // Button configuration - moved up 3cm (0.3 units) from previous position
-  const buttonFontSize = isMobile ? 0.12 : 0.15;
+  const buttonFontSize = (isMobile || isTabletPortrait) ? 0.12 : 0.15; // Same font size for mobile and tablet portrait
   const imageHeight = 4.5 * scale; // Image height with scale applied
   const buttonY = baseY - (imageHeight / 2) + 0.05 + 0.3; // Added 0.3 units (3cm) to move up
 
@@ -118,11 +118,11 @@ export const Photo = (props: Photo) => {
     if (!ref.current) return;
 
     const scrollOffset = scroll.offset;
-    const parallaxStrength = isMobile ? 1.5 : 2;
+    const parallaxStrength = (isMobile || isTabletPortrait) ? 1.5 : 2; // Same parallax for mobile and tablet portrait
     const parallaxY = scrollOffset * parallaxStrength;
     
-    const mouseX = state.mouse.x * (isMobile ? 0.3 : 0.5);
-    const mouseY = state.mouse.y * (isMobile ? 0.3 : 0.5);
+    const mouseX = state.mouse.x * ((isMobile || isTabletPortrait) ? 0.3 : 0.5); // Same mouse sensitivity
+    const mouseY = state.mouse.y * ((isMobile || isTabletPortrait) ? 0.3 : 0.5);
 
     // Smooth position interpolation
     const targetX = baseX + mouseX;
@@ -139,8 +139,8 @@ export const Photo = (props: Photo) => {
     ref.current.scale.y = MathUtils.lerp(ref.current.scale.y, targetScale, 0.1);
 
     // Smooth rotation interpolation
-    const targetRotationX = mouseY * (isMobile ? 0.1 : 0.2);
-    const targetRotationY = mouseX * (isMobile ? 0.1 : 0.2);
+    const targetRotationX = mouseY * ((isMobile || isTabletPortrait) ? 0.1 : 0.2); // Same rotation for mobile and tablet portrait
+    const targetRotationY = mouseX * ((isMobile || isTabletPortrait) ? 0.1 : 0.2);
     
     ref.current.rotation.x = MathUtils.lerp(ref.current.rotation.x, targetRotationX, 0.1);
     ref.current.rotation.y = MathUtils.lerp(ref.current.rotation.y, targetRotationY, 0.1);
