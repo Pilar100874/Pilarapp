@@ -230,7 +230,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
             />
           </mesh>
           
-          {/* Progress bar */}
+          {/* Progress bar - changed to green */}
           <mesh 
             position-z={0.06} 
             position-x={-loadingBarWidth/2 + (loadingBarWidth * loadingProgress/100)/2}
@@ -238,7 +238,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
           >
             <planeGeometry args={[loadingBarWidth, loadingBarHeight]} />
             <meshBasicMaterial 
-              color="#ffffff" 
+              color="#00ff00" 
               transparent 
               opacity={0.8}
               depthWrite={false}
